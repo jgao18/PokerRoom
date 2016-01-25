@@ -33,9 +33,7 @@ function init() {
 
   // Array of button names
   buttonNames = ["Start","How to Play"];
-  start_game();
 
-  stage.update();
   menu();
 }
 
