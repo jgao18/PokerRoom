@@ -21,14 +21,44 @@
 		var width = canvas.width;
 		var height = canvas.height;
 		
-		// Array of possible card numbers
-		cardNumber = [1,2,3,4,5,6,7,8,9,10,"Jack","Queen","King","Ace"];
+		// Random card Number
+		function randomNum() {
+			var cardNumber = [1,2,3,4,5,6,7,8,9,10,"Jack","Queen","King","Ace"];
+			var item = cardNumber[Math.floor(Math.random()*cardNumber.length)];
+			return item;
+		}
+		
+		function randomSuit() {
+			var suits = ["Spade","Club","Hearts","Club"];
+			var pick = suits[Math.floor(Math.random()*suits.length)];
+			return pick;
+		}
 		
 		// Array of button names
 		buttonNames = ["Start","How to Play"];
 
 		function init() {
 			menu();
+			
+			var example = new createjs.Container();
+			var rect = new createjs.Shape();
+			rect.graphics.beginFill("white").drawRect(120,150,50,70);
+			var circle = new createjs.Shape();
+			circle.graphics.beginFill("red").drawCircle(120,150,20);
+			example.addChild(rect,circle);
+			stage.addChild(example);
+			createjs.Ticker.addEventListener("tick", handleTick);
+			function handleTick(event) {
+				example.getChildAt(0).width 
+				//example.circle.radius += 1;
+			    stage.update();
+			}
+			
+			var diamond = new createjs.Shape();
+			diamond.graphics.beginFill("red").drawRect(500,80,50,50);
+			diamond.rotation = 45;
+			stage.addChild(diamond);
+			stage.update();
 		}
 		
 		// main menu to game
@@ -73,6 +103,7 @@
 			return;
 		}
 		
+		
 		// Creates the poker table and background
 		function pokertable() {
 			// Retrieving the pokertable and background
@@ -100,6 +131,7 @@
 			rect.y = 100;
 			stage.addChild(rect);
 			stage.update();
+			// Need to return card
 			return;
 		}
 		
@@ -113,6 +145,7 @@
 			function handleTick(event) {
 			     stage.update();
 			}
+			// Need to return spade
 			return;
 		}
 		
@@ -126,6 +159,7 @@
 			function handleTick(event) {
 			     stage.update();
 			}
+			// Need to return Heart
 			return;
 		}
 		
@@ -139,6 +173,7 @@
 			function handleTick(event) {
 			     stage.update();
 			}
+			// Need to return Diamond
 			return;
 		}
 		
@@ -152,6 +187,7 @@
 			function handleTick(event) {
 			     stage.update();
 			}
+			// Need to return Club
 			return;
 		}
 		
@@ -186,8 +222,7 @@
 							stage.removeChild(user_button);
 							start_game();
 						}
-						
-						if(label == "How to Play")
+						else if(label == "How to Play")
 						{
 							alert("Instructions");
 						}		
