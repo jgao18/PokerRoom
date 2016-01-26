@@ -85,8 +85,8 @@ function paint_suit(x, y, suit, sizeMultiplier)
     heart.graphics.lineTo(x+sm*10.333,y+sm*12.333); // moving drawing point to right, lower
     heart.graphics.lineTo(x+sm*8.333,y+sm*15.333); // right diagonal down line to middle
     heart.graphics.lineTo(x+sm*6.4,y+sm*12.333); // left diagonal left line
-
-    stage.addChild(heart);
+    return heart;
+    //stage.addChild(heart);
   }
   else if (suit == "spade")
   {
@@ -103,7 +103,8 @@ function paint_suit(x, y, suit, sizeMultiplier)
     spade.graphics.moveTo(x+sm*8.333,y+sm*12.333); // moving drawing point to center of 2 circles
     spade.graphics.lineTo(x+sm*9.333,y+sm*14); // right diagonal down line of triangle
     spade.graphics.lineTo(x+sm*7.333,y+sm*14); // straight line of triangle
-    stage.addChild(spade);
+	return spade;
+    //stage.addChild(spade);
   }
   else if (suit == "diamond")
   {
@@ -115,8 +116,8 @@ function paint_suit(x, y, suit, sizeMultiplier)
     diamond.graphics.lineTo(x+sm*10.333,y+sm*13); // right diagonal down \
     diamond.graphics.lineTo(x+sm*8.333,y+sm*15.666); // left diagonal down /
     diamond.graphics.lineTo(x+sm*6.333,y+sm*13); // left diagonal up \
-
-    stage.addChild(diamond);
+    return diamond;
+    //stage.addChild(diamond);
   }
   else if (suit == "club")
   {
@@ -135,7 +136,8 @@ function paint_suit(x, y, suit, sizeMultiplier)
     club.graphics.moveTo(x+sm*8.333,y+sm*12.333); // moving drawing point to center of 2 circles
     club.graphics.lineTo(x+sm*9.333,y+sm*14); // right diagonal down line of triangle
     club.graphics.lineTo(x+sm*7.333,y+sm*14); // straight line of triangle
-    stage.addChild(club);
+	return club;
+    //stage.addChild(club);
   }
 }
 
@@ -143,26 +145,33 @@ function paint_cards(card, posNumberX, posNumberY, posSuitX, posSuitY, tenAdjust
 {
   var tenAdjustment = tenAdjustment || posNumberX; // tenAjustment - optional, in case adjustments are necessary for the two digit number
   var cardColor;
+  
+  var store_objects = new createjs.Container();
+  var store;
+  var number;
 
   if (card.charAt(0) == "h") {
-    paint_suit(posSuitX, posSuitY, "heart", 6)
+    store = paint_suit(posSuitX, posSuitY, "heart", 6)
     cardColor = "red";
   } else if (card.charAt(0) == "c") {
-    paint_suit(posSuitX, posSuitY, "club", 6)
+    store = paint_suit(posSuitX, posSuitY, "club", 6)
     cardColor = "black";
   } else if (card.charAt(0) == "d") {
-    paint_suit(posSuitX, posSuitY, "diamond", 6)
+    store = paint_suit(posSuitX, posSuitY, "diamond", 6)
     cardColor = "red";
   } else if (card.charAt(0) == 's') {
-    paint_suit(posSuitX, posSuitY, "spade", 6)
+    store = paint_suit(posSuitX, posSuitY, "spade", 6)
     cardColor = "black";
   }
 
   if (card.length == 2) {
-    paint_number(card.charAt(1), cardColor, posNumberX, posNumberY);
+    number = paint_number(card.charAt(1), cardColor, posNumberX, posNumberY);
   } else if (card.length == 3) {
-    paint_number(card.substr(1,2), cardColor, tenAdjustment, posNumberY);
+    number = paint_number(card.substr(1,2), cardColor, tenAdjustment, posNumberY);
   }
+  
+  store_objects.addChild(store, number);
+  return store_objects;
 }
 
 function draw_card()
@@ -177,17 +186,32 @@ function draw_card()
 
 function paint_player_cards()
 {
+  var card1;
+  var card2;
+	
   var playerCardOutline1 = new createjs.Shape();
   playerCardOutline1.graphics.beginFill("white").drawRoundRect(width/2.4,height/1.2,50,70,5);
-  stage.addChild(playerCardOutline1);
+  //stage.addChild(playerCardOutline1);
 
   var playerCardOutline2 = new createjs.Shape();
   playerCardOutline2.graphics.beginFill("white").drawRoundRect(width/2,height/1.2,50,70,5);
-  stage.addChild(playerCardOutline2);
+  //stage.addChild(playerCardOutline2);
 
-  paint_cards(draw_card(), width/2.27, height/1.2, width/2.6, height/1.265, width/2.3);
-  paint_cards(draw_card(), width/1.9, height/1.2, width/2.13, height/1.265, width/1.95);
-
+  card1 = paint_cards(draw_card(), width/2.27, height/1.2, width/2.6, height/1.265, width/2.3);
+  card2 = paint_cards(draw_card(), width/1.9, height/1.2, width/2.13, height/1.265, width/1.95);
+  
+  //place the whole card in one container
+  card1.addChildAt(playerCardOutline1,0);
+  card2.addChildAt(playerCardOutline2,0);
+  createjs.Ticker.addEventListener("tick", handleTick);
+  function handleTick(event) {
+	  card1.y -= 1;
+	  card2.y -= 1;
+    stage.update();
+  }
+  
+  stage.addChild(card1,card2);
+  
   stage.update();
   paint_flop();
 }
@@ -240,8 +264,9 @@ function paint_number(number, color, x,y) {
   title.x = x;
   title.y = y;
 
-  stage.addChild(title);
-  stage.update();
+  return title;
+  //stage.addChild(title);
+  //stage.update();
 }
 
 function button(x,y,label,color) {
