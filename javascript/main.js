@@ -1,7 +1,7 @@
 // function Executes on click of login button.
 function clicked(){
-	var user= document.getElementByID("username").value;
-	var pass= document.getElementByID("password").value;
+	var user= document.getElementById("username").value;
+	var pass= document.getElementById("password").value;
 
 	var coruser="test";
 	var corpass="123";
