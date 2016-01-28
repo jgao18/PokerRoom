@@ -1,0 +1,44 @@
+As a user of this software, I want to be able to...
+
+  Accounts and Profiles
+    - Create an account with a unique username and password so that I can begin playing
+    - Login to my existing account so that I can continue playing
+    - Reset my password if I have forgotten it or desire a new one
+    - Upload a profile picture so that I can be recognized easily
+    - View statistics about my account, e.g. chip count, fold frequency, average winning per hand, etc.
+    
+  Online Interaction
+    - Create a room so that other players can join
+    - Customize a room so that I can play as I desire, e.g. room password, max players, blinds
+    - View the rooms with games in progress so that I can join
+    - View a list of online players so that I can interact with them
+    - Request online players to be a friend, so that they can be directly invited to a room
+    - View a list of friends who are online
+    
+  Currency Management
+    - Collect a daily chip reward when I log in so that I am incentivized to play
+    - View an advertisement in return for a chip reward so that I will not be bankrupt
+    - Share chips with others so that I can help friends and pity others
+    
+  Gameplay
+    - View the chips of the other players in the room so that I can play accordingly
+    - View which player is the dealer
+    - View my cards and only my cards
+    - Have a chance to bet, call, fold, or raise before the flop, turn, river, and after the river
+    - Bet, call, fold, or raise when it is my turn to play
+    - View which players are in-play and which are not (folded) 
+    - View the cards of the in-play players after the round has concluded
+    - Receive the winnings of the pot if I have the strongest hand, or if all other players have folded
+    - Toggle a help feature with basic rules and hand strengths
+    - Leave a room that I have joined if I am bankrupt or if I want to quit playing
+    
+  Website settings
+    - Open an options user interface to manipulate settings, e.g. music and SFX volume
+
+
+As a front-end developer of this software, I want to be able to...
+
+  - Paint entire cards at a specified location
+  - Acquire properties and actions of players with simple calls
+  
+  
