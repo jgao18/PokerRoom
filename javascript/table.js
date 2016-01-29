@@ -70,6 +70,10 @@ function start_game() {
   pokertable();
   cards();
   paint_player_cards();
+  passFirstCard();
+  hold();
+  raise();
+  fold();
 }
 
 function paint_suit(x, y, suit, sizeMultiplier)
@@ -252,6 +256,7 @@ function cards() {
   rect.graphics.beginFill("purple").drawRoundRect(200,300,50,70,5);
   stage.addChild(rect);
   stage.update();
+  return rect;
 }
 
 function paint_number(number, color, x,y) {
@@ -308,6 +313,165 @@ function button(x,y,label,color) {
       })
     }
   }
+}
+
+function hold() {
+	
+	var hold_button = new createjs.Container();
+    var hold_text = new createjs.Text("hold", "10px Bembo", "#000");
+    hold_text.textBaseline = "top";
+    hold_text.textAlign = "center";
+
+    var width = hold_text.getMeasuredWidth()+15;
+    var height = hold_text.getMeasuredHeight()+7;
+
+    hold_text.x = 316.5;
+    hold_text.y = 478;
+
+    var background = new createjs.Shape();
+    background.graphics.beginFill("yellow").drawRoundRect(300,475,width,height,10);
+
+    hold_button.addChild(background, hold_text)
+    stage.addChild(hold_button);
+	stage.update();
+}
+
+function raise() {
+	
+	var raise_button = new createjs.Container();
+    var raise_text = new createjs.Text("raise", "10px Bembo", "#000");
+    raise_text.textBaseline = "top";
+    raise_text.textAlign = "center";
+
+    var width = raise_text.getMeasuredWidth()+15;
+    var height = raise_text.getMeasuredHeight()+7;
+
+    raise_text.x = 357;
+    raise_text.y = 478;
+
+    var background = new createjs.Shape();
+    background.graphics.beginFill("yellow").drawRoundRect(340,475,width,height,10);
+
+    raise_button.addChild(background,raise_text)
+    stage.addChild(raise_button);
+	stage.update();
+}
+
+function fold() {
+	
+	var fold_button = new createjs.Container();
+    var fold_text = new createjs.Text("fold", "10px Bembo", "#000");
+    fold_text.textBaseline = "top";
+    fold_text.textAlign = "center";
+
+    var width = fold_text.getMeasuredWidth()+15;
+    var height = fold_text.getMeasuredHeight()+7;
+
+    fold_text.x = 396;
+    fold_text.y = 478;
+
+    var background = new createjs.Shape();
+    background.graphics.beginFill("yellow").drawRoundRect(380,475,width,height,10);
+
+    fold_button.addChild(background,fold_text)
+    stage.addChild(fold_button);
+	stage.update();
+}
+
+
+function cardBack() {
+	var back = new createjs.Shape();
+	back.graphics.beginFill("purple").drawRoundRect(200,300,50,70,5);
+	return back;
+}
+
+// Still needs work
+function tableCard() {
+	var tCard1 = new createjs.Shape();
+	var tCard2 = new createjs.Shape();
+	var tCard3 = new createjs.Shape();
+	var tCard4 = new createjs.Shape();
+	var tCard5 = new createjs.Shape();
+	var tCard1 = cardBack();
+	var tCard2 = cardBack();
+	var tCard3 = cardBack();
+	var tCard4 = cardBack();
+	var tCard5 = cardBack();
+	var limit = 12;
+	stage.addChild(tCard1,tCard2,tCard3,tCard4,tCard5);
+	var cards = [tCard1,tCard2,tCard3,tCard4,tCard5];
+	// So I could put this is an array then access one at a time
+	var i;
+	var j = 0;
+	var tableTicker = createjs.Ticker.addEventListener("tick", handleTick);
+	for (i = 0; i < 5 ; i++) {
+	   var store = cards[i];
+	   function handleTick(event) {
+		 j++;
+		 store.x += 12;
+	     stage.update();
+		 if (j > 20) {
+			createjs.Ticker.off("tick",tableTicker);
+			limit--;
+		 }
+		 console.log(i);
+	  }
+   }
+}
+
+function passFirstCard() {
+	var pCard1 = new createjs.Shape();
+	pCard1.graphics.beginFill("purple").drawRoundRect(200,300,50,70,5);
+	stage.addChild(pCard1);
+	var i = 0;
+    var tick1 = createjs.Ticker.addEventListener("tick", handleTick);
+    function handleTick(event) {
+		 i++;
+		 pCard1.x += 2.2;
+		 pCard1.y += 4;
+         stage.update();
+		 if (i > 50) {
+			createjs.Ticker.off("tick",tick1);
+			passSecondCard();
+		 }
+    }
+}
+
+function passSecondCard() {
+	var pCard2 = new createjs.Shape();
+	pCard2.graphics.beginFill("purple").drawRoundRect(200,300,50,70,5);
+	stage.addChild(pCard2);
+	var i = 0;
+    var tick2 = createjs.Ticker.addEventListener("tick", handleTick);
+    function handleTick(event) {
+		 i++;
+		 pCard2.x += 3.5;
+		 pCard2.y += 4;
+         stage.update();
+		 if (i > 50) {
+			createjs.Ticker.off("tick",tick2);
+			rotateCards();
+		 }
+    }
+}
+
+function rotateCards() {
+   var pCard = new createjs.Shape();
+   var index = stage.numChildren;
+   console.log(index);
+   pCard = stage.getChildAt(index-1);
+   var tick = createjs.Ticker.addEventListener("tick", handleTick);
+   var i = 0;
+   function handleTick(event) {
+	 i++;
+	 pCard.scaleX -= 0.05;
+	 pCard.x += 11;
+     stage.update();
+	 if (i > 20) {
+		createjs.Ticker.off("tick",tick);
+		tableCard();
+	 }
+   }
 }
 
 function how_to_play() {
