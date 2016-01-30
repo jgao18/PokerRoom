@@ -1,0 +1,22 @@
+{
+  "name": "pokerroom",
+  "version": "1.0.0",
+  "description": "Software Engineering Semester Project",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jgao18/PokerRoom.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jgao18/PokerRoom/issues"
+  },
+  "homepage": "https://github.com/jgao18/PokerRoom#readme",
+  "dependencies": {
+    "express": "^4.13.4"
+  }
+}

@@ -1,11 +1,10 @@
 var stage, circle, text;
-var canvas, context, cardNumber, buttonNames;
+var canvas, context, buttonNames;
 var width, height;
 var bg, main;
 var main_backgroud;
-var newDeck, currentDeck, tableCards;
-var cardCount;
-var cardContainer ;
+var deck;
+var socket;
 
 function init() {
   // Creating the stage
@@ -17,25 +16,33 @@ function init() {
   width = canvas.width;
   height = canvas.height;
 
-  cardCount = 52;
-  newDeck = ["hA","h2","h3","h4","h5","h6","h7","h8","h9","h10","hJ","hQ","hK","cA","c2","c3","c4","c5","c6","c7","c8","c9","c10","cJ",
-          "cQ","cK","dA","d2","d3","d4","d5","d6","d7","d8","d9","d10","dJ","dQ","dK","sA","s2","s3","s4","s5","s6","s7","s8","s9","s10",
-          "sJ","sQ","sK"];
-
-  currentDeck = ["hA","h2","h3","h4","h5","h6","h7","h8","h9","h10","hJ","hQ","hK","cA","c2","c3","c4","c5","c6","c7","c8","c9","c10","cJ",
-          "cQ","cK","dA","d2","d3","d4","d5","d6","d7","d8","d9","d10","dJ","dQ","dK","sA","s2","s3","s4","s5","s6","s7","s8","s9","s10",
-          "sJ","sQ","sK"];
-
-  tableCards = [];
-
-  // Array of possible card numbers
-  cardNumber = [1,2,3,4,5,6,7,8,9,10,"Jack","Queen","King","Ace"];
+  deck = new Deck();
+  deck.get_new_deck();
 
   // Array of button names
   buttonNames = ["Start","How to Play"];
 
   menu();
+
+  socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
 }
+
+var setEventHandlers = function() {
+	// Socket connection successful
+	socket.on("connect", onSocketConnected);
+
+	// Socket disconnection
+	socket.on("disconnect", onSocketDisconnect);
+
+	// New player message received
+	socket.on("new player", onNewPlayer);
+
+	// Player move message received
+	socket.on("move player", onMovePlayer);
+
+	// Player removed message received
+	socket.on("remove player", onRemovePlayer);
+};
 
 // main menu to game
 function menu() {
@@ -68,91 +75,15 @@ function menu() {
 function start_game() {
   document.getElementById("demoCanvas").style.background = '#FF0000';
   pokertable();
-  cards();
-  paint_player_cards();
+  paint_deck();
   passFirstCard();
   hold();
   raise();
   fold();
 }
 
-function paint_suit(x, y, suit, sizeMultiplier)
+function paint_card(card, posNumberX, posNumberY, posSuitX, posSuitY, tenAdjustment)
 {
-  sm = sizeMultiplier;
-  if (suit == "heart")
-  {
-    var heart = new createjs.Shape();
-    heart.graphics.beginStroke("red");
-    heart.graphics.beginFill("red");
-    heart.graphics.drawCircle(x+sm*7.333,y+sm*12,sm*1); // left circle
-    heart.graphics.drawCircle(x+sm*9.333,y+sm*12,sm*1); // right circle
-    heart.graphics.lineTo(x+sm*10.333,y+sm*12.333); // moving drawing point to right, lower
-    heart.graphics.lineTo(x+sm*8.333,y+sm*15.333); // right diagonal down line to middle
-    heart.graphics.lineTo(x+sm*6.4,y+sm*12.333); // left diagonal left line
-    return heart;
-    //stage.addChild(heart);
-  }
-  else if (suit == "spade")
-  {
-    y = y + 2*sm; // positional correction
-    var spade = new createjs.Shape();
-    spade.graphics.beginStroke("black");
-    spade.graphics.beginFill("black");
-    spade.graphics.drawCircle(x+sm*7.333,y+sm*12,sm*1); // left circle
-    spade.graphics.drawCircle(x+sm*9.333,y+sm*12,sm*1); // right circle
-    spade.graphics.beginFill("black");
-    spade.graphics.moveTo(x+sm*10.333,y+sm*11.666); // moving drawing point to right, upper
-    spade.graphics.lineTo(x+sm*8.333,y+sm*8.666); // right diagonal up line to middle
-    spade.graphics.lineTo(x+sm*6.4,y+sm*11.666); // left diagonal down
-    spade.graphics.moveTo(x+sm*8.333,y+sm*12.333); // moving drawing point to center of 2 circles
-    spade.graphics.lineTo(x+sm*9.333,y+sm*14); // right diagonal down line of triangle
-    spade.graphics.lineTo(x+sm*7.333,y+sm*14); // straight line of triangle
-	return spade;
-    //stage.addChild(spade);
-  }
-  else if (suit == "diamond")
-  {
-    var diamond = new createjs.Shape();
-    diamond.graphics.beginStroke("red");
-    diamond.graphics.beginFill("red");
-
-    diamond.graphics.moveTo(x+sm*8.333,y+sm*10.666); // starting drawing point
-    diamond.graphics.lineTo(x+sm*10.333,y+sm*13); // right diagonal down \
-    diamond.graphics.lineTo(x+sm*8.333,y+sm*15.666); // left diagonal down /
-    diamond.graphics.lineTo(x+sm*6.333,y+sm*13); // left diagonal up \
-    return diamond;
-    //stage.addChild(diamond);
-  }
-  else if (suit == "club")
-  {
-    y = y + 1.5*sm; // positional correction
-    var club = new createjs.Shape();
-    club.graphics.beginStroke("black");
-    club.graphics.beginFill("black");
-    club.graphics.drawCircle(x+sm*7.333,y+sm*12,sm*1); // left circle
-    club.graphics.drawCircle(x+sm*9.333,y+sm*12,sm*1); // right circle
-
-    club.graphics.moveTo(x+sm*8.333,y+sm*10.333); // moving drawing point to center of circles
-    club.graphics.lineTo(x+sm*8.333,y+sm*11.666); // line up from center of bottom circles to center of top circle
-    club.graphics.endStroke();
-
-    club.graphics.drawCircle(x+sm*8.333,y+sm*10.05,sm*1); // top circle
-    club.graphics.moveTo(x+sm*8.333,y+sm*12.333); // moving drawing point to center of 2 circles
-    club.graphics.lineTo(x+sm*9.333,y+sm*14); // right diagonal down line of triangle
-    club.graphics.lineTo(x+sm*7.333,y+sm*14); // straight line of triangle
-	return club;
-    //stage.addChild(club);
-  }
-}
-
-function paint_cards(card, posNumberX, posNumberY, posSuitX, posSuitY, tenAdjustment)
-{
-  var tenAdjustment = tenAdjustment || posNumberX; // tenAjustment - optional, in case adjustments are necessary for the two digit number
-  var cardColor;
-  
-  var store_objects = new createjs.Container();
-  var store;
-  var number;
 
   if (card.charAt(0) == "h") {
     store = paint_suit(posSuitX, posSuitY, "heart", 6)
@@ -173,64 +104,18 @@ function paint_cards(card, posNumberX, posNumberY, posSuitX, posSuitY, tenAdjust
   } else if (card.length == 3) {
     number = paint_number(card.substr(1,2), cardColor, tenAdjustment, posNumberY);
   }
-  
+
+  var tenAdjustment = tenAdjustment || posNumberX; // tenAjustment - optional, in case adjustments are necessary for the two digit number
+  var cardColor;
+
+  var store_objects = new createjs.Container();
+  var store;
+  var number;
+
   store_objects.addChild(store, number);
   return store_objects;
 }
 
-function draw_card()
-{
-  var cardIndex = Math.floor((Math.random()*cardCount));
-  var card = currentDeck[cardIndex];
-  currentDeck.splice(cardIndex, 1);
-  cardCount--;
-
-  return card;
-}
-
-function paint_player_cards()
-{
-  var card1;
-  var card2;
-	
-  var playerCardOutline1 = new createjs.Shape();
-  playerCardOutline1.graphics.beginFill("white").drawRoundRect(width/2.4,height/1.2,50,70,5);
-  //stage.addChild(playerCardOutline1);
-
-  var playerCardOutline2 = new createjs.Shape();
-  playerCardOutline2.graphics.beginFill("white").drawRoundRect(width/2,height/1.2,50,70,5);
-  //stage.addChild(playerCardOutline2);
-
-  card1 = paint_cards(draw_card(), width/2.27, height/1.2, width/2.6, height/1.265, width/2.3);
-  card2 = paint_cards(draw_card(), width/1.9, height/1.2, width/2.13, height/1.265, width/1.95);
-  
-  //place the whole card in one container
-  card1.addChildAt(playerCardOutline1,0);
-  card2.addChildAt(playerCardOutline2,0);
-  createjs.Ticker.addEventListener("tick", handleTick);
-  function handleTick(event) {
-	  card1.y -= 1;
-	  card2.y -= 1;
-    stage.update();
-  }
-  
-  stage.addChild(card1,card2);
-  
-  stage.update();
-  paint_flop();
-}
-
-function paint_flop()  {
-  firstCard = draw_card();
-  secondCard = draw_card();
-  thirdCard = draw_card();
-
-  tableCards.concat([firstCard, secondCard, thirdCard]);
-
-  paint_cards(firstCard, width/2.66, height/2.2, width/3.1, height/2.4);
-  paint_cards(secondCard, width/2.26, height/2.2, width/2.6, height/2.4);
-  paint_cards(thirdCard, width/1.96, height/2.2, width/2.2, height/2.4);
-}
 
 // Creates the poker table and background
 function pokertable() {
@@ -249,29 +134,6 @@ function pokertable() {
   function handleTick(event) {
        stage.update();
   }
-}
-
-function cards() {
-  var rect = new createjs.Shape();
-  rect.graphics.beginFill("purple").drawRoundRect(200,300,50,70,5);
-  stage.addChild(rect);
-  stage.update();
-  return rect;
-}
-
-function paint_number(number, color, x,y) {
-  if (color == "red") {
-    title = new createjs.Text(number, "30px Impact", "#FF0000");
-  } else if (color == "black") {
-    title = new createjs.Text(number, "30px Impact", "#000000");
-  }
-
-  title.x = x;
-  title.y = y;
-
-  return title;
-  //stage.addChild(title);
-  //stage.update();
 }
 
 function button(x,y,label,color) {
@@ -316,7 +178,7 @@ function button(x,y,label,color) {
 }
 
 function hold() {
-	
+
 	var hold_button = new createjs.Container();
     var hold_text = new createjs.Text("hold", "10px Bembo", "#000");
     hold_text.textBaseline = "top";
@@ -337,7 +199,7 @@ function hold() {
 }
 
 function raise() {
-	
+
 	var raise_button = new createjs.Container();
     var raise_text = new createjs.Text("raise", "10px Bembo", "#000");
     raise_text.textBaseline = "top";
@@ -358,7 +220,7 @@ function raise() {
 }
 
 function fold() {
-	
+
 	var fold_button = new createjs.Container();
     var fold_text = new createjs.Text("fold", "10px Bembo", "#000");
     fold_text.textBaseline = "top";
@@ -378,6 +240,14 @@ function fold() {
 	stage.update();
 }
 
+
+function paint_deck() {
+
+  var card_back = deck.card().get_card_back_object();
+  card_back.x = 200;
+  card_back.y = 300;
+  stage.addChild(card_back);
+}
 
 function cardBack() {
 	var back = new createjs.Shape();
@@ -420,27 +290,31 @@ function tableCard() {
 }
 
 function passFirstCard() {
-	var pCard1 = new createjs.Shape();
-	pCard1.graphics.beginFill("purple").drawRoundRect(200,300,50,70,5);
-	stage.addChild(pCard1);
-	var i = 0;
-    var tick1 = createjs.Ticker.addEventListener("tick", handleTick);
-    function handleTick(event) {
-		 i++;
-		 pCard1.x += 2.2;
-		 pCard1.y += 4;
-         stage.update();
-		 if (i > 50) {
-			createjs.Ticker.off("tick",tick1);
-			passSecondCard();
-		 }
+  var pCard1 = deck.card().get_card_back_object();
+  pCard1.x = 200;
+  pCard1.y = 300;
+  stage.addChild(pCard1);
+
+  var i = 0;
+  var tick1 = createjs.Ticker.addEventListener("tick", handleTick);
+  function handleTick(event) {
+  	 i++;
+  	 pCard1.x += 2.2;
+  	 pCard1.y += 4;
+     stage.update();
+  	 if (i > 50) {
+  		createjs.Ticker.off("tick",tick1);
+  		passSecondCard();
     }
+  }
 }
 
 function passSecondCard() {
-	var pCard2 = new createjs.Shape();
-	pCard2.graphics.beginFill("purple").drawRoundRect(200,300,50,70,5);
-	stage.addChild(pCard2);
+  var pCard2 = deck.card().get_card_back_object();
+  pCard2.x = 200;
+  pCard2.y = 300;
+  stage.addChild(pCard2);
+
 	var i = 0;
     var tick2 = createjs.Ticker.addEventListener("tick", handleTick);
     function handleTick(event) {
@@ -456,23 +330,24 @@ function passSecondCard() {
 }
 
 function rotateCards() {
-   var pCard = new createjs.Shape();
+   var pCard = deck.card().get_card_back_object();
    var index = stage.numChildren;
    console.log(index);
    pCard = stage.getChildAt(index-1);
    var tick = createjs.Ticker.addEventListener("tick", handleTick);
    var i = 0;
    function handleTick(event) {
-	 i++;
-	 pCard.scaleX -= 0.05;
-	 pCard.x += 11;
-     stage.update();
-	 if (i > 20) {
-		createjs.Ticker.off("tick",tick);
-		tableCard();
-	 }
+  	 i++;
+  	 pCard.scaleX -= 0.05;
+  	 pCard.x += 2;
+       stage.update();
+  	 if (i > 20) {
+  		createjs.Ticker.off("tick",tick);
+  		tableCard();
+  	 }
    }
 }
+
 
 function how_to_play() {
   // write tutorial
