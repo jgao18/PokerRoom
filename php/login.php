@@ -1,6 +1,6 @@
 <?php
     require_once("form_with_validation.php");
-    
+    include("header.php")
     ?>
 <html>
 <head>
@@ -107,7 +107,7 @@ input[type=checkbox] {
     text-shadow: 0 1px 0 #fff;
 }
 input[type=submit] {
-    float: right;
+    float: center;
     margin-right: 20px;
     margin-top: 20px;
     width: 80px;
@@ -142,11 +142,16 @@ input[type=submit]:active {
 
         <?php echo $message; ?><br />
         <?php echo form_errors($errors); ?>
-        
-        <form action="login.php" method="post">
-          Username: <input type="text" name="username" value="" /><br />
-          Password: <input type="password" name="password" value="" /><br><br />            
-          <input type="submit" name="submit" value="Submit" />
+
+    <form action="login.php" method="post">
+      <p>Username:
+        <input type="text" name="username" value="<?php echo htmlentities($username); ?>" />
+      </p>
+      <p>Password:
+            <input type="password" name="password" value="" />
+      </p>
+           <input type="submit" name="submit" value="Login" />
+           <input type="submit" name="New User" value="New User" />
     </form>
 	</center>
 	</body>
