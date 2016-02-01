@@ -25,7 +25,7 @@
 			// try to login
 			if ($username == "poker" && $password == "1234") {
 				// successful login
-				redirect_to("poker.html");
+				redirect_to("lobby.php");
 			} else {
 				$message = "Username/password do not match.";
 
