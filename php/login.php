@@ -1,3 +1,7 @@
+<?php
+    require_once("form_with_validation.php");
+    
+    ?>
 <html>
 <head>
 	<title>Login Form Validation</title>
@@ -131,18 +135,19 @@ input[type=submit]:active {
     background-image: linear-gradient(top left 90deg, #6ec2e8 0%, #b6e2ff 100%);
 }
 </style>
-<script type="text/JavaScript" src="javascript/main.js"></script>
+
 </head>
 <body>
-	
-	<center>
-		<form id ="form_id" method="post" name="myform">
-			<label>User Name :</label>
-			<input type="text" name="username" id="username" />
-			<label>Password :</label>
-			<input type="text" name="password" id="password"><br><br />	
-			<input type="button" value="Login" id="submit"         onClick="clicked()" />
-	</form>
+   	<center>
+
+        <?php echo $message; ?><br />
+        <?php echo form_errors($errors); ?>
+        
+        <form action="login.php" method="post">
+          Username: <input type="text" name="username" value="" /><br />
+          Password: <input type="password" name="password" value="" /><br><br />            
+          <input type="submit" name="submit" value="Submit" />
+    </form>
 	</center>
 	</body>
 	</html>
