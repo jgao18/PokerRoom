@@ -24,7 +24,7 @@ function init() {
 
   menu();
 
-  socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
+  //socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
 }
 
 var setEventHandlers = function() {
@@ -77,6 +77,11 @@ function start_game() {
   pokertable();
   paint_deck();
   passFirstCard();
+  cardsToRight();
+  cardsToLeft();
+  cardsToBack();
+  playerAmount();
+  pot();
   hold();
   raise();
   fold();
@@ -125,7 +130,7 @@ function pokertable() {
   var table = new createjs.Bitmap("images/pokertable.png");
 
   // adjusting the location of the table
-  table.x = width/6.5;
+  table.x = width/6;
   table.y = height/3;
   // adding the table and background to container and stage
   poker_menu.addChild(game_background, table);
@@ -257,36 +262,43 @@ function cardBack() {
 
 // Still needs work
 function tableCard() {
-	var tCard1 = new createjs.Shape();
-	var tCard2 = new createjs.Shape();
-	var tCard3 = new createjs.Shape();
-	var tCard4 = new createjs.Shape();
-	var tCard5 = new createjs.Shape();
-	var tCard1 = cardBack();
-	var tCard2 = cardBack();
-	var tCard3 = cardBack();
-	var tCard4 = cardBack();
-	var tCard5 = cardBack();
-	var limit = 12;
-	stage.addChild(tCard1,tCard2,tCard3,tCard4,tCard5);
+	var tCard1 = deck.card().get_card_back_object();
+	var tCard2 = deck.card().get_card_back_object();
+	var tCard3 = deck.card().get_card_back_object();
+	var tCard4 = deck.card().get_card_back_object();
+	var tCard5 = deck.card().get_card_back_object();
 	var cards = [tCard1,tCard2,tCard3,tCard4,tCard5];
-	// So I could put this is an array then access one at a time
+	
 	var i;
+	for (i = 0; i < 5; i++) {
+		cards[i].x = 200;
+		cards[i].y = 300;
+	}
+	
+	stage.addChild(tCard1,tCard2,tCard3,tCard4,tCard5);
+	// So I could put this is an array then access one at a time
+	i = 0;
 	var j = 0;
+	var limit = 6;
+	var store = cards[0];
 	var tableTicker = createjs.Ticker.addEventListener("tick", handleTick);
-	for (i = 0; i < 5 ; i++) {
-	   var store = cards[i];
-	   function handleTick(event) {
-		 j++;
-		 store.x += 12;
-	     stage.update();
-		 if (j > 20) {
+	createjs.Ticker.setInterval(25);
+	createjs.Ticker.setFPS(40);
+    function handleTick(event) {
+		if (i > 4) {
 			createjs.Ticker.off("tick",tableTicker);
-			limit--;
-		 }
-		 console.log(i);
-	  }
-   }
+			return;
+		}
+		j++
+    	store.x += limit;
+        stage.update();
+    	if (j > 50) {
+			j = 0;
+			limit -= 1.2;
+			i++;
+    		store = cards[i];
+      	}	
+    }
 }
 
 function passFirstCard() {
@@ -324,7 +336,9 @@ function passSecondCard() {
          stage.update();
 		 if (i > 50) {
 			createjs.Ticker.off("tick",tick2);
-			rotateCards();
+			console.log("hello");
+			//cardsToRight();
+			//rotateCards();
 		 }
     }
 }
@@ -342,12 +356,135 @@ function rotateCards() {
   	 pCard.x += 2;
        stage.update();
   	 if (i > 20) {
-  		createjs.Ticker.off("tick",tick);
-  		tableCard();
+		 createjs.Ticker.off("tick",tick);
   	 }
    }
 }
 
+function cardsToRight() {
+	var rCard1 = deck.card().get_card_back_object();
+	var rCard2 = deck.card().get_card_back_object();
+    rCard1.x = 200;
+    rCard1.y = 300;
+    rCard2.x = 200;
+    rCard2.y = 300;
+    stage.addChild(rCard1,rCard2);
+	
+    var i = 0;
+    var rightTicker1 = createjs.Ticker.addEventListener("tick", handleTick);
+    function handleTick(event) {
+    	 i++;
+    	 rCard1.x -= 3.6;
+         stage.update();
+    	 if (i > 50) {
+    		createjs.Ticker.off("tick",rightTicker1);
+			nextRightCard();
+      }
+    }
+	
+	function nextRightCard() {
+    	var j = 0;
+    	var rightTicker2 = createjs.Ticker.addEventListener("tick", handleTick);
+    	function handleTick(event) {
+    	 	j++;
+    	 	rCard2.x -= 2.4;
+         	stage.update();
+    	 	if (j > 50) {
+    			createjs.Ticker.off("tick",rightTicker2);
+     	    }
+	    }	
+    }
+}
+
+function cardsToLeft() {
+	var lCard1 = deck.card().get_card_back_object();
+	var lCard2 = deck.card().get_card_back_object();
+    lCard1.x = 200;
+    lCard1.y = 300;
+    lCard2.x = 200;
+    lCard2.y = 300;
+    stage.addChild(lCard1,lCard2);
+	
+    var i = 0;
+    var leftTicker1 = createjs.Ticker.addEventListener("tick", handleTick);
+    function handleTick(event) {
+    	 i++;
+    	 lCard1.x += 8.2;
+         stage.update();
+    	 if (i > 50) {
+    		createjs.Ticker.off("tick",leftTicker1);
+			nextLeftCard();
+      }
+    }
+	
+	function nextLeftCard() {
+    	var j = 0;
+    	var leftTicker2 = createjs.Ticker.addEventListener("tick", handleTick);
+    	function handleTick(event) {
+    	 	j++;
+    	 	lCard2.x += 9.4;
+         	stage.update();
+    	 	if (j > 50) {
+    			createjs.Ticker.off("tick",leftTicker2);
+     	    }
+	    }	
+    }
+}
+
+function cardsToBack() {
+	var bCard1 = deck.card().get_card_back_object();
+	var bCard2 = deck.card().get_card_back_object();
+    bCard1.x = 200;
+    bCard1.y = 300;
+    bCard2.x = 200;
+    bCard2.y = 300;
+    stage.addChild(bCard1,bCard2);
+	
+    var i = 0;
+    var backTicker1 = createjs.Ticker.addEventListener("tick", handleTick);
+    function handleTick(event) {
+    	 i++;
+	  	 bCard1.x += 2.2;
+	  	 bCard1.y -= 4;
+         stage.update();
+    	 if (i > 50) {
+    		createjs.Ticker.off("tick",backTicker1);
+			nextBackCard();
+      }
+    }
+	
+	function nextBackCard() {
+    	var j = 0;
+    	var backTicker2 = createjs.Ticker.addEventListener("tick", handleTick);
+    	function handleTick(event) {
+    	 	j++;
+   		    bCard2.x += 3.5;
+   		    bCard2.y -= 4;
+         	stage.update();
+    	 	if (j > 50) {
+				tableCard();
+    			createjs.Ticker.off("tick",backTicker2);
+     	    }
+	    }	
+    }
+	
+}
+
+function playerAmount(amount) {
+	var user_amount = new createjs.Text("$1000", "15px Bembo", "#FFFF00");
+	user_amount.x = 420;
+	user_amount.y = 476;
+	stage.addChild(user_amount);
+	stage.update();
+}
+
+function pot(firstAmount, secondAmount, thridAmount, fouthAmount) {
+	var pot_amount = new createjs.Text("Pot: $1000", "16px Bembo", "#FFFF00");
+	pot_amount.x = 340;
+	pot_amount.y = 390;
+	stage.addChild(pot_amount);
+	stage.update();
+}
 
 function how_to_play() {
   // write tutorial
