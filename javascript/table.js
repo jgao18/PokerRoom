@@ -170,6 +170,7 @@ function button(x,y,label,color) {
 
         if(label == "How to Play")
         {
+          window.location.assign('file:///C:/pokerRoom/PokerRoom/php/instructions.html');
           alert("Instructions");
         }
       })
