@@ -111,3 +111,28 @@ var get_room_background_object = function(sm)
 
   return background;
 }
+
+function turn_signal(user) {
+	
+	var signal = new createjs.Shape();
+	if (user == "left") {
+		signal.graphics.beginStroke("#FFFF00").beginFill("#FFFF00");
+		signal.graphics.moveTo(43, 260).lineTo(103, 260).lineTo(73, 280).lineTo(43, 260);
+		// difference of 60 to 30 to 30
+		
+	}
+	else if (user == "back") {
+		signal.graphics.beginStroke("#FFFF00").beginFill("#FFFF00");
+		signal.graphics.moveTo(340, 60).lineTo(400, 60).lineTo(370, 80).lineTo(340, 60);
+	}
+	else if (user == "right") {
+		signal.graphics.beginStroke("#FFFF00").beginFill("#FFFF00");
+		signal.graphics.moveTo(643, 260).lineTo(703, 260).lineTo(673, 280).lineTo(643, 260);
+	}
+	else if (user == "main") {
+		signal.graphics.beginStroke("#FFFF00").beginFill("#FFFF00");
+		signal.graphics.moveTo(515, 540).lineTo(545, 510).lineTo(545, 570).lineTo(515, 540);
+	}
+	
+	return signal;
+}

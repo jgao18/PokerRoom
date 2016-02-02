@@ -81,10 +81,20 @@ function start_game() {
   cardsToLeft();
   cardsToBack();
   playerAmount();
+  leftUserAmount();
+  rightUserAmount();
+  backUserAmount();
   pot();
   hold();
   raise();
   fold();
+  
+  var signalNow1 = turn_signal("right");
+  var signalNow2 = turn_signal("main");
+  var signalNow3 = turn_signal("left");
+  var signalNow4 = turn_signal("back");
+  stage.addChild(signalNow1,signalNow2,signalNow3,signalNow4);
+  stage.update();
 }
 
 function paint_card(card, posNumberX, posNumberY, posSuitX, posSuitY, tenAdjustment)
@@ -483,6 +493,30 @@ function pot(firstAmount, secondAmount, thridAmount, fouthAmount) {
 	pot_amount.x = 340;
 	pot_amount.y = 390;
 	stage.addChild(pot_amount);
+	stage.update();
+}
+
+function leftUserAmount(userName, leftAmount) {
+	var leftAmount = new createjs.Text("User: $1000", "15px Bembo","#FFFF00");
+	leftAmount.x = 40;
+	leftAmount.y = 380;
+	stage.addChild(leftAmount);
+	stage.update();
+}
+
+function rightUserAmount(userName, leftAmount) {
+	var rightAmount = new createjs.Text("User: $1000", "15px Bembo","#FFFF00");
+	rightAmount.x = 635;
+	rightAmount.y = 380;
+	stage.addChild(rightAmount);
+	stage.update();
+}
+
+function backUserAmount(userName, leftAmount) {
+	var backAmount = new createjs.Text("User: $1000", "15px Bembo","#FFFF00");
+	backAmount.x = 335;
+	backAmount.y = 175;
+	stage.addChild(backAmount);
 	stage.update();
 }
 
