@@ -8,7 +8,6 @@ var get_heart_object = function(sm)
   heart.graphics.lineTo(sm*10.333,sm*12.333); // moving drawing point to right, lower
   heart.graphics.lineTo(sm*8.333,sm*15.333); // right diagonal down line to middle
   heart.graphics.lineTo(sm*6.4,sm*12.333); // left diagonal left line
-
   return heart;
 }
 
@@ -118,7 +117,6 @@ function turn_signal(user) {
 	if (user == "left") {
 		signal.graphics.beginStroke("#FFFF00").beginFill("#FFFF00");
 		signal.graphics.moveTo(43, 260).lineTo(103, 260).lineTo(73, 280).lineTo(43, 260);
-		// difference of 60 to 30 to 30
 		
 	}
 	else if (user == "back") {

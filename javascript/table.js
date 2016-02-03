@@ -327,6 +327,7 @@ function passFirstCard() {
      stage.update();
   	 if (i > 50) {
   		createjs.Ticker.off("tick",tick1);
+		flip(pCard1,310,504);
   		passSecondCard();
     }
   }
@@ -347,29 +348,11 @@ function passSecondCard() {
          stage.update();
 		 if (i > 50) {
 			createjs.Ticker.off("tick",tick2);
-			console.log("hello");
+			flip(pCard2,375,504);
 			//cardsToRight();
 			//rotateCards();
 		 }
     }
-}
-
-function rotateCards() {
-   var pCard = deck.card().get_card_back_object();
-   var index = stage.numChildren;
-   console.log(index);
-   pCard = stage.getChildAt(index-1);
-   var tick = createjs.Ticker.addEventListener("tick", handleTick);
-   var i = 0;
-   function handleTick(event) {
-  	 i++;
-  	 pCard.scaleX -= 0.05;
-  	 pCard.x += 2;
-       stage.update();
-  	 if (i > 20) {
-		 createjs.Ticker.off("tick",tick);
-  	 }
-   }
 }
 
 function cardsToRight() {
@@ -388,7 +371,7 @@ function cardsToRight() {
     	 rCard1.x -= 3.6;
          stage.update();
     	 if (i > 50) {
-    		createjs.Ticker.off("tick",rightTicker1);
+			createjs.Ticker.off("tick",rightTicker1);
 			nextRightCard();
       }
     }
@@ -518,6 +501,36 @@ function backUserAmount(userName, leftAmount) {
 	backAmount.x = 335;
 	backAmount.y = 175;
 	stage.addChild(backAmount);
+	stage.update();
+}
+
+function flip(card,x,y) {
+	var store = card;
+	var flipTick = createjs.Ticker.addEventListener("tick", handleTick);
+    var i = 0;
+    function handleTick(event) {
+   	 	i++;
+   	 	store.scaleX -= 0.05;
+   	 	store.x += 1.2;
+        stage.update();
+   	 	if (i > 20) {
+			//stage.removeChild
+			playerCards(x,y);
+ 			createjs.Ticker.off("tick",flipTick);
+   		}
+    }
+}
+
+function playerCards(x,y) {
+    var deck = new Deck();
+    deck.get_new_deck();
+	var oneCard = deck.draw_card();
+	
+    card = oneCard.get_card_container_object(oneCard);
+	card.x += x;
+	card.y += y;
+
+    stage.addChild(card);
 	stage.update();
 }
 
