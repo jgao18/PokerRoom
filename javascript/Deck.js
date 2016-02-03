@@ -1,7 +1,7 @@
 // Deck Class -- contains Card objects
 function Deck(sm, font, width, height, strokeColor, strokeThickness, backFillColor, frontFillColor)
 {
-  this.sm = sm || 6;
+  this.sm = sm || 5.2;
   this.font = font || "30px Impact";
   this.width = width || 50
   this.height = height || 70;
@@ -24,6 +24,7 @@ function Deck(sm, font, width, height, strokeColor, strokeThickness, backFillCol
 
 Deck.prototype.get_new_deck = function()
 {
+  var i, j;
   for (i=0; i < this.suits.length; i++)
   {
     for (j=0; j < this.values.length; j++)

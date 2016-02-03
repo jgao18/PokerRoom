@@ -1,5 +1,5 @@
 function init() {
-	var stage = new createjs.Stage("demoCanvas");
+  var stage = new createjs.Stage("demoCanvas");
 
   var deck = new Deck();
   deck.get_new_deck();
@@ -12,7 +12,7 @@ function init() {
   value.y = 22;
   back = oneCard.get_card_back_object();
   front = oneCard.get_card_front_object();
-  front.x = 25;
+  front.x = 200;
   front.y = 22;
   card = oneCard.get_card_container_object(front, value, suit);
 

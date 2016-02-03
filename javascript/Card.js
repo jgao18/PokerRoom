@@ -73,26 +73,27 @@ Card.prototype.get_card_container_object = function(frontX, frontY, valueX, valu
   front.y = frontY;
 
   var value = get_value_object(this.value, this.color, this.font);
-  value.x = valueX;
-  value.y = valueY;
+  value.x += 17;
 
   var suit;
   if (this.suit == "spade")
   {
-    suit = get_spade_object(this.sm)
+	  suit = get_spade_object(this.sm);
+	  suit.y += 6;
   } else if (this.suit == "heart")
   {
-    suit = get_heart_object(this.sm)
+	  suit = get_heart_object(this.sm);
   } else if (this.suit == "club")
   {
-    suit = get_club_object(this.sm)
+	  suit = get_club_object(this.sm);
+	  suit.y += 6;
   } else
   {
-    suit = get_diamond_object(this.sm)
+	  suit = get_diamond_object(this.sm);
   }
 
-  suit.x = suitX;
-  suit.y = suitY;
+  suit.x -= 18;
+  suit.y -= 14;
 
   return get_container_object(front, value, suit);
 }
