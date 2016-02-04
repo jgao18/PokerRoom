@@ -56,9 +56,14 @@ function menu() {
   }
 
   // Title of Game
-  title = new createjs.Text("Let's Play Poker", "50px Bembo", "#FF0000");
-  title.x = width/3.5;
+  title = new createjs.Text("Poker Room", "50px Bembo", "#FF0000");
+  title.x = width/3.1;
   title.y = height/4;
+  
+  // Subtitle of Game
+  subtitle = new createjs.Text("Let's Play Poker", "30px Bembo", "#FF0000");
+  subtitle.x = width/2.8;
+  subtitle.y = height/2.8;
 
   // Creating Buttons for Game
   var start = new button(width/2.3,height/2.3,"Start", "#F00");
@@ -66,8 +71,11 @@ function menu() {
 
   // adding the title to canvas
   stage.addChild(title);
+  
+  // adding the subtitle to canvas
+  stage.addChild(subtitle);
 
-  // update to show title
+  // update to show title and subtitle
   stage.update();
 }
 
@@ -87,6 +95,7 @@ function start_game() {
   pot();
   hold();
   raise();
+  chip();
   fold();
   
   var signalNow1 = turn_signal("right");
@@ -191,6 +200,24 @@ function button(x,y,label,color) {
       })
     }
   }
+}
+
+function chip() {
+  
+  var chip_icon = new createjs.Container();
+  var chip_background = new createjs.Shape();
+  chip_background.graphics.beginFill("gold").drawCircle(316,187,15);
+  chip_background.graphics.beginFill("blue").drawCircle(316,187,12);
+  chip_background.graphics.beginFill("gold").drawCircle(20,390,15);
+  chip_background.graphics.beginFill("blue").drawCircle(20,390,12);
+  chip_background.graphics.beginFill("gold").drawCircle(615,390,15);
+  chip_background.graphics.beginFill("blue").drawCircle(615,390,12);
+  chip_background.graphics.beginFill("gold").drawCircle(430,483,15);
+  chip_background.graphics.beginFill("blue").drawCircle(430,483,12);
+
+  chip_icon.addChild(chip_background)
+  stage.addChild(chip_icon);
+  stage.update();
 }
 
 function hold() {
@@ -466,10 +493,16 @@ function cardsToBack() {
 
 function playerAmount(amount) {
 	var user_amount = new createjs.Text("$1000", "15px Bembo", "#FFFF00");
-	user_amount.x = 420;
+	user_amount.x = 450;
 	user_amount.y = 476;
-	stage.addChild(user_amount);
-	stage.update();
+	
+	var chip_plate = new createjs.Container();
+    var chip_plate_background = new createjs.Shape();
+    chip_plate_background.graphics.beginFill("black").drawRect(420,475,70,17);
+    chip_plate.addChild(chip_plate_background)
+    
+    stage.addChild(chip_plate,user_amount)
+    stage.update();
 }
 
 function pot(firstAmount, secondAmount, thridAmount, fouthAmount) {
@@ -484,24 +517,42 @@ function leftUserAmount(userName, leftAmount) {
 	var leftAmount = new createjs.Text("User: $1000", "15px Bembo","#FFFF00");
 	leftAmount.x = 40;
 	leftAmount.y = 380;
-	stage.addChild(leftAmount);
-	stage.update();
+	
+    var chip_plate = new createjs.Container();
+    var chip_plate_background = new createjs.Shape();
+    chip_plate_background.graphics.beginFill("black").drawRect(30,380,88,17);
+    chip_plate.addChild(chip_plate_background)
+    
+    stage.addChild(chip_plate,leftAmount)
+    stage.update();
 }
 
 function rightUserAmount(userName, leftAmount) {
 	var rightAmount = new createjs.Text("User: $1000", "15px Bembo","#FFFF00");
 	rightAmount.x = 635;
 	rightAmount.y = 380;
-	stage.addChild(rightAmount);
-	stage.update();
+	
+	var chip_plate = new createjs.Container();
+    var chip_plate_background = new createjs.Shape();
+    chip_plate_background.graphics.beginFill("black").drawRect(625,380,88,17);
+    chip_plate.addChild(chip_plate_background)
+    
+    stage.addChild(chip_plate,rightAmount)
+    stage.update();
 }
 
 function backUserAmount(userName, leftAmount) {
 	var backAmount = new createjs.Text("User: $1000", "15px Bembo","#FFFF00");
 	backAmount.x = 335;
 	backAmount.y = 175;
-	stage.addChild(backAmount);
-	stage.update();
+	
+    var chip_plate = new createjs.Container();
+    var chip_plate_background = new createjs.Shape();
+    chip_plate_background.graphics.beginFill("black").drawRect(326,175,88,17);
+    chip_plate.addChild(chip_plate_background)
+    
+    stage.addChild(chip_plate,backAmount)
+    stage.update();
 }
 
 function flip(card,x,y) {
