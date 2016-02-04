@@ -97,6 +97,8 @@ function start_game() {
   raise();
   chip();
   fold();
+  options();
+  leave();
   
   var signalNow1 = turn_signal("right");
   var signalNow2 = turn_signal("main");
@@ -582,6 +584,48 @@ function playerCards(x,y) {
 	card.y += y;
 
     stage.addChild(card);
+	stage.update();
+}
+
+function options() {
+	
+	var options_button = new createjs.Container();
+	var options_text = new createjs.Text("Options", "20px Bembo", "#000");
+	options_text.textBaseline = "top";
+	options_text.textAlign = "center";
+	
+	var width = options_text.getMeasuredWidth()+15;
+    var height = options_text.getMeasuredHeight()+7;
+    
+    options_text.x = 700;
+    options_text.y = 579; 
+
+	var background = new createjs.Shape();
+	background.graphics.beginFill("yellow").drawRoundRect(662,575,width,height,10);
+	
+	options_button.addChild(background,options_text)
+	stage.addChild(options_button);
+	stage.update();
+}
+
+function leave() {
+	
+	var leave_button = new createjs.Container();
+	var leave_text = new createjs.Text("Leave", "20px Bembo", "#000");
+	leave_text.textBaseline = "top";
+	leave_text.textAlign = "center";
+	
+	var width = leave_text.getMeasuredWidth()+15;
+    var height = leave_text.getMeasuredHeight()+7;
+    
+    leave_text.x = 700;
+    leave_text.y = 614;
+
+	var background = new createjs.Shape();
+	background.graphics.beginFill("yellow").drawRoundRect(662,610,width+14,height,10);
+	
+	leave_button.addChild(background,leave_text)
+	stage.addChild(leave_button);
 	stage.update();
 }
 
