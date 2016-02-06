@@ -1,0 +1,54 @@
+- Denotes server action
+=> Denotes client action
+
+The server will maintain:
+  - A list of connected players: connectedPlayers = [Player()]
+  - A dictionary of the players playing the current hand and their respective drawn cards: currentHandPlayers = [{Player(), Card(), Card()}]
+  - A Deck() object
+  - A list of stages and the current stage: stages = [preflop, flop, turn, river], currentStage
+  - The Player() whos turn it is: currentTurn
+  - The Player() who is the dealer: dealer
+  - A value representing the small blind: smallBlind
+  - a value representing the big blind: bigBlind
+  - A value representing the current highest bet: currentCall
+  - A value representing the pot: pot
+
+The server will loop the game while there is at least one player:
+  - Server sends the clients a list of the connected players
+      => Client paints appropriate seats and player chip counts
+  - Get a new deck: Deck.newDeck()
+  - Server declares the Player() with the smallBlind and the Player() with the bigBlind (two seats past the dealer Player()), deducting from their chip count
+      => Client paints blinds onto the table and updates the blind Player()'s chip count
+  - Server loops through each connected player, adding them to the currentHandPlayers with two Deck.draw_card() objects
+      => Client paints appropriate cards for player and card backs for other seats
+  - Server sets currentStage to preflop
+
+StageLoop:
+  - The player to start is the player after the big blind
+      => Client paints currentTurn object
+    - Set currentCall equal to the bigBlind
+    - Set currentStage to flop
+  HandLoop:
+    - Server loops through each player in currentHandPlayers:
+        - Server requests action from client
+          => Client paints the action buttons (fold/check, call, raise) and sends the server the selected action
+          => Client paints the action (greyed out cards, check, chips in) and updates chip count
+        - If the client folded, remove the Player() from currentHandPlayers
+        - If the client called or raised, update the Player() chip count
+        Continue looping until currentCall is the same for everyone, or there is only 1 player left in currentHandPlayers
+
+  - If there is only one player left after HandLoop, add the pot to the Player() chip count
+      => Client updates chip cardCount
+  - If there are two or more players left, increment currentStage to turn, Deck.draw_card(), set currentCall to check, and set currentTurn to the Person() after the dealer
+      => Client paints turn card and currentTurn object
+      Do HandLoop()
+  - If there is only one player left after HandLoop, add the pot to the Player() chip count
+      => Client updates chip cardCount
+  - If there are two or more players left, increment currentStage to river, Deck.draw_card(), set currentCall to check, and set currentTurn to the Person() after the dealer
+      => Client paints turn card and currentTurn object
+      Do HandLoop()
+  - If there is only one player left after HandLoop, add the pot to the Player() chip count
+      => Client updates chip cardCount
+  - If there are two or more players left, determine the winner and add the chips to the winning Player() chip cardCount
+      => Client paints the faces of the cards, updates chip count
+  - Clear the stage, and do StageLoop()
