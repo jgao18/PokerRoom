@@ -1,21 +1,5 @@
 Priority - Initials - Description
 
-1 - QQ
-1 - QQ
-1 - QQ
-1 - QQ
-1 - QQ
-1 - QQ
-1 - QQ
-1 - QQ
-1 - QQ
-1 - QQ
-1 - QQ
-1 - QQ
-1 - QQ
-1 - QQ
-1 - QQ
-1 - QQ
-1 - QQ
-1 - QQ
-1 - QQ
+1 - QQ - Add detail to chips object, Create detailed card back, move both to objects.js file, move buttons to objects.js
+5 - QQ - Add a "burn" animation to the first, fifth, and seventh cards drawn from the deck of the commmunity cards 
+1 - QQ - Create a database and link it
