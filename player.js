@@ -1,7 +1,9 @@
-var Player = function()
+var Player = function(id, username, chips, tableIndex)
 {
-  var username, password, statistics;
-  var chips = 0;
+  var username = username || "INVALIDUSER"
+  var password, statistics;
+  var chips = chips || 0 ;
+  var tableIndex = tableIndex;
   var id;
 
   var getUsername = function()
@@ -19,6 +21,11 @@ var Player = function()
     return chips;
   }
 
+  var getTableIndex = function()
+  {
+    return tableIndex;
+  }
+
   var setUsername = function(user)
   {
     username = user;
@@ -33,4 +40,23 @@ var Player = function()
   {
     chips += numChips;
   }
+
+  var setTableIndex = function(index)
+  {
+    tableIndex = index;
+  }
+
+  return {
+		getUsername: getUsername,
+		getPassword: getPassword,
+    getChips: getChips,
+    getTableIndex: getTableIndex,
+		setUsername: setUsername,
+		setPassword: setPassword,
+    addChips: addChips,
+    setTableIndex: setTableIndex,
+		id: id
+	}
 }
+
+exports.Player = Player;

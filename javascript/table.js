@@ -5,6 +5,10 @@ var bg, main;
 var main_backgroud;
 var deck;
 var socket;
+var currentPlayer;
+var currentPlayers;
+var maxPlayers;
+var playerIndex;
 
 function init() {
   // Creating the stage
@@ -19,36 +23,91 @@ function init() {
   deck = new Deck();
   deck.get_new_deck();
 
+  currentPlayers = [];
+  maxPlayers = 4
+
   // Array of button names
   buttonNames = ["Start","How to Play"];
 
   menu();
 
-  //socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
+  socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
+  setEventHandlers();
 }
 
 var setEventHandlers = function() {
 	// Socket connection successful
-	socket.on("connect", onSocketConnected);
+  	socket.on("connect", onSocketConnected);
 
 	// Socket disconnection
-	socket.on("disconnect", onSocketDisconnect);
+	//socket.on("disconnect", onSocketDisconnect);
 
-	// New player message received
+	// New player message received by server
 	socket.on("new player", onNewPlayer);
-
-	// Player move message received
-	socket.on("move player", onMovePlayer);
 
 	// Player removed message received
 	socket.on("remove player", onRemovePlayer);
 };
 
+function onSocketConnected() {
+  console.log("Client connected!");
+}
+
+function onNewPlayer(data)
+{
+  console.log("New player connected: " + data.username);
+
+  // Initialize the new player
+  var newPlayer = new Player(data.id, data.username, data.chips, data.index);
+  playerIndex = data.index;
+
+  if (newPlayer.getUsername() == currentPlayer.getUsername())
+  {
+    playerAmount(newPlayer.getUsername(), newPlayer.getChips());
+    currentPlayer.id = data.id;
+    console.log(data.username + " has an index of " + newPlayer.getTableIndex());
+  }
+
+  // Add new player to the remote players array
+  currentPlayers.push(newPlayer);
+
+  //var playerIndex = newPlayer.getTableIndex();
+  var i;
+  i = currentPlayers.length;
+  console.log("the value of i is " + i + " and the value of tableIndex is " + playerIndex);
+  while (true)
+  {
+    if (i-- <= 1) break;
+    console.log(" didn't  break; the value of i is " + i + "the value of mod is " + (playerIndex + 1) % currentPlayers.length);
+    leftUserAmount(currentPlayers[(playerIndex + 1) % currentPlayers.length].getUsername(), currentPlayers[(playerIndex + 1) % currentPlayers.length].getChips());
+    console.log("EOB");
+    if (i-- <= 1) break;
+    console.log(" didn't break; the value of i is " + i + "the value of mod is " + (playerIndex + 2) % currentPlayers.length);
+    backUserAmount(currentPlayers[(playerIndex + 2) % currentPlayers.length].getUsername(), currentPlayers[(playerIndex + 2) % currentPlayers.length].getChips());
+    if (i-- <= 1) break;
+    console.log(" didn't break; the value of i is " + i + "the value of mod is " + (playerIndex + 3) % currentPlayers.length);
+    rightUserAmount(currentPlayers[(playerIndex + 3) % currentPlayers.length].getUsername(), currentPlayers[(playerIndex + 3) % currentPlayers.length].getChips());
+    if (i-- <= 1) break;
+  }
+}
+
+function onRemovePlayer(data) {
+  var i;
+  for (i = 0; i < currentPlayers.length; i++ )
+  {
+    if (currentPlayers[i].id == data.id)
+    {
+      currentPlayers.splice(i, 1);
+      break;
+    }
+  }
+}
+
 // main menu to game
 function menu() {
 
   // adding background image
-  main_background = new createjs.Bitmap("images/pokerfelt.jpg");
+  main_background = new createjs.Bitmap("../images/pokerfelt.jpg");
   stage.addChild(main_background);
   createjs.Ticker.addEventListener("tick", handleTick);
   function handleTick(event) {
@@ -59,7 +118,7 @@ function menu() {
   title = new createjs.Text("Poker Room", "50px Bembo", "#FF0000");
   title.x = width/3.1;
   title.y = height/4;
-  
+
   // Subtitle of Game
   subtitle = new createjs.Text("Let's Play Poker", "30px Bembo", "#FF0000");
   subtitle.x = width/2.8;
@@ -71,7 +130,7 @@ function menu() {
 
   // adding the title to canvas
   stage.addChild(title);
-  
+
   // adding the subtitle to canvas
   stage.addChild(subtitle);
 
@@ -81,74 +140,47 @@ function menu() {
 
 // Starts game
 function start_game() {
+
+  // This should be filled by the database in a future implementaton
+  currentPlayer = new Player();
+  currentPlayer.setUsername("testUser" + Math.floor((Math.random() * 100) + 1));
+  currentPlayer.setPassword("testPassword" + Math.floor((Math.random() * 10) + 1));
+  currentPlayer.addChips(Math.floor((Math.random() * 10000) + 1));
+  socket.emit("new player", {username: currentPlayer.getUsername(), chips: currentPlayer.getChips()});
+
   document.getElementById("demoCanvas").style.background = '#FF0000';
   pokertable();
   paint_deck();
-  passFirstCard();
-  cardsToRight();
-  cardsToLeft();
-  cardsToBack();
-  playerAmount();
-  leftUserAmount();
-  rightUserAmount();
-  backUserAmount();
-  pot();
+  //passFirstCard();
+  //cardsToRight();
+  //cardsToLeft();
+  //cardsToBack();
+  //playerAmount();
+  //leftUserAmount();
+  //rightUserAmount();
+  //backUserAmount();
+  //pot();
   hold();
   raise();
-  chip();
+  //chip();
   fold();
   options();
   leave();
-  
+
   var signalNow1 = turn_signal("right");
   var signalNow2 = turn_signal("main");
   var signalNow3 = turn_signal("left");
   var signalNow4 = turn_signal("back");
-  stage.addChild(signalNow1,signalNow2,signalNow3,signalNow4);
-  stage.update();
+  //stage.addChild(signalNow1,signalNow2,signalNow3,signalNow4);
+  //stage.update();
 }
-
-function paint_card(card, posNumberX, posNumberY, posSuitX, posSuitY, tenAdjustment)
-{
-
-  if (card.charAt(0) == "h") {
-    store = paint_suit(posSuitX, posSuitY, "heart", 6)
-    cardColor = "red";
-  } else if (card.charAt(0) == "c") {
-    store = paint_suit(posSuitX, posSuitY, "club", 6)
-    cardColor = "black";
-  } else if (card.charAt(0) == "d") {
-    store = paint_suit(posSuitX, posSuitY, "diamond", 6)
-    cardColor = "red";
-  } else if (card.charAt(0) == 's') {
-    store = paint_suit(posSuitX, posSuitY, "spade", 6)
-    cardColor = "black";
-  }
-
-  if (card.length == 2) {
-    number = paint_number(card.charAt(1), cardColor, posNumberX, posNumberY);
-  } else if (card.length == 3) {
-    number = paint_number(card.substr(1,2), cardColor, tenAdjustment, posNumberY);
-  }
-
-  var tenAdjustment = tenAdjustment || posNumberX; // tenAjustment - optional, in case adjustments are necessary for the two digit number
-  var cardColor;
-
-  var store_objects = new createjs.Container();
-  var store;
-  var number;
-
-  store_objects.addChild(store, number);
-  return store_objects;
-}
-
 
 // Creates the poker table and background
 function pokertable() {
   // Retrieving the pokertable and background
   var poker_menu = new createjs.Container();
-  var game_background = new createjs.Bitmap("images/pokerfelt.jpg");
-  var table = new createjs.Bitmap("images/pokertable.png");
+  var game_background = new createjs.Bitmap("../images/pokerfelt.jpg");
+  var table = new createjs.Bitmap("../images/pokertable.png");
 
   // adjusting the location of the table
   table.x = width/6;
@@ -202,24 +234,6 @@ function button(x,y,label,color) {
       })
     }
   }
-}
-
-function chip() {
-  
-  var chip_icon = new createjs.Container();
-  var chip_background = new createjs.Shape();
-  chip_background.graphics.beginFill("gold").drawCircle(316,187,15);
-  chip_background.graphics.beginFill("blue").drawCircle(316,187,12);
-  chip_background.graphics.beginFill("gold").drawCircle(20,390,15);
-  chip_background.graphics.beginFill("blue").drawCircle(20,390,12);
-  chip_background.graphics.beginFill("gold").drawCircle(615,390,15);
-  chip_background.graphics.beginFill("blue").drawCircle(615,390,12);
-  chip_background.graphics.beginFill("gold").drawCircle(430,483,15);
-  chip_background.graphics.beginFill("blue").drawCircle(430,483,12);
-
-  chip_icon.addChild(chip_background)
-  stage.addChild(chip_icon);
-  stage.update();
 }
 
 function hold() {
@@ -294,12 +308,6 @@ function paint_deck() {
   stage.addChild(card_back);
 }
 
-function cardBack() {
-	var back = new createjs.Shape();
-	back.graphics.beginFill("purple").drawRoundRect(200,300,50,70,5);
-	return back;
-}
-
 // Still needs work
 function tableCard() {
 	var tCard1 = deck.card().get_card_back_object();
@@ -308,13 +316,13 @@ function tableCard() {
 	var tCard4 = deck.card().get_card_back_object();
 	var tCard5 = deck.card().get_card_back_object();
 	var cards = [tCard1,tCard2,tCard3,tCard4,tCard5];
-	
+
 	var i;
 	for (i = 0; i < 5; i++) {
 		cards[i].x = 200;
 		cards[i].y = 300;
 	}
-	
+
 	stage.addChild(tCard1,tCard2,tCard3,tCard4,tCard5);
 	// So I could put this is an array then access one at a time
 	i = 0;
@@ -337,7 +345,7 @@ function tableCard() {
 			limit -= 1.2;
 			i++;
     		store = cards[i];
-      	}	
+      	}
     }
 }
 
@@ -392,7 +400,7 @@ function cardsToRight() {
     rCard2.x = 200;
     rCard2.y = 300;
     stage.addChild(rCard1,rCard2);
-	
+
     var i = 0;
     var rightTicker1 = createjs.Ticker.addEventListener("tick", handleTick);
     function handleTick(event) {
@@ -404,7 +412,7 @@ function cardsToRight() {
 			nextRightCard();
       }
     }
-	
+
 	function nextRightCard() {
     	var j = 0;
     	var rightTicker2 = createjs.Ticker.addEventListener("tick", handleTick);
@@ -415,7 +423,7 @@ function cardsToRight() {
     	 	if (j > 50) {
     			createjs.Ticker.off("tick",rightTicker2);
      	    }
-	    }	
+	    }
     }
 }
 
@@ -427,7 +435,7 @@ function cardsToLeft() {
     lCard2.x = 200;
     lCard2.y = 300;
     stage.addChild(lCard1,lCard2);
-	
+
     var i = 0;
     var leftTicker1 = createjs.Ticker.addEventListener("tick", handleTick);
     function handleTick(event) {
@@ -439,7 +447,7 @@ function cardsToLeft() {
 			nextLeftCard();
       }
     }
-	
+
 	function nextLeftCard() {
     	var j = 0;
     	var leftTicker2 = createjs.Ticker.addEventListener("tick", handleTick);
@@ -450,7 +458,7 @@ function cardsToLeft() {
     	 	if (j > 50) {
     			createjs.Ticker.off("tick",leftTicker2);
      	    }
-	    }	
+	    }
     }
 }
 
@@ -462,7 +470,7 @@ function cardsToBack() {
     bCard2.x = 200;
     bCard2.y = 300;
     stage.addChild(bCard1,bCard2);
-	
+
     var i = 0;
     var backTicker1 = createjs.Ticker.addEventListener("tick", handleTick);
     function handleTick(event) {
@@ -475,7 +483,7 @@ function cardsToBack() {
 			nextBackCard();
       }
     }
-	
+
 	function nextBackCard() {
     	var j = 0;
     	var backTicker2 = createjs.Ticker.addEventListener("tick", handleTick);
@@ -488,23 +496,9 @@ function cardsToBack() {
 				tableCard();
     			createjs.Ticker.off("tick",backTicker2);
      	    }
-	    }	
+	    }
     }
-	
-}
 
-function playerAmount(amount) {
-	var user_amount = new createjs.Text("$1000", "15px Bembo", "#FFFF00");
-	user_amount.x = 450;
-	user_amount.y = 476;
-	
-	var chip_plate = new createjs.Container();
-    var chip_plate_background = new createjs.Shape();
-    chip_plate_background.graphics.beginFill("black").drawRect(420,475,70,17);
-    chip_plate.addChild(chip_plate_background)
-    
-    stage.addChild(chip_plate,user_amount)
-    stage.update();
 }
 
 function pot(firstAmount, secondAmount, thridAmount, fouthAmount) {
@@ -515,46 +509,89 @@ function pot(firstAmount, secondAmount, thridAmount, fouthAmount) {
 	stage.update();
 }
 
-function leftUserAmount(userName, leftAmount) {
-	var leftAmount = new createjs.Text("User: $1000", "15px Bembo","#FFFF00");
-	leftAmount.x = 40;
-	leftAmount.y = 380;
-	
-    var chip_plate = new createjs.Container();
-    var chip_plate_background = new createjs.Shape();
-    chip_plate_background.graphics.beginFill("black").drawRect(30,380,88,17);
-    chip_plate.addChild(chip_plate_background)
-    
-    stage.addChild(chip_plate,leftAmount)
-    stage.update();
-}
-
-function rightUserAmount(userName, leftAmount) {
-	var rightAmount = new createjs.Text("User: $1000", "15px Bembo","#FFFF00");
-	rightAmount.x = 635;
-	rightAmount.y = 380;
-	
+function playerAmount(username, amount) {
 	var chip_plate = new createjs.Container();
-    var chip_plate_background = new createjs.Shape();
-    chip_plate_background.graphics.beginFill("black").drawRect(625,380,88,17);
-    chip_plate.addChild(chip_plate_background)
-    
-    stage.addChild(chip_plate,rightAmount)
-    stage.update();
+
+  var chip_plate_background = new createjs.Shape();
+  chip_plate_background.graphics.beginFill("black").drawRect(420,475,70,17);
+  chip_plate.addChild(chip_plate_background)
+
+  var chip_background = new createjs.Shape();
+  chip_background.graphics.beginFill("gold").drawCircle(430,483,15);
+  chip_background.graphics.beginFill("blue").drawCircle(430,483,12);
+  chip_plate.addChild(chip_background);
+
+  var user_amount = new createjs.Text(username + ": " + "$" + amount, "15px Bembo", "#FFFF00");
+  user_amount.x = 450;
+  user_amount.y = 476;
+  chip_plate.addChild(user_amount);
+
+  stage.addChild(chip_plate)
+  stage.update();
 }
 
-function backUserAmount(userName, leftAmount) {
-	var backAmount = new createjs.Text("User: $1000", "15px Bembo","#FFFF00");
-	backAmount.x = 335;
-	backAmount.y = 175;
-	
-    var chip_plate = new createjs.Container();
-    var chip_plate_background = new createjs.Shape();
-    chip_plate_background.graphics.beginFill("black").drawRect(326,175,88,17);
-    chip_plate.addChild(chip_plate_background)
-    
-    stage.addChild(chip_plate,backAmount)
-    stage.update();
+function leftUserAmount(username, amount) {
+  var chip_plate = new createjs.Container();
+
+  var chip_plate_background = new createjs.Shape();
+  chip_plate_background.graphics.beginFill("black").drawRect(30,380,88,17);
+  chip_plate.addChild(chip_plate_background)
+
+  var chip_background = new createjs.Shape();
+  chip_background.graphics.beginFill("gold").drawCircle(20,390,15);
+  chip_background.graphics.beginFill("blue").drawCircle(20,390,12);
+  chip_plate.addChild(chip_background);
+
+  var leftAmount = new createjs.Text(username + ": " + "$" + amount, "15px Bembo","#FFFF00");
+  leftAmount.x = 40;
+  leftAmount.y = 380;
+  chip_plate.addChild(leftAmount);
+
+  stage.addChild(chip_plate);
+  stage.update();
+}
+
+function rightUserAmount(username, amount) {
+	var chip_plate = new createjs.Container();
+
+  var chip_plate_background = new createjs.Shape();
+  chip_plate_background.graphics.beginFill("black").drawRect(625,380,88,17);
+  chip_plate.addChild(chip_plate_background)
+
+  var chip_background = new createjs.Shape();
+  chip_background.graphics.beginFill("gold").drawCircle(615,390,15);
+  chip_background.graphics.beginFill("blue").drawCircle(615,390,12);
+  chip_plate.addChild(chip_background);
+
+  var rightAmount = new createjs.Text(username + ": " + "$" + amount, "15px Bembo","#FFFF00");
+  rightAmount.x = 635;
+  rightAmount.y = 380;
+  chip_plate.addChild(rightAmount);
+
+  stage.addChild(chip_plate)
+  stage.update();
+
+}
+
+function backUserAmount(username, amount) {
+  var chip_plate = new createjs.Container();
+
+  var chip_plate_background = new createjs.Shape();
+  chip_plate_background.graphics.beginFill("black").drawRect(326,175,88,17);
+  chip_plate.addChild(chip_plate_background)
+
+  var chip_background = new createjs.Shape();
+  chip_background.graphics.beginFill("gold").drawCircle(316,187,15);
+  chip_background.graphics.beginFill("blue").drawCircle(316,187,12);
+  chip_plate.addChild(chip_background);
+
+  var backAmount = new createjs.Text(username + ": " + "$" + amount, "15px Bembo","#FFFF00");
+  backAmount.x = 335;
+  backAmount.y = 175;
+  chip_plate.addChild(backAmount);
+
+  stage.addChild(chip_plate)
+  stage.update();
 }
 
 function flip(card,x,y) {
@@ -578,7 +615,7 @@ function playerCards(x,y) {
     var deck = new Deck();
     deck.get_new_deck();
 	var oneCard = deck.draw_card();
-	
+
     card = oneCard.get_card_container_object(oneCard);
 	card.x += x;
 	card.y += y;
@@ -588,42 +625,42 @@ function playerCards(x,y) {
 }
 
 function options() {
-	
+
 	var options_button = new createjs.Container();
 	var options_text = new createjs.Text("Options", "20px Bembo", "#000");
 	options_text.textBaseline = "top";
 	options_text.textAlign = "center";
-	
+
 	var width = options_text.getMeasuredWidth()+15;
     var height = options_text.getMeasuredHeight()+7;
-    
+
     options_text.x = 700;
-    options_text.y = 579; 
+    options_text.y = 579;
 
 	var background = new createjs.Shape();
 	background.graphics.beginFill("yellow").drawRoundRect(662,575,width,height,10);
-	
+
 	options_button.addChild(background,options_text)
 	stage.addChild(options_button);
 	stage.update();
 }
 
 function leave() {
-	
+
 	var leave_button = new createjs.Container();
 	var leave_text = new createjs.Text("Leave", "20px Bembo", "#000");
 	leave_text.textBaseline = "top";
 	leave_text.textAlign = "center";
-	
+
 	var width = leave_text.getMeasuredWidth()+15;
     var height = leave_text.getMeasuredHeight()+7;
-    
+
     leave_text.x = 700;
     leave_text.y = 614;
 
 	var background = new createjs.Shape();
 	background.graphics.beginFill("yellow").drawRoundRect(662,610,width+14,height,10);
-	
+
 	leave_button.addChild(background,leave_text)
 	stage.addChild(leave_button);
 	stage.update();
