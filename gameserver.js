@@ -40,15 +40,19 @@ function onNewPlayer(data) {
 
   connectedPlayers.push(newPlayer);
 
-  // Send existing players to the new player
   var i, existingPlayer;
+  outputArray = []
   for (i = 0; i < connectedPlayers.length; i++) {
     existingPlayer = connectedPlayers[i];
-    this.emit("new player", {id: existingPlayer.id, username: existingPlayer.getUsername(), chips: existingPlayer.getChips(), index: existingPlayer.getTableIndex()});
+    outputArray.push({id: existingPlayer.id, username: existingPlayer.getUsername(), chips: existingPlayer.getChips(), index: existingPlayer.getTableIndex()});
   };
 
-  // Broadcast new player to connected socket clients
-  this.broadcast.emit("new player", {id: this.id, username: newPlayer.getUsername(), chips: newPlayer.getChips(), index: newPlayer.getTableIndex()});
+  // Send playerArray to new player
+  this.emit("new player", outputArray);
+
+
+  // Send playerArray to existing players
+  this.broadcast.emit("new player", outputArray);
 };
 
 function onClientDisconnect() {
