@@ -1,40 +1,36 @@
 <?php
-	require_once("validation_functions.php");
-	
-	$errors = array();
-	$message = "";
-	
-	if (isset($_POST['submit'])) {
-		// form was submitted
-		$username = trim($_POST["username"]);
-		$password = trim($_POST["password"]);
+  include("validation_functions.php");
+  
+  //session_start();
+if(isset($_POST['submit']))
+{
+  $connection= mysqli_connect('localhost','root','poker','db_user') ;
+ if(mysqli_connect_errno()) {
+    die("Database connection failed: " . 
+         mysqli_connect_error() . 
+         " (" . mysqli_connect_errno() . ")"
+    );
+  }
+ $username=$_POST['username'];
+ $password=$_POST['password'];
+ if($username!=''&&$password!='')
+ {
+   $query="select * from login where username='".$username."' and password='".$password."'";
+  $search=mysqli_query($connection,$query);
+   $res=mysqli_fetch_row($search);
+   if($res)
+   {
+    $_SESSION['username']=$username;
+    redirect_to("lobby.php");
 
-		// Validations
-		$fields_required = array("username", "password");
-		foreach($fields_required as $field) {
-			$value = trim($_POST[$field]);
-			if (!has_presence($value)) {
-				$errors[$field] = ucfirst($field) . " can't be blank";
-			}
-		}
-		
-		$fields_with_max_lengths = array("username" => 30, "password" => 8);
-		validate_max_lengths($fields_with_max_lengths);
-		
-		if (empty($errors)) {
-			// try to login
-			if ($username == "poker" && $password == "1234") {
-				// successful login
-				redirect_to("lobby.php");
-			} else {
-				$message = "Username/password do not match.";
-
-			}
-		}
-
-	} else {
-		$username = "";
-		$message = "Please log in.";
-	}
+    }else{
+          echo "Username/password not found.";
+    //echo'You entered username or password is incorrect';
+   }
+ }
+ else
+ {
+  echo'Enter both username and password';
+ }
+}
 ?>
-
