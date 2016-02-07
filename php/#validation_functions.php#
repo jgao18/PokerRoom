@@ -1,0 +1,33 @@
+ Expects an assoc. array
+	foreach($fields_with_max_lengths as $field => $max) {
+		$value = trim($_POST[$field]);
+	  if (!has_max_length($value, $max)) {
+	    $errors[$field] = ucfirst($field) . " is too long";
+	  }
+	}
+}
+
+function form_errors($errors=array()) {
+	$output = "";
+	if (!empty($errors)) {
+	  $output .= "<div class=\"error\">";
+	  $output .= "Please fix the following errors:";
+	  $output .= "<ul>";
+	  foreach ($errors as $key => $error) {
+	    $output .= "<li>{$error}</li>";
+	  }
+	  $output .= "</ul>";
+	  $output .= "</div>";
+	}
+	return $output;
+}
+
+?>
+<?php
+		function redirect_to($new_location) {
+		header("Location: " . $new_location);
+		exit;
+	}
+	
+?>
+

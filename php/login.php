@@ -1,6 +1,7 @@
 <?php
-    require_once("form_with_validation.php");
-    include("header.php")
+    include("form_with_validation.php");
+    include("header.php");
+    include("session.php");
     ?>
 <html>
 <head>
@@ -137,21 +138,22 @@ input[type=submit]:active {
 </style>
 
 </head>
+ <li><a href="register.php">new user?</a></li>
 <body>
    	<center>
 
-        <?php echo $message; ?><br />
-        <?php echo form_errors($errors); ?>
-
+        <?php echo message(); ?>
+     
+   
     <form action="login.php" method="post">
       <p>Username:
-        <input type="text" name="username" value="<?php echo htmlentities($username); ?>" />
+        <input type="text" name="username" value="" />
       </p>
       <p>Password:
             <input type="password" name="password" value="" />
       </p>
-           <input type="submit" name="submit" value="Login" />
-           <input type="submit" name="New User" value="New User" />
+           <input type="submit" name="submit" value="Login" /><br />
+
     </form>
 	</center>
 	</body>
