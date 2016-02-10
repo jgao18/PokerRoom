@@ -25,6 +25,10 @@ function init() {
 
   currentPlayers = [];
   maxPlayers = 4
+  for (i = 0; i< maxPlayers; i++)
+  {
+    currentPlayers.push(new Player());
+  }
 
   // Array of button names
   buttonNames = ["Start","How to Play"];
@@ -56,43 +60,42 @@ function onSocketConnected() {
 function onNewPlayer(data)
 {
   playerList = data;
-  playerIndex = playerList.length - 1;
 
-  console.log("New player connected: " + playerList[playerIndex].username);
+  console.log(currentPlayers);
 
-  currentPlayers = [];
-  var i;
   for (i = 0; i < playerList.length; i++)
   {
     var existingPlayer = new Player(playerList[i].id, playerList[i].username, playerList[i].chips, playerList[i].index);
-    if (existingPlayer.getUsername() == currentPlayer.getUsername())
+    if (existingPlayer.getUsername() != "INVALID_USER")
     {
-      currentPlayer = existingPlayer;
-      playerAmount(currentPlayer.getUsername(), currentPlayer.getChips());
-      console.log("Found the current player. His username is " + currentPlayer.getUsername() + " and his tableIndex is " + currentPlayer.getTableIndex());
+      if (existingPlayer.getUsername() == currentPlayer.getUsername())
+      {
+        currentPlayer = existingPlayer;
+        playerAmount(currentPlayer.getUsername(), currentPlayer.getChips());
+        console.log("Found the current player. His username is " + currentPlayer.getUsername() + " and his tableIndex is " + currentPlayer.getTableIndex());
+      }
+      currentPlayers[existingPlayer.getTableIndex()] = existingPlayer;
     }
-    currentPlayers.push(existingPlayer);
   }
 
-  var iterator;
-  iterator = currentPlayers.length;
+  console.log(currentPlayers);
+
+  var localIndex;
+  localIndex = currentPlayer.getTableIndex();
   var nextPlayerIndex;
-  while (true)
+  var nextPlayerIterator = 0;
+
+  for (i = 0; i< maxPlayers - 1; i++)
   {
-    if (iterator-- <= 1) break;
-    nextPlayerIndex = (currentPlayer.getTableIndex() + 1) % currentPlayers.length;
-    console.log("the iterator is currently at: " + iterator + ". The next player's index is " + nextPlayerIndex);
-    leftUserAmount(currentPlayers[nextPlayerIndex].getUsername(), currentPlayers[nextPlayerIndex].getChips());
-
-    if (iterator-- <= 1) break;
-    nextPlayerIndex = (currentPlayer.getTableIndex() + 2) % currentPlayers.length;
-    console.log("the iterator is currently at: " + iterator + ". The next player's index is " + nextPlayerIndex);
-    backUserAmount(currentPlayers[nextPlayerIndex].getUsername(), currentPlayers[nextPlayerIndex].getChips());
-
-    if (iterator-- <= 1) break;
-    nextPlayerIndex = (currentPlayer.getTableIndex() + 3) % currentPlayers.length;
-    console.log("the iterator is currently at: " + iterator + ". The next player's index is " + nextPlayerIndex);
-    rightUserAmount(currentPlayers[nextPlayerIndex].getUsername(), currentPlayers[nextPlayerIndex].getChips());
+    nextPlayerIterator++;
+    nextPlayerIndex = (localIndex + nextPlayerIterator) % currentPlayers.length;
+    //console.log(currentPlayers)
+    //console.log(currentPlayers[nextPlayerIndex].getUsername() != "INVALID_USER");
+    if (currentPlayers[nextPlayerIndex].getUsername() != "INVALID_USER")
+    {
+      console.log("got thru" + nextPlayerIndex + " fdsfds" + i);
+      drawPlayerAt(nextPlayerIndex, i);
+    }
   }
 }
 
@@ -105,6 +108,22 @@ function onRemovePlayer(data) {
       currentPlayers.splice(i, 1);
       break;
     }
+  }
+}
+
+function drawPlayerAt(playerIndex, indexAfterLocal)
+{
+  if (indexAfterLocal == 0)
+  {
+    leftUserAmount(currentPlayers[playerIndex].getUsername(), currentPlayers[playerIndex].getChips());
+  }
+  else if (indexAfterLocal == 1)
+  {
+    backUserAmount(currentPlayers[playerIndex].getUsername(), currentPlayers[playerIndex].getChips());
+  }
+  else if (indexAfterLocal == 2)
+  {
+    rightUserAmount(currentPlayers[playerIndex].getUsername(), currentPlayers[playerIndex].getChips());
   }
 }
 

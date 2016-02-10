@@ -1,6 +1,6 @@
 var Player = function(id, username, chips, tableIndex)
 {
-  var username = username || "INVALIDUSER"
+  var username = username || "INVALID_USER"
   var password, statistics;
   var chips = chips || 0 ;
   var tableIndex = tableIndex;
