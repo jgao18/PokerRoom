@@ -7,10 +7,12 @@ var socket;
 var players;
 var connectedPlayers;
 var currentHandPlayers;
+var maxPlayers;
 
 function init() {
     connectedPlayers = [];
     currentHandPlayers = [];
+    maxPlayers = 4;
 
     socket = io.listen(8000);
 
@@ -39,13 +41,21 @@ function onNewPlayer(data) {
   util.log("New player " + newPlayer.getUsername() + " has been added with " + newPlayer.getChips() + " chips. His index is " + newPlayer.getTableIndex());
 
   connectedPlayers.push(newPlayer);
-
   var i, existingPlayer;
-  outputArray = []
+  outputArray = [];
+  for (i = 0; i < maxPlayers; i++)
+  {
+    outputArray.push(new Player());
+  }
+
+  util.log("outputArray length: " + outputArray.length)
+
   for (i = 0; i < connectedPlayers.length; i++) {
     existingPlayer = connectedPlayers[i];
-    outputArray.push({id: existingPlayer.id, username: existingPlayer.getUsername(), chips: existingPlayer.getChips(), index: existingPlayer.getTableIndex()});
+    outputArray[existingPlayer.getTableIndex()] = {id: existingPlayer.id, username: existingPlayer.getUsername(), chips: existingPlayer.getChips(), index: existingPlayer.getTableIndex()};
   };
+
+  util.log("NEW outputArray length: " + outputArray.length)
 
   // Send playerArray to new player
   this.emit("new player", outputArray);
