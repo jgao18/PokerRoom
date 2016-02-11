@@ -10,9 +10,28 @@ var currentPlayers;
 var maxPlayers;
 var playerIndex;
 
+var game_menu = new createjs.Container();
+
+function addToGame(object) {
+	game_menu.addChild(object);
+	stage.update();
+}
+
+function deleteItemGame(object) {
+	game_menu.removeChild(object);
+	stage.update();
+}
+	
+function removeGameChildren() {
+	game_menu.removeAllChildren();
+	stage.update();
+}
+
 function init() {
   // Creating the stage
   stage = new createjs.Stage("demoCanvas");
+  backgroundFelt();
+  stage.addChild(game_menu);
 
   // Get dimensions of Canvas
   canvas = document.getElementById('demoCanvas');
@@ -131,12 +150,6 @@ function drawPlayerAt(playerIndex, indexAfterLocal)
 function menu() {
 
   // adding background image
-  main_background = new createjs.Bitmap("../images/pokerfelt.jpg");
-  stage.addChild(main_background);
-  createjs.Ticker.addEventListener("tick", handleTick);
-  function handleTick(event) {
-    stage.update();
-  }
 
   // Title of Game
   title = new createjs.Text("Poker Room", "50px Bembo", "#FF0000");
@@ -149,14 +162,10 @@ function menu() {
   subtitle.y = height/2.8;
 
   // Creating Buttons for Game
-  var start = new button(width/2.3,height/2.3,"Start", "#F00");
-  var how_to_play = new button(width/2.53,height/1.8, "How to Play", "#F00")
-
-  // adding the title to canvas
-  stage.addChild(title);
-
-  // adding the subtitle to canvas
-  stage.addChild(subtitle);
+  addToMenu(title);
+  addToMenu(subtitle);
+  startButton();
+  howToPlayButton();
 
   // update to show title and subtitle
   stage.update();
@@ -184,12 +193,12 @@ function start_game() {
   //rightUserAmount();
   //backUserAmount();
   //pot();
-  hold();
-  raise();
+  holdButton();
+  raiseButton();
   //chip();
-  fold();
-  options();
-  leave();
+  foldButton();
+  optionsButton();
+  leaveButton(currentPlayer.id);
 
   var signalNow1 = turn_signal("right");
   var signalNow2 = turn_signal("main");
@@ -201,135 +210,26 @@ function start_game() {
 
 // Creates the poker table and background
 function pokertable() {
-  // Retrieving the pokertable and background
-  var poker_menu = new createjs.Container();
-  var game_background = new createjs.Bitmap("../images/pokerfelt.jpg");
+  // Retrieving the pokertable
   var table = new createjs.Bitmap("../images/pokertable.png");
 
   // adjusting the location of the table
   table.x = width/6;
   table.y = height/3;
   // adding the table and background to container and stage
-  poker_menu.addChild(game_background, table);
-  stage.addChild(poker_menu);
+  addToGame(table);
   createjs.Ticker.addEventListener("tick", handleTick);
   function handleTick(event) {
        stage.update();
   }
 }
 
-function button(x,y,label,color) {
-
-  var user_button = new createjs.Container();
-
-  var text = new createjs.Text(label, "20px Bembo", "#000");
-  text.textBaseline = "top";
-  text.textAlign = "center";
-
-  var width = text.getMeasuredWidth()+30;
-  var height = text.getMeasuredHeight()+20;
-
-  text.x = width/2 + x;
-  text.y = 10 + y;
-
-  var background = new createjs.Shape();
-  background.graphics.beginFill(color).drawRoundRect(x,y,width,height,10);
-
-  user_button.addChild(background, text)
-  stage.addChild(user_button);
-
-  var i;
-  for (i = 0; i < buttonNames.length; i++)
-  {
-    if (label == buttonNames[i]){
-      user_button.addEventListener("click", function(event) {
-
-        if(label == "Start")
-        {
-          stage.removeChild(user_button);
-          start_game();
-        }
-
-        if(label == "How to Play")
-        {
-          window.location.assign('file:///C:/pokerRoom/PokerRoom/php/instructions.html');
-          alert("Instructions");
-        }
-      })
-    }
-  }
-}
-
-function hold() {
-
-	var hold_button = new createjs.Container();
-    var hold_text = new createjs.Text("hold", "10px Bembo", "#000");
-    hold_text.textBaseline = "top";
-    hold_text.textAlign = "center";
-
-    var width = hold_text.getMeasuredWidth()+15;
-    var height = hold_text.getMeasuredHeight()+7;
-
-    hold_text.x = 316.5;
-    hold_text.y = 478;
-
-    var background = new createjs.Shape();
-    background.graphics.beginFill("yellow").drawRoundRect(300,475,width,height,10);
-
-    hold_button.addChild(background, hold_text)
-    stage.addChild(hold_button);
-	stage.update();
-}
-
-function raise() {
-
-	var raise_button = new createjs.Container();
-    var raise_text = new createjs.Text("raise", "10px Bembo", "#000");
-    raise_text.textBaseline = "top";
-    raise_text.textAlign = "center";
-
-    var width = raise_text.getMeasuredWidth()+15;
-    var height = raise_text.getMeasuredHeight()+7;
-
-    raise_text.x = 357;
-    raise_text.y = 478;
-
-    var background = new createjs.Shape();
-    background.graphics.beginFill("yellow").drawRoundRect(340,475,width,height,10);
-
-    raise_button.addChild(background,raise_text)
-    stage.addChild(raise_button);
-	stage.update();
-}
-
-function fold() {
-
-	var fold_button = new createjs.Container();
-    var fold_text = new createjs.Text("fold", "10px Bembo", "#000");
-    fold_text.textBaseline = "top";
-    fold_text.textAlign = "center";
-
-    var width = fold_text.getMeasuredWidth()+15;
-    var height = fold_text.getMeasuredHeight()+7;
-
-    fold_text.x = 396;
-    fold_text.y = 478;
-
-    var background = new createjs.Shape();
-    background.graphics.beginFill("yellow").drawRoundRect(380,475,width,height,10);
-
-    fold_button.addChild(background,fold_text)
-    stage.addChild(fold_button);
-	stage.update();
-}
-
-
 function paint_deck() {
 
   var card_back = deck.card().get_card_back_object();
   card_back.x = 200;
   card_back.y = 300;
-  stage.addChild(card_back);
+  addToGame(card_back);
 }
 
 // Still needs work
@@ -534,7 +434,7 @@ function pot(firstAmount, secondAmount, thridAmount, fouthAmount) {
 }
 
 function playerAmount(username, amount) {
-	var chip_plate = new createjs.Container();
+  var chip_plate = new createjs.Container();
 
   var chip_plate_background = new createjs.Shape();
   chip_plate_background.graphics.beginFill("black").drawRect(420,475,70,17);
@@ -550,7 +450,7 @@ function playerAmount(username, amount) {
   user_amount.y = 476;
   chip_plate.addChild(user_amount);
 
-  stage.addChild(chip_plate)
+  addToGame(chip_plate)
   stage.update();
 }
 
@@ -571,7 +471,7 @@ function leftUserAmount(username, amount) {
   leftAmount.y = 380;
   chip_plate.addChild(leftAmount);
 
-  stage.addChild(chip_plate);
+  addToGame(chip_plate);
   stage.update();
 }
 
@@ -592,7 +492,7 @@ function rightUserAmount(username, amount) {
   rightAmount.y = 380;
   chip_plate.addChild(rightAmount);
 
-  stage.addChild(chip_plate)
+  addToGame(chip_plate)
   stage.update();
 
 }
@@ -614,7 +514,7 @@ function backUserAmount(username, amount) {
   backAmount.y = 175;
   chip_plate.addChild(backAmount);
 
-  stage.addChild(chip_plate)
+  addToGame(chip_plate)
   stage.update();
 }
 
@@ -648,47 +548,6 @@ function playerCards(x,y) {
 	stage.update();
 }
 
-function options() {
-
-	var options_button = new createjs.Container();
-	var options_text = new createjs.Text("Options", "20px Bembo", "#000");
-	options_text.textBaseline = "top";
-	options_text.textAlign = "center";
-
-	var width = options_text.getMeasuredWidth()+15;
-    var height = options_text.getMeasuredHeight()+7;
-
-    options_text.x = 700;
-    options_text.y = 579;
-
-	var background = new createjs.Shape();
-	background.graphics.beginFill("yellow").drawRoundRect(662,575,width,height,10);
-
-	options_button.addChild(background,options_text)
-	stage.addChild(options_button);
-	stage.update();
-}
-
-function leave() {
-
-	var leave_button = new createjs.Container();
-	var leave_text = new createjs.Text("Leave", "20px Bembo", "#000");
-	leave_text.textBaseline = "top";
-	leave_text.textAlign = "center";
-
-	var width = leave_text.getMeasuredWidth()+15;
-    var height = leave_text.getMeasuredHeight()+7;
-
-    leave_text.x = 700;
-    leave_text.y = 614;
-
-	var background = new createjs.Shape();
-	background.graphics.beginFill("yellow").drawRoundRect(662,610,width+14,height,10);
-
-	leave_button.addChild(background,leave_text)
-	stage.addChild(leave_button);
-	stage.update();
-}
 
 function how_to_play() {
   // write tutorial
@@ -697,5 +556,3 @@ function how_to_play() {
 function play_again() {
   // write code to play again
 }
-
-//hello world
