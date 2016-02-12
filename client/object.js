@@ -1,3 +1,6 @@
+// Container for main menu
+var main_menu = new createjs.Container();
+
 var get_heart_object = function(sm)
 {
   var heart = new createjs.Shape();
@@ -61,6 +64,23 @@ var get_club_object = function(sm)
   return club;
 }
 
+// Access this function to atler the menu Container
+function addToMenu(object) {
+	main_menu.addChild(object);
+	stage.update();
+}
+
+function deleteItemMenu(object) {
+	main_menu.removeChild(object);
+	stage.update();
+}
+	
+function removeMenuChildren() {
+	stage.removeChild(main_menu);
+	main_menu.removeAllChildren();
+	stage.update();
+}
+
 var get_value_object = function(value, color, font)
 {
   if (color == "red") {
@@ -111,26 +131,121 @@ var get_room_background_object = function(sm)
   return background;
 }
 
+// Indicates which user's turn
 function turn_signal(user) {
-	
 	var signal = new createjs.Shape();
-	if (user == "left") {
-		signal.graphics.beginStroke("#FFFF00").beginFill("#FFFF00");
-		signal.graphics.moveTo(43, 260).lineTo(103, 260).lineTo(73, 280).lineTo(43, 260);
-		
-	}
-	else if (user == "back") {
-		signal.graphics.beginStroke("#FFFF00").beginFill("#FFFF00");
-		signal.graphics.moveTo(340, 60).lineTo(400, 60).lineTo(370, 80).lineTo(340, 60);
-	}
-	else if (user == "right") {
-		signal.graphics.beginStroke("#FFFF00").beginFill("#FFFF00");
-		signal.graphics.moveTo(643, 260).lineTo(703, 260).lineTo(673, 280).lineTo(643, 260);
-	}
-	else if (user == "main") {
-		signal.graphics.beginStroke("#FFFF00").beginFill("#FFFF00");
-		signal.graphics.moveTo(515, 540).lineTo(545, 510).lineTo(545, 570).lineTo(515, 540);
+	signal.graphics.beginStroke("#FFFF00").beginFill("#FFFF00");
+	
+	// Depending on which user, provide the user signal
+	switch (user) {
+		case "left":
+			signal.graphics.moveTo(43, 260).lineTo(103, 260).lineTo(73, 280).lineTo(43, 260);
+			break;
+		case "back":
+			signal.graphics.moveTo(340, 60).lineTo(400, 60).lineTo(370, 80).lineTo(340, 60);
+			break;
+		case "right":
+			signal.graphics.moveTo(643, 260).lineTo(703, 260).lineTo(673, 280).lineTo(643, 260);
+			break;
+		case "main":
+			signal.graphics.moveTo(515, 540).lineTo(545, 510).lineTo(545, 570).lineTo(515, 540);
+			break;
 	}
 	
 	return signal;
+}
+
+// Allows a user to create a button with specifications
+function button(x,y,width,height,label,color,textSize) {
+	// The container which the button will be put
+    var user_button = new createjs.Container();
+
+	// Creating the text for button
+	var text;
+	switch (textSize) {
+		case 10:
+			text = new createjs.Text(label, "10px Bembo", "#000");
+			text.y -= 2;
+			break;
+		case 20:
+			text = new createjs.Text(label, "20px Bembo", "#000");
+			break;
+	}
+    text.textBaseline = "top";
+    text.textAlign = "center";
+	
+	// Setting text coordinates
+    text.x += x + (width/2);
+    text.y += y + (height/4);
+
+	// Creating the button shape
+    var background = new createjs.Shape();
+    background.graphics.beginFill(color).drawRoundRect(x,y,width,height,10);
+
+	// Adding the button shape and text to container
+    user_button.addChild(background, text)
+    return user_button;
+}
+	
+/* All are buttons for the game */
+function optionsButton() {
+	var options = new button(662,575,80,30,"Options","yellow",20);
+	addToGame(options);
+	stage.update();
+}
+
+function leaveButton(data) {
+	var leave = new button(662,610,80,30,"Leave","yellow",20);
+	addToGame(leave);
+	stage.update();
+	
+	leave.addEventListener("click", function(event) {
+		removeGameChildren();
+        menu();
+	})
+}
+
+function holdButton() {
+	var hold = new button(295,475,35,18,"hold", "yellow",10);
+	addToGame(hold);
+	stage.update();
+}
+
+function raiseButton() {
+	var raise = new button(335,475,35,18,"raise", "yellow",10);
+	addToGame(raise);
+	stage.update();
+}
+
+function foldButton() {
+	var fold = new button(375,475,35,18,"fold", "yellow",10);
+	addToGame(fold);
+	stage.update();
+}
+
+function startButton() {
+	var start = new button(315,300,100,45,"Start", "#F00",20);
+	addToMenu(start);
+	stage.update();
+	
+	start.addEventListener("click", function(event) {
+        removeMenuChildren();
+        start_game();
+	})
+}
+
+function howToPlayButton() {
+	var how_To_Play = new button(300,370,130,45,"How To Play", "#F00",20);
+	addToMenu(how_To_Play);
+	stage.addChild(main_menu);
+	stage.update();
+}
+
+function backgroundFelt() {
+    main_background = new createjs.Bitmap("../images/pokerfelt.jpg");
+    stage.addChild(main_background);
+    createjs.Ticker.addEventListener("tick", handleTick);
+    function handleTick(event) {
+      	stage.update();
+    }
 }
