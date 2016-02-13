@@ -9,7 +9,7 @@ var currentPlayer;
 var currentPlayers;
 var maxPlayers;
 var playerIndex;
-var numPlayers = 1;
+var numPlayers = 0;
 var tableCardsPass = false;
 
 // Holds all items for the game
@@ -64,11 +64,7 @@ function game_init() {
   currentPlayer.setUsername("testUser" + Math.floor((Math.random() * 100) + 1));
   currentPlayer.setPassword("testPassword" + Math.floor((Math.random() * 10) + 1));
   currentPlayer.addChips(Math.floor((Math.random() * 10000) + 1));
-  currentPlayer.setPosition(2);
   //socket.emit("new player", {username: currentPlayer.getUsername(), chips: currentPlayer.getChips()});
-  
-  socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
-  setEventHandlers();
 
   menu();
 }
@@ -87,7 +83,10 @@ var setEventHandlers = function() {
 	socket.on("remove player", onRemovePlayer);
 	
 	// Game is activated
-	socket.on("start game", start_game)
+	socket.on("start game", start_game);
+	
+	// The server sending information to the client on who turn it is
+	socket.on("current turn", playerTurn);
 };
 
 function onSocketConnected() {
@@ -144,6 +143,31 @@ function onNewPlayer(data)
   numPlayers++;
 }
 
+function playerTurn(data) {
+	console.log(data);
+	var userTurn = data.username;
+	console.log("Indicating the player's turn right now" + userTurn);
+	
+	if (game_menu.contains(signal)) {
+		deleteItemFromGame(signal);
+	}
+	
+    var nextPlayerIndex;
+	localIndex = currentPlayer.getTableIndex();
+	var nextPlayerIterator = 0;
+		
+	for (var i = 0; i < currentPlayers.length; i++) {
+		nextPlayerIterator++;
+		nextPlayerIndex = (localIndex + nextPlayerIterator) % numPlayers;
+		console.log(nextPlayerIndex);
+		if (currentPlayers[i].getUsername() == userTurn) {
+			var signal = turn_signal(nextPlayerIndex);
+			addToGame(signal);
+			stage.update();
+		}
+	}
+}
+
 function passingCards() {
 	
     if( tableCardsPass == false ) {
@@ -194,50 +218,17 @@ function onRemovePlayer(data) {
 // IndexAfterLocal refers the order they are in the array
 function drawPlayerAt(playerIndex, indexAfterLocal)
 { 
-	 /*
-	 switch(randomUserStart()) {
-	 	case 0:
-			signal = turn_signal("main");
-			console.log("hello");
-			break;
-		case 1:
-			signal = turn_signal("left");
-			console.log("hello");
-			break;
-	 }
-	 
-     addToGame(signal);
-	 stage.update(); 
-  }*/
-  
-  console.log(randomUserStart());
-
   if (indexAfterLocal == 0)
   {
     leftUserAmount(currentPlayers[playerIndex].getUsername(), currentPlayers[playerIndex].getChips());
-	/*cardsToRight();
-	if (currentPlayers[playerIndex].getPosition == 1) {
-        addToGame(turn_signal("right"));
-   	 	stage.update(); 
-	}*/
   }
   else if (indexAfterLocal == 1)
   {
     backUserAmount(currentPlayers[playerIndex].getUsername(), currentPlayers[playerIndex].getChips());
-	/*cardsToBack()
-	if (currentPlayers[playerIndex].getPosition == 1) {
-        addToGame(turn_signal("back"));
-   	 	stage.update(); 
-	}*/
   }
   else if (indexAfterLocal == 2)
   {
     rightUserAmount(currentPlayers[playerIndex].getUsername(), currentPlayers[playerIndex].getChips());
-	/*cardsToLeft();
-	if (currentPlayers[playerIndex].getPosition == 1) {
-        addToGame(turn_signal("left"));
-   	 	stage.update(); 
-	}*/
   }
 }
 
@@ -267,6 +258,8 @@ function menu() {
 function lobby() {
 	
    // This tells the server that the a new player has entered.
+   socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
+   setEventHandlers();
    socket.emit("new player", {username: currentPlayer.getUsername(), chips: currentPlayer.getChips()});
    
    // All the prepared background for lobby
@@ -274,7 +267,7 @@ function lobby() {
    paint_deck();
    readyButton();
    optionsButton();
-   leaveButton();
+   leaveButton(currentPlayer);
 }
 
 // Starts game
@@ -285,8 +278,9 @@ function start_game() {
   //socket.emit("new player", {username: currentPlayer.getUsername(), chips: currentPlayer.getChips()});
 
   //document.getElementById("demoCanvas").style.background = '#FF0000';
+  socket.emit("current turn");
   passFirstCard();
-  holdButton();
+  callButton();
   raiseButton();
   passingCards()
   //chip();

@@ -138,16 +138,20 @@ function turn_signal(user) {
 	
 	// Depending on which user, provide the user signal
 	switch (user) {
-		case "left":
-			signal.graphics.moveTo(43, 260).lineTo(103, 260).lineTo(73, 280).lineTo(43, 260);
-			break;
-		case "back":
-			signal.graphics.moveTo(340, 60).lineTo(400, 60).lineTo(370, 80).lineTo(340, 60);
-			break;
-		case "right":
+		    // left
+		case 3:
 			signal.graphics.moveTo(643, 260).lineTo(703, 260).lineTo(673, 280).lineTo(643, 260);
 			break;
-		case "main":
+			// back
+		case 2:
+			signal.graphics.moveTo(340, 60).lineTo(400, 60).lineTo(370, 80).lineTo(340, 60);
+			break;
+			// right 
+		case 1:
+			signal.graphics.moveTo(43, 260).lineTo(103, 260).lineTo(73, 280).lineTo(43, 260);
+			break;
+			// main
+		case 0:
 			signal.graphics.moveTo(515, 540).lineTo(545, 510).lineTo(545, 570).lineTo(515, 540);
 			break;
 	}
@@ -194,19 +198,26 @@ function optionsButton() {
 	stage.update();
 }
 
-function leaveButton(data) {
+/* Good start on the leave Button. 
+   Need to complete:
+	  - Put all other characters into a container for easy deletion
+	  - Once a player leaves a game, all players screens are updated.
+      - Have all Playerlist updated once a player leaves correctly.
+*/
+function leaveButton(currentPlayer) {
 	var leave = new button(662,610,80,30,"Leave","yellow",20);
 	addToGame(leave);
 	stage.update();
 	
 	leave.addEventListener("click", function(event) {
-		removeGameChildren();
+		removeGameChildren();		
         game_init();
+		socket.emit("leave", currentPlayer.id);
 	})
 }
 
-function holdButton() {
-	var hold = new button(295,475,35,18,"hold", "yellow",10);
+function callButton() {
+	var hold = new button(295,475,35,18,"call","yellow",10);
 	addToGame(hold);
 	stage.update();
 }
