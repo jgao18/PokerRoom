@@ -52,15 +52,15 @@
  error_reporting('E_ALL ^ E_NOTICE');
  if(isset($_POST['submit']))
  {
-  mysql_connect('localhost','root','poker') or die(mysql_error());
-  mysql_select_db('db_user') or die(mysql_error());
+  mysql_connect('localhost','csci3300_poker','8duK8rat2ehuyedR') or die(mysql_error());
+  mysql_select_db('csci3300_poker') or die(mysql_error());
   $name=$_POST['name'];
   $username=$_POST['username'];
   $password=$_POST['password'];
   $mail=$_POST['mail'];  
-  $q=mysql_query("select * from login where name='".$name."' or username='".$username."'or mail='".$mail."' ") or die(mysql_error());
-  $r=mysql_fetch_row($q);
-  if($r>0)
+  $query=mysql_query("select * from login where username='".$username."'or mail='".$mail."' ") or die(mysql_error());
+  $row=mysql_fetch_row($query);
+  if($row>0)
   {
    $er='The username '.$username.' or email '.$mail.' is already present in our database';
   }
