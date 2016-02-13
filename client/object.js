@@ -72,6 +72,28 @@ var get_value_object = function(value, color, font)
   return title;
 }
 
+var get_dealer_chip = function(sm)
+{
+	var dealer_chip = new createjs.Container();
+	var dealer_chip_text = new createjs.Text("DEALER", "20px Bembo", "#000");
+	dealer_chip_text.textBaseline = "top";
+	dealer_chip_text.textAlign = "center";
+	
+	var width = dealer_chip_text.getMeasuredWidth()+15;
+	var height = dealer_chip_text.getMeasuredHeight()+7;
+	
+	dealer_chip_text.x = 700;
+    dealer_chip_text.y = 579;
+    
+    var background = new createjs.Shape();
+	background.graphics.beginFill("white").drawCircle(662,575,width,height,10);
+
+	dealer_chip.addChild(background,dealer_chip_text)
+	stage.addChild(dealer_chip);
+	stage.update();
+}
+
+
 var get_back_object = function(width, height, strokeColor, strokeThickness, fillColor)
 {
   strokeColor = strokeColor;
