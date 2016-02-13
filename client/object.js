@@ -201,7 +201,7 @@ function leaveButton(data) {
 	
 	leave.addEventListener("click", function(event) {
 		removeGameChildren();
-        menu();
+        game_init();
 	})
 }
 
@@ -230,7 +230,7 @@ function startButton() {
 	
 	start.addEventListener("click", function(event) {
         removeMenuChildren();
-        start_game();
+        lobby();
 	})
 }
 
@@ -239,6 +239,17 @@ function howToPlayButton() {
 	addToMenu(how_To_Play);
 	stage.addChild(main_menu);
 	stage.update();
+}
+
+function readyButton() {
+	var ready = new button(315,300,100,45,"Ready", "#F00",20);
+	addToGame(ready);
+	stage.update();
+	
+	ready.addEventListener("click", function(event) {
+        deleteItemFromGame(ready);
+        socket.emit("ready");
+	})
 }
 
 function backgroundFelt() {
