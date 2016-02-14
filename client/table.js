@@ -214,11 +214,37 @@ function nextAction() {
 			break;
 			//flip last card
 		case 3:
-			action = 0;
-			//show all cards
+			var cardList = ["rCard1","rCard2","lCard1","lCard2","bCard1","bCard2"];
+			var placement = [20,300,80,300,615,300,675,300];
+			var j = 0;
+			for (var i = 0; i < cardList.length; i++) {
+				if (stage.getChildByName(cardList[i]) != null) {
+					var card1 = stage.getChildByName(cardList[i]);
+					var card2 = stage.getChildByName(cardList[i+1]);
+					flip(card1,placement[j],placement[j+1]);
+					flip(card2,placement[j+2],placement[j+3]);
+				}
+				j += 4;
+				i++;
+			}
+			action++;
+			break;
+		case 4:
+			//action = 0;
+			
+			for (var i = 0; i < 13; i ++) {
+				var shape = stage.getChildByName("tableCards");
+				stage.removeChild(shape);
+			}
+			var cardList = ["rCard1","rCard2","lCard1","lCard2","bCard1","bCard2"];
+			/*for(var j = 0; i < cardList.length; i += ) {
+				
+			}*/
+			//show all cards 
 			//turn action to 0;
 	}
 }
+
 
 function passingCards() {
 	
@@ -455,6 +481,8 @@ function cardsToRight() {
     rCard1.y = 300;
     rCard2.x = 200;
     rCard2.y = 300;
+	rCard1.name = "rCard1";
+	rCard2.name = "rCard2";
     stage.addChild(rCard1,rCard2);
 
     var i = 0;
@@ -490,6 +518,8 @@ function cardsToLeft() {
     lCard1.y = 300;
     lCard2.x = 200;
     lCard2.y = 300;
+	lCard1.name = "lCard1";
+	lCard2.name = "lCard2";
     stage.addChild(lCard1,lCard2);
 
     var i = 0;
@@ -525,6 +555,8 @@ function cardsToBack() {
     bCard1.y = 300;
     bCard2.x = 200;
     bCard2.y = 300;
+	bCard1.name = "bCard1";
+	bCard2.name = "bCard2";
     stage.addChild(bCard1,bCard2);
 
     var i = 0;
@@ -661,7 +693,7 @@ function flip(card,x,y) {
    	 	store.x += 1.2;
         stage.update();
    	 	if (i > 20) {
-			//stage.removeChild
+			stage.removeChild(card);
 			playerCards(x,y);
  			createjs.Ticker.off("tick",flipTick);
    		}
@@ -676,6 +708,7 @@ function playerCards(x,y) {
     card = oneCard.get_card_container_object(oneCard);
 	card.x += x;
 	card.y += y;
+	card.name =  "tableCards";
 
     stage.addChild(card);
 	stage.update();
