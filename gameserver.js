@@ -108,15 +108,20 @@ function onNewPlayer(data) {
 */
 function currentTurn() {
 	
+	util.log("Coming in the the current turn");
 	if (currentHandPlayers.length == 0) {
-		currentHandPlayers = connectedPlayers;
+		this.emit("next action");
+		this.broadcast.emit("next action");
+		console.log("Going in to copy");
+		currentHandPlayers = connectedPlayers.slice();
 	}
 	
 	numTimesAccess++;
+	util.log(numTimesAccess);
 	
 	if (currentHandPlayers.length == numTimesAccess) {
+		numTimesAccess = 0;
 		util.log("OMGGGGGGGGG");
-		numTimeAccess = 0;
 		playerTurn = currentHandPlayers[0];
 		util.log("This is the player " + playerTurn.getUsername());
 		currentHandPlayers.splice(0, 1);

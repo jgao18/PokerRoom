@@ -155,7 +155,7 @@ function turn_signal(user) {
 			signal.graphics.moveTo(515, 540).lineTo(545, 510).lineTo(545, 570).lineTo(515, 540);
 			break;
 	}
-	
+	signal.name = "signal";
 	return signal;
 }
 
@@ -217,21 +217,31 @@ function leaveButton(currentPlayer) {
 }
 
 function callButton() {
-	var hold = new button(295,475,35,18,"call","yellow",10);
-	addToGame(hold);
+	var call = new button(295,475,35,18,"call","yellow",10);
+	addToGame(call);
 	stage.update();
+	call.addEventListener("click", function(event) {	
+		socket.emit("current turn");
+	})
 }
 
 function raiseButton() {
 	var raise = new button(335,475,35,18,"raise", "yellow",10);
 	addToGame(raise);
 	stage.update();
+	raise.addEventListener("click", function(event) {
+		socket.emit("current turn");
+		console.log("Pressing raise");
+	})
 }
 
 function foldButton() {
 	var fold = new button(375,475,35,18,"fold", "yellow",10);
 	addToGame(fold);
 	stage.update();
+	fold.addEventListener("click", function(event) {
+		socket.emit("current turn");
+	})
 }
 
 function startButton() {

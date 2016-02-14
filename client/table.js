@@ -11,6 +11,9 @@ var maxPlayers;
 var playerIndex;
 var numPlayers = 0;
 var tableCardsPass = false;
+var numOfTimes = 0;
+var playerIterator = 0;
+var action = 0;
 
 // Holds all items for the game
 var game_menu = new createjs.Container();
@@ -35,6 +38,15 @@ function deleteItemFromGame(object) {
 function removeGameChildren() {
 	game_menu.removeAllChildren();
 	stage.update();
+}
+
+function childFinder(object) {
+	for (var i = 0; i < stage.numChildren; i++ ) {
+		console.log(stage.getChildAt(i).name);
+		if (stage.getChildAt(i).name == object) {
+			return stage.getChildAt(i);
+		}
+	}
 }
 
 function game_init() {
@@ -87,6 +99,9 @@ var setEventHandlers = function() {
 	
 	// The server sending information to the client on who turn it is
 	socket.on("current turn", playerTurn);
+	
+	// Calls for the next action
+	socket.on("next action", nextAction);
 };
 
 function onSocketConnected() {
@@ -146,19 +161,25 @@ function onNewPlayer(data)
 function playerTurn(data) {
 	console.log(data);
 	var userTurn = data.username;
-	console.log("Indicating the player's turn right now" + userTurn);
+	console.log("Indicating the player's turn right now " + userTurn);
 	
-	if (game_menu.contains(signal)) {
-		deleteItemFromGame(signal);
+	if (numOfTimes > 0) {
+		console.log("Hello my name is Jessie!");
+		var shape = game_menu.getChildByName("signal");
+		game_menu.removeChild(shape);
 	}
+	
+	numOfTimes++;
 	
     var nextPlayerIndex;
 	localIndex = currentPlayer.getTableIndex();
-	var nextPlayerIterator = 0;
-		
+	playerIterator++;
+	nextPlayerIndex = (localIndex + playerIterator) % numPlayers;
+	
 	for (var i = 0; i < currentPlayers.length; i++) {
-		nextPlayerIterator++;
-		nextPlayerIndex = (localIndex + nextPlayerIterator) % numPlayers;
+		console.log("This is the localIndex: " + localIndex);
+		console.log("This is the playerIterator: " + playerIterator);
+		console.log("This is the numPlayers: " + numPlayers)
 		console.log(nextPlayerIndex);
 		if (currentPlayers[i].getUsername() == userTurn) {
 			var signal = turn_signal(nextPlayerIndex);
@@ -168,11 +189,42 @@ function playerTurn(data) {
 	}
 }
 
+function nextAction() {
+	switch(action) {
+		case 0:
+			var tCard5 = stage.getChildByName("tCard5");
+			var tCard4 = stage.getChildByName("tCard4");
+			var tCard3 = stage.getChildByName("tCard3");
+			flip(tCard5,260,300);
+			flip(tCard4,320,300);
+			flip(tCard3,380,300);
+			action++;
+			break;
+			//flip three cards
+		case 1:
+			var tCard2 = stage.getChildByName("tCard2");
+			flip(tCard2,440,300);
+			action++;
+			break;
+			//flip next card
+		case 2:
+			var tCard1 = stage.getChildByName("tCard1");
+			flip(tCard1,500,300);
+			action++;
+			break;
+			//flip last card
+		case 3:
+			action = 0;
+			//show all cards
+			//turn action to 0;
+	}
+}
+
 function passingCards() {
 	
     if( tableCardsPass == false ) {
     	 tableCard();
-  	 tableCardsPass == true;
+  	     tableCardsPass == true;
     }
 		
 	localIndex = currentPlayer.getTableIndex();
@@ -314,10 +366,15 @@ function paint_deck() {
 // Still needs work
 function tableCard() {
 	var tCard1 = deck.card().get_card_back_object();
+	tCard1.name = "tCard1";
 	var tCard2 = deck.card().get_card_back_object();
+	tCard2.name = "tCard2";
 	var tCard3 = deck.card().get_card_back_object();
+	tCard3.name = "tCard3";
 	var tCard4 = deck.card().get_card_back_object();
+	tCard4.name = "tCard4";
 	var tCard5 = deck.card().get_card_back_object();
+	tCard5.name = "tCard5";
 	var cards = [tCard1,tCard2,tCard3,tCard4,tCard5];
 
 	var i;
