@@ -4,7 +4,7 @@
   //session_start();
 if(isset($_POST['submit']))
 {
-  $connection= mysqli_connect('localhost','root','poker','db_user') ;
+  $connection= mysqli_connect('localhost','csci3300_poker','8duK8rat2ehuyedR','csci3300_poker') ;
  if(mysqli_connect_errno()) {
     die("Database connection failed: " . 
          mysqli_connect_error() . 

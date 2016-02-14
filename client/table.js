@@ -573,8 +573,11 @@ function playerAmount(username, amount) {
   chip_plate.addChild(chip_plate_background)
 
   var chip_background = new createjs.Shape();
-  chip_background.graphics.beginFill("gold").drawCircle(430,483,15);
-  chip_background.graphics.beginFill("blue").drawCircle(430,483,12);
+  chip_background.graphics.beginFill("red").drawCircle(430,483,15);
+  chip_background.graphics.beginFill("white").drawCircle(430,483,12);
+  chip_background.graphics.beginFill("red").drawCircle(430,483,9);
+  chip_background.graphics.beginFill("red").drawPolyStar(430,483,15,8,0.5,90);
+  chip_background.graphics.beginFill("white").drawCircle(430,483,2);
   chip_plate.addChild(chip_background);
 
   var user_amount = new createjs.Text(username + ": " + "$" + amount, "15px Bembo", "#FFFF00");
