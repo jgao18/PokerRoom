@@ -356,7 +356,7 @@ function start_game() {
   //socket.emit("new player", {username: currentPlayer.getUsername(), chips: currentPlayer.getChips()});
 
   //document.getElementById("demoCanvas").style.background = '#FF0000';
-  socket.emit("current turn");
+  socket.emit("first turn");
   passFirstCard();
   callButton();
   raiseButton();
