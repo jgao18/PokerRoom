@@ -52,6 +52,8 @@ function onSocketConnection(client) {
 	client.on("leave", playerLeft);
 	// Indicates the turn for the user
 	client.on("current turn", currentTurn);
+	
+	client.on("first turn", firstTurn);
 };
 
 // Called by clients when they hit the Play button
@@ -101,11 +103,25 @@ function onNewPlayer(data) {
    Signal first user's turn
    First user presses button
    Signal second user's turn
+
+So both players call this function in the beginning +2
+User presses the button +1
 */
 // Server kepts track of the current Turn
 /* Issues:
 	- When a user leaves and comes back currentTurn won't work
 */
+
+function firstTurn() {
+	numTimesAccess++;
+	if ( numTimesAccess ==  currentHandPlayers.length) {
+		playerTurn = currentHandPlayers[0];
+		currentHandPlayers.splice(0, 1);
+		this.emit("current turn", {username: playerTurn.getUsername(),index: playerTurn.getTableIndex()});
+		this.broadcast.emit("current turn", {username: playerTurn.getUsername(),index: playerTurn.getTableIndex()});
+	}
+}
+
 function currentTurn() {
 	
 	util.log("Coming in the the current turn");
@@ -116,18 +132,13 @@ function currentTurn() {
 		currentHandPlayers = connectedPlayers.slice();
 	}
 	
-	numTimesAccess++;
+	//currentHandPlayers.splice(0, 1);
 	util.log(numTimesAccess);
-	
-	if (currentHandPlayers.length == numTimesAccess) {
-		numTimesAccess = 0;
-		util.log("OMGGGGGGGGG");
-		playerTurn = currentHandPlayers[0];
-		util.log("This is the player " + playerTurn.getUsername());
-		currentHandPlayers.splice(0, 1);
-		this.emit("current turn", {username: playerTurn.getUsername(),index: playerTurn.getTableIndex()});
-		this.broadcast.emit("current turn", {username: playerTurn.getUsername(),index: playerTurn.getTableIndex()});
-	}
+    playerTurn = currentHandPlayers[0];
+    util.log("This is the player " + playerTurn.getUsername());
+    currentHandPlayers.splice(0, 1);
+	this.emit("current turn", {username: playerTurn.getUsername(),index: playerTurn.getTableIndex()});
+	this.broadcast.emit("current turn", {username: playerTurn.getUsername(),index: playerTurn.getTableIndex()});
 };
 
 // users will wait until all players press the ready button
