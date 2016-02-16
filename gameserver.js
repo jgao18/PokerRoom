@@ -1,5 +1,7 @@
 // http://rawkes.com/articles/creating-a-real-time-multiplayer-game-with-websockets-and-node.html
 
+
+// We could pass a buffer( or an array ) with the current the deck the players are using
 // required imports
 var util = require("util");
 var io = require("socket.io");
@@ -54,6 +56,9 @@ function onSocketConnection(client) {
 	client.on("current turn", currentTurn);
 	
 	client.on("first turn", firstTurn);
+	
+	client.on("buttons", buttons);
+	
 };
 
 // Called by clients when they hit the Play button
@@ -112,9 +117,17 @@ User presses the button +1
 	- When a user leaves and comes back currentTurn won't work
 */
 
+function buttons() {
+	this.emit("remove buttons");
+	this.broadcast.emit("add buttons");
+}
+
+// how do I do I indicate that this is the first player
 function firstTurn() {
 	numTimesAccess++;
 	if ( numTimesAccess ==  currentHandPlayers.length) {
+		//buttons();
+		this.emit("add buttons");
 		playerTurn = currentHandPlayers[0];
 		currentHandPlayers.splice(0, 1);
 		this.emit("current turn", {username: playerTurn.getUsername(),index: playerTurn.getTableIndex()});
@@ -133,6 +146,7 @@ function currentTurn() {
 	}
 	
 	//currentHandPlayers.splice(0, 1);
+	//buttons();
 	util.log(numTimesAccess);
     playerTurn = currentHandPlayers[0];
     util.log("This is the player " + playerTurn.getUsername());

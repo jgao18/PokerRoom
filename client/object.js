@@ -240,30 +240,36 @@ function leaveButton(currentPlayer) {
 
 function callButton() {
 	var call = new button(295,475,35,18,"call","yellow",10);
-	addToGame(call);
-	stage.update();
+	//addToGame(call);
+	//stage.update();
 	call.addEventListener("click", function(event) {	
 		socket.emit("current turn");
+		socket.emit("buttons");
 	})
+	return call;
 }
 
 function raiseButton() {
 	var raise = new button(335,475,35,18,"raise", "yellow",10);
-	addToGame(raise);
-	stage.update();
+	//addToGame(raise);
+    //stage.update();
 	raise.addEventListener("click", function(event) {
 		socket.emit("current turn");
+		socket.emit("buttons");
 		console.log("Pressing raise");
 	})
+	return raise;
 }
 
 function foldButton() {
 	var fold = new button(375,475,35,18,"fold", "yellow",10);
-	addToGame(fold);
-	stage.update();
+	//addToGame(fold);
+	//stage.update();
 	fold.addEventListener("click", function(event) {
 		socket.emit("current turn");
+		socket.emit("buttons");
 	})
+	return fold;
 }
 
 function startButton() {
@@ -292,6 +298,23 @@ function readyButton() {
 	ready.addEventListener("click", function(event) {
         deleteItemFromGame(ready);
         socket.emit("ready");
+	})
+}
+
+function againButton() {
+	var again = new button(315,245,100,45,"Again?", "#F00",20);
+	addToGame(again);
+	stage.update();
+	
+	again.addEventListener("click", function(event) {
+		
+		for (var i = 0; i < 13; i ++) {
+			var shape = stage.getChildByName("tableCards");
+			stage.removeChild(shape);
+		}
+		
+		deleteItemFromGame(again);
+		socket.emit("ready");
 	})
 }
 
