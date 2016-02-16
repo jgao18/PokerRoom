@@ -102,6 +102,10 @@ var setEventHandlers = function() {
 	
 	// Calls for the next action
 	socket.on("next action", nextAction);
+	
+	socket.on("add buttons", addButtonContainer);
+	
+	socket.on("remove buttons", removeButtonContainer);
 };
 
 function onSocketConnected() {
@@ -177,13 +181,9 @@ function playerTurn(data) {
 	nextPlayerIndex = (localIndex + playerIterator) % numPlayers;
 	
 	for (var i = 0; i < currentPlayers.length; i++) {
-		console.log("This is the localIndex: " + localIndex);
-		console.log("This is the playerIterator: " + playerIterator);
-		console.log("This is the numPlayers: " + numPlayers)
-		console.log(nextPlayerIndex);
 		if (currentPlayers[i].getUsername() == userTurn) {
 			var signal = turn_signal(nextPlayerIndex);
-			addToGame(signal);
+			game_menu.addChild(signal);
 			stage.update();
 		}
 	}
@@ -227,16 +227,24 @@ function nextAction() {
 				j += 4;
 				i++;
 			}
-			action++;
+			againButton();
+			action = 0;
 			break;
 		case 4:
 			//action = 0;
+			var signal = stage.getChildByName("signal");
+			// signal is added before I can delete
+			game_menu.removeChild(signal);
 			
 			for (var i = 0; i < 13; i ++) {
 				var shape = stage.getChildByName("tableCards");
 				stage.removeChild(shape);
 			}
-			var cardList = ["rCard1","rCard2","lCard1","lCard2","bCard1","bCard2"];
+			
+			againButton();
+			action = 0;
+			//var cardList = ["rCard1","rCard2","lCard1","lCard2","bCard1","bCard2"];
+			break;
 			/*for(var j = 0; i < cardList.length; i += ) {
 				
 			}*/
@@ -358,11 +366,12 @@ function start_game() {
   //document.getElementById("demoCanvas").style.background = '#FF0000';
   socket.emit("first turn");
   passFirstCard();
-  callButton();
-  raiseButton();
+  //addButtonContainer();
+  //callButton();
+  //raiseButton();
   passingCards()
   //chip();
-  foldButton();
+  //foldButton();
 }
 
 // Creates the poker table and background
@@ -711,6 +720,28 @@ function playerCards(x,y) {
 	card.name =  "tableCards";
 
     stage.addChild(card);
+	stage.update();
+}
+
+function playerOptions() {
+	fold();
+	
+}
+
+function addButtonContainer() {
+	var user_buttons = new createjs.Container();
+	user_buttons.name = "buttons";
+	var user_raise = raiseButton();
+	var user_call = callButton();
+	var user_fold = foldButton();
+	user_buttons.addChild(user_raise,user_call,user_fold);
+	game_menu.addChild(user_buttons);
+	stage.update();
+}
+
+function removeButtonContainer() {
+	var user_buttons = game_menu.getChildByName("buttons");
+	game_menu.removeChild(user_buttons);
 	stage.update();
 }
 
