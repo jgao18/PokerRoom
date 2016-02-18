@@ -335,7 +335,6 @@ function menu() {
   addToMenu(title);
   addToMenu(subtitle);
   startButton();
-  howToPlayButton();
 
   // update to show title and subtitle
   stage.update();
@@ -353,6 +352,7 @@ function lobby() {
    paint_deck();
    readyButton();
    optionsButton();
+   helpButton();
    leaveButton(currentPlayer);
 }
 
