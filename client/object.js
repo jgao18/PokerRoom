@@ -214,10 +214,29 @@ function button(x,y,width,height,label,color,textSize) {
 }
 	
 /* All are buttons for the game */
+
+/* For this button, I'd like an alert popup to occur on-click, but I want
+ * it to look nicer than the default popup (background color, font size, 
+ * font color, etc.
+*/
+function helpButton() {
+	var help = new button(662,540,80,30,"Help","yellow",20);
+	addToGame(help);
+	stage.update();
+	
+	help.addEventListener("click", function(event) {
+		alert(" Royal Flush: A royal flush is an ace high straight flush. For example, A-K-Q-J-10 all of diamonds. \n Straight Flush: A straight flush is a five-card straight, all in the same suit. For example, 7-6-5-4-3 all of clubs. \n Four of a Kind: Four of a kind, or quads, are four cards of equal value. For example, four jacks. \n Full House: A full house contains a set (3) of cards of one value and a pair of another value. For example, Q-Q-Q-2-2. \n Flush: A flush is any 5 cards, all of the same suit. For example, K-Q-9-6-3 all of diamonds. \n Straight: Five cards of sequential value. Every possible straight will contain either a 5 or a 10. For example, 7-6-5-4-3 with different suits. \n Three of a Kind: Three cards of the same value. For example, three aces. \n Two Pairs: This is two cards of one value and another two cards of another value. For example, two jacks and two 8s. \n Pair: One pair is two cards of the same rank. For example, two queens. \n High Card: The hand with the highest card(s) wins. If two or more players hold the highest card, a kicker comes into play (see below).");
+	})
+}	
+
 function optionsButton() {
 	var options = new button(662,575,80,30,"Options","yellow",20);
 	addToGame(options);
 	stage.update();
+	
+	options.addEventListener("click", function(event) {
+		alert("Hi!");
+	})	
 }
 
 /* Good start on the leave Button. 
@@ -237,6 +256,8 @@ function leaveButton(currentPlayer) {
 		socket.emit("leave", currentPlayer.id);
 	})
 }
+
+
 
 function callButton() {
 	var call = new button(295,475,35,18,"call","yellow",10);
@@ -275,19 +296,13 @@ function foldButton() {
 function startButton() {
 	var start = new button(315,300,100,45,"Start", "#F00",20);
 	addToMenu(start);
+	stage.addChild(main_menu);
 	stage.update();
 	
 	start.addEventListener("click", function(event) {
         removeMenuChildren();
         lobby();
 	})
-}
-
-function howToPlayButton() {
-	var how_To_Play = new button(300,370,130,45,"How To Play", "#F00",20);
-	addToMenu(how_To_Play);
-	stage.addChild(main_menu);
-	stage.update();
 }
 
 function readyButton() {
