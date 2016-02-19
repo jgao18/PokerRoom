@@ -8,14 +8,14 @@ function Card(value, suit, sm, font, width, height, strokeColor, strokeThickness
     this.color = "black";
   else
     this.color = "red";
-  this.sm = sm;
-  this.font = font;
-  this.width = width;
-  this.height = height;
-  this.strokeColor = strokeColor;
-  this.strokeThickness = strokeThickness;
-  this.backFillColor = backFillColor;
-  this.frontFillColor = frontFillColor;
+  this.sm = sm || 5.2;
+  this.font = font || "30px Impact";
+  this.width = width || 50
+  this.height = height || 70;
+  this.strokeColor = strokeColor || "gold";
+  this.strokeThickness = strokeThickness || 4;
+  this.backFillColor = backFillColor || "purple";
+  this.frontFillColor = frontFillColor || "white";
 }
 
 Card.prototype.get_color = function()
