@@ -1,0 +1,8 @@
+JG - Once turing is set up with Node.js, set up online play
+JS - Refactor code
+JG Endless raising
+JG - Server sends client data (card values/suits) at the right time
+JS - Algorithm to recognize who won the hand
+BP - Get server recognizing clients as soon as they log in
+JG - Look into fps freeze on tab change
+JS - Separates rules (nolimit/limit)
