@@ -264,20 +264,31 @@ function callButton() {
 	//addToGame(call);
 	//stage.update();
 	call.addEventListener("click", function(event) {	
+		//socket.emit("buttons");
 		socket.emit("current turn");
 		socket.emit("buttons");
+		//socket.emit("buttons");
 	})
 	return call;
 }
 
+// If someone raises, then 
 function raiseButton() {
 	var raise = new button(335,475,35,18,"raise", "yellow",10);
-	//addToGame(raise);
-    //stage.update();
+	
 	raise.addEventListener("click", function(event) {
-		socket.emit("current turn");
-		socket.emit("buttons");
-		console.log("Pressing raise");
+		var show;
+		if ((show = stage.getChildByName("bet_amount"))) {
+			setAmountBet(0);
+			stage.removeChild(show);
+		}
+		
+		if ((show = game_menu.getChildByName("raise_amount"))) {
+			game_menu.removeChild(show);
+		} 
+		else {
+			raiseAmount();
+		}
 	})
 	return raise;
 }
@@ -287,8 +298,12 @@ function foldButton() {
 	//addToGame(fold);
 	//stage.update();
 	fold.addEventListener("click", function(event) {
+		// We need some way to indicate two things:
+		//socket.emit("buttons");
+		socket.emit("fold");
 		socket.emit("current turn");
 		socket.emit("buttons");
+		//socket.emit("buttons");
 	})
 	return fold;
 }
@@ -311,9 +326,60 @@ function readyButton() {
 	stage.update();
 	
 	ready.addEventListener("click", function(event) {
+		console.log("Why is printing in the readyButton twice");
         deleteItemFromGame(ready);
         socket.emit("ready");
 	})
+}
+
+function raiseAmount() {
+	var raise_amount = new createjs.Container();
+	var one = new button(260,445,35,18,"1", "yellow",10);
+	one.addEventListener("click", function(event) {
+		betAmount(1);
+	})
+	
+	var five = new button(300,445,35,18,"5", "yellow",10);
+	five.addEventListener("click", function(event) {
+    	betAmount(5);
+	})
+	
+	var ten = new button(340,445,35,18,"10", "yellow",10);
+	ten.addEventListener("click", function(event) {
+  	    betAmount(10);
+	})
+	
+	var twenty = new button(380,445,35,18,"20", "yellow",10);
+	twenty.addEventListener("click", function(event) {
+        betAmount(20);
+	})
+	
+	var hundred = new button(420,445,35,18,"100", "yellow",10);
+	hundred.addEventListener("click", function(event) {
+        betAmount(100);
+	})
+	
+	var bet_button = new button(460,445,35,18,"bet", "yellow",10);
+	bet_button.addEventListener("click", function(event) {
+		var done_raising = game_menu.getChildByName("raise_amount");
+		game_menu.removeChild(done_raising);
+       	
+		var store = getAmountBet();
+		removePlayerChips(store);
+		
+		var currentChips = getPlayerChips();
+		var player = getCurrentPlayer();
+		playerAmount(player, currentChips);
+		socket.emit("increase pot", {chips: store});
+		socket.emit("current turn");
+		socket.emit("buttons");
+	})
+	
+	betAmount(0);
+	raise_amount.addChild(one,five,ten,twenty,hundred,bet_button);
+	raise_amount.name = "raise_amount";
+	addToGame(raise_amount);
+	stage.update();
 }
 
 function againButton() {
@@ -328,8 +394,12 @@ function againButton() {
 			stage.removeChild(shape);
 		}
 		
+		var userStore = game_menu.getChildByName("won player");
+		game_menu.removeChild(userStore);
+		
 		deleteItemFromGame(again);
 		socket.emit("ready");
+		socket.emit("from again");
 	})
 }
 

@@ -12,15 +12,22 @@ var players;
 var connectedPlayers;
 var currentHandPlayers;
 var maxPlayers;
+var userSockets;
 //var currentPlayerTurn = 0;
 var playerConnected;
 var readyPlayers = 0;
 var numTimesAccess = 0;
+var playingPlayers;
+var roundOver = false;
+var indexPlayer = 1;
+var again = 0;
 
 function init() {
 	// initialize connectedPlayers and currentHandPlayers once server has started.
     connectedPlayers = [];
     currentHandPlayers = [];
+	playingPlayers = [];
+	userSockets = [];
     maxPlayers = 4
 	
     socket = io.listen(8000);
@@ -43,9 +50,11 @@ var setEventHandlers = function() {
 // Occurs when a user first connects to poker.html
 function onSocketConnection(client) {
 	// Printing message
+	
     util.log("New player has connected: " + client.id);
 	// When a new player comes in, onNewPlayer runs
     client.on("new player", onNewPlayer);
+	
 	// When client disconnects, call onClientDisconnect
     client.on("disconnect", onClientDisconnect);
 	// When client presses ready button
@@ -59,16 +68,33 @@ function onSocketConnection(client) {
 	
 	client.on("buttons", buttons);
 	
+	client.on("fold", fold);
+	
+	client.on("call", currentTurn);
+	
+	client.on("increase pot", potIncrease);
+	
+	//client.on("from again", againButton)
+	
+	//client.on("call", userCalled);
+	
 };
 
 // Called by clients when they hit the Play button
 function onNewPlayer(data) {
   // Makes a new player with data provided
   
+  util.log(this.id);
+  //userSockets[data.username] = this.id;
+  userSockets.push({username: data.username, socket: this });
+  util.log("This is what happens: " + userSockets[0].username);
+  util.log("The socket id is: " + userSockets[data.username]);
+  
   var newPlayer = new Player(this.id, data.username, data.chips, connectedPlayers.length);
   util.log("New player " + newPlayer.getUsername() + " has been added with " + newPlayer.getChips() + " chips. His index is " + newPlayer.getTableIndex());
 
   // Player is now a connected player
+  playingPlayers.push(newPlayer);
   connectedPlayers.push(newPlayer);
   currentHandPlayers.push(newPlayer);
   
@@ -98,36 +124,63 @@ function onNewPlayer(data) {
 
   // Send playerArray to existing players
   this.broadcast.emit("new player", outputArray);
+  
+  if (connectedPlayers.length ==  2) {
+	  
+	  this.emit("ready");
+	  this.broadcast.emit("ready");
+  }
+  
+  if (connectedPlayers.length > 2) {
+	  this.emit("ready");
+  }
+  
 };
 
-/* The server will keep track of which turn the players are at
-   by looking at the the current list of players and modifying 
-   it when someone's turn is next. Happens after everyone has accepted game.
-
-   First user comes in
-   Signal first user's turn
-   First user presses button
-   Signal second user's turn
-
-So both players call this function in the beginning +2
-User presses the button +1
-*/
-// Server kepts track of the current Turn
-/* Issues:
-	- When a user leaves and comes back currentTurn won't work
-*/
-
-function buttons() {
-	this.emit("remove buttons");
-	this.broadcast.emit("add buttons");
+function potIncrease(data) {
+	util.log(data.id);
+	util.log("This is how many chips I have: " + data.chips);
+	this.emit("add to pot", {chips: data.chips});
+	this.broadcast.emit("add to pot", {chips: data.chips});
 }
 
-// how do I do I indicate that this is the first player
+// This is not what I want
+function buttons() {
+	
+	//util.log("This is the indexPlayer" + indexPlayer);
+	//indexPlayer++;
+	if (indexPlayer == playingPlayers.length) {
+		util.log("It is reverting!");
+		indexPlayer = 0;
+	}
+	
+	this.emit("remove buttons");
+	//util.log("Doing buttons");
+	//var user = playingPlayers[indexPlayer].getUsername();
+	//io.sockets.in(user).emit("add buttons");
+	for (var i = 0; i < userSockets.length; i++) {
+		if(playingPlayers[indexPlayer].getUsername() == userSockets[i].username) {
+			var userSocket = userSockets[i].socket;
+			//util.log("This is the socket: " + storeSocket);
+			this.emit("signal", {username: userSockets[i].username });
+			this.broadcast.emit("signal", {username: userSockets[i].username })
+			userSocket.emit("add buttons");
+			util.log("Changing buttons");
+		}
+	}
+	indexPlayer++;
+	util.log("This is the indexPlayer" + indexPlayer);
+	//indexPlayer++;
+}
+
 function firstTurn() {
 	numTimesAccess++;
+	util.log("It is in the first turn");
 	if ( numTimesAccess ==  currentHandPlayers.length) {
 		//buttons();
-		this.emit("add buttons");
+		util.log("It is in the first turn if statement");
+		var userSocket = userSockets[0].socket;
+		userSocket.emit("add buttons");
 		playerTurn = currentHandPlayers[0];
 		currentHandPlayers.splice(0, 1);
 		this.emit("current turn", {username: playerTurn.getUsername(),index: playerTurn.getTableIndex()});
@@ -135,21 +188,45 @@ function firstTurn() {
 	}
 }
 
+function fold() {
+	for (var i = 0; i < playingPlayers.length; i++) {
+		if( playingPlayers[i].id == this.id ) {
+			util.log("destroying player");
+			playingPlayers.splice(i, 1);
+		}
+	}
+	
+	if (playingPlayers.length == 1) {
+		roundOver = true;
+		var user = playingPlayers[0];
+		this.emit("remove buttons");
+		this.broadcast.emit("remove buttons");
+		this.emit("winning player", {player: user.getUsername()});
+		this.broadcast.emit("winning player", {player: user.getUsername()});
+		this.emit("round over");
+		this.broadcast.emit("round over");
+		playingPlayers = connectedPlayers.slice();
+	}
+}
+
 function currentTurn() {
 	
 	util.log("Coming in the the current turn");
+	// If last player folds and there is only one player
+	// then don't brodcast next action
 	if (currentHandPlayers.length == 0) {
-		this.emit("next action");
-		this.broadcast.emit("next action");
-		console.log("Going in to copy");
 		currentHandPlayers = connectedPlayers.slice();
+		if (roundOver == false) {
+			
+			this.emit("next action");
+			this.broadcast.emit("next action");
+			console.log("Going in to copy");
+		}
+		//currentHandPlayers = connectedPlayers.slice();
 	}
 	
-	//currentHandPlayers.splice(0, 1);
-	//buttons();
 	util.log(numTimesAccess);
     playerTurn = currentHandPlayers[0];
-    util.log("This is the player " + playerTurn.getUsername());
     currentHandPlayers.splice(0, 1);
 	this.emit("current turn", {username: playerTurn.getUsername(),index: playerTurn.getTableIndex()});
 	this.broadcast.emit("current turn", {username: playerTurn.getUsername(),index: playerTurn.getTableIndex()});
@@ -159,7 +236,10 @@ function currentTurn() {
 function startGame() {
 	util.log("Printing in Start Game");
 	readyPlayers++;
+	// something is wrong in connectedPlayers
+	util.log(connectedPlayers.length);
 	if (readyPlayers == connectedPlayers.length) {
+		roundOver = false;
 		util.log("Game is ready!");
 		readyPlayers = 0;
 		this.emit("start game");
@@ -168,7 +248,7 @@ function startGame() {
 };
 
 function playerLeft(data) {
-	util.log("Hello!!!!!");
+	util.log("Printing here");
     util.log("Player has disconnected: " + this.id);
 
     var i;
@@ -177,15 +257,19 @@ function playerLeft(data) {
       if (connectedPlayers[i].id == this.id)
       {
         connectedPlayers.splice(i, 1);
+		this.emit("remove player", {id: this.id});
         this.broadcast.emit("remove player", {id: this.id});
         break;
       }
     }
+	
+	if (connectedPlayers.length == 0) {
+		init();
+	}
 };
 
 // Disconnects each client 
 function onClientDisconnect() {
-	util.log("Hello!!!!!");
     util.log("Player has disconnected: " + this.id);
 
     var i;
