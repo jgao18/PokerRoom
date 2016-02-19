@@ -41,6 +41,10 @@ var Player = function(id, username, chips, tableIndex, position)
   {
     chips += numChips;
   }
+  
+  var deleteChips = function(numChips) {
+	chips -= numChips;
+  }
 
   var setTableIndex = function(index)
   {
@@ -71,6 +75,7 @@ var Player = function(id, username, chips, tableIndex, position)
 		setUsername: setUsername,
 		setPassword: setPassword,
     	addChips: addChips,
+	    deleteChips: deleteChips,
     	setTableIndex: setTableIndex,
 		id: id,
 	    position: position,

@@ -14,12 +14,38 @@ var tableCardsPass = false;
 var numOfTimes = 0;
 var playerIterator = 0;
 var action = 0;
+var amountBet = 0;
+var pot_amount = 0;
 
 // Holds all items for the game
 var game_menu = new createjs.Container();
 
 function randomUserStart() {
 	return Math.floor(Math.random()* numPlayers);
+}
+
+function getNumPlayers() {
+	return numPlayers;
+}
+
+function getAmountBet() {
+	return amountBet;
+}
+
+function getCurrentPlayer() {
+	return currentPlayer.getUsername();
+}
+
+function setAmountBet(num) {
+	amountBet = num;
+}
+
+function removePlayerChips(amount) {
+	currentPlayer.deleteChips(amount);
+}
+
+function getPlayerChips() {
+	return currentPlayer.getChips();
 }
 
 // Adds object to Game Container
@@ -38,15 +64,6 @@ function deleteItemFromGame(object) {
 function removeGameChildren() {
 	game_menu.removeAllChildren();
 	stage.update();
-}
-
-function childFinder(object) {
-	for (var i = 0; i < stage.numChildren; i++ ) {
-		console.log(stage.getChildAt(i).name);
-		if (stage.getChildAt(i).name == object) {
-			return stage.getChildAt(i);
-		}
-	}
 }
 
 function game_init() {
@@ -72,6 +89,8 @@ function game_init() {
     currentPlayers.push(new Player());
   }
   
+  createjs.Ticker.timingMode = createjs.Ticker.RAF;
+  
   currentPlayer = new Player();
   currentPlayer.setUsername("testUser" + Math.floor((Math.random() * 100) + 1));
   currentPlayer.setPassword("testPassword" + Math.floor((Math.random() * 10) + 1));
@@ -87,6 +106,7 @@ var setEventHandlers = function() {
 
 	// Socket disconnection
 	//socket.on("disconnect", onSocketDisconnect);
+	socket.on("test", test);
 
 	// New player message received by server
 	socket.on("new player", onNewPlayer);
@@ -106,9 +126,20 @@ var setEventHandlers = function() {
 	socket.on("add buttons", addButtonContainer);
 	
 	socket.on("remove buttons", removeButtonContainer);
+	
+	socket.on("ready", readyButton);
+	
+	socket.on("add to pot", serverPot);
+	
+	socket.on("round over", lastAction);
+	
+	socket.on("winning player", wonPlayer);
+	
+	socket.on("signal", assignSignal);
 };
 
 function onSocketConnected() {
+  console.log(this);
   console.log("Client connected!");
 }
 
@@ -163,7 +194,7 @@ function onNewPlayer(data)
 }
 
 function playerTurn(data) {
-	console.log(data);
+	/*console.log(data);
 	var userTurn = data.username;
 	console.log("Indicating the player's turn right now " + userTurn);
 	
@@ -186,7 +217,7 @@ function playerTurn(data) {
 			game_menu.addChild(signal);
 			stage.update();
 		}
-	}
+	}*/
 }
 
 function nextAction() {
@@ -215,7 +246,7 @@ function nextAction() {
 			//flip last card
 		case 3:
 			var cardList = ["rCard1","rCard2","lCard1","lCard2","bCard1","bCard2"];
-			var placement = [20,300,80,300,615,300,675,300];
+			var placement = [20,300,80,300,615,300,675,300,310,90,370,90];
 			var j = 0;
 			for (var i = 0; i < cardList.length; i++) {
 				if (stage.getChildByName(cardList[i]) != null) {
@@ -227,11 +258,21 @@ function nextAction() {
 				j += 4;
 				i++;
 			}
+			
 			againButton();
 			action = 0;
 			break;
 		case 4:
 			//action = 0;
+			var cardList = ["rCard1","rCard2","lCard1","lCard2","bCard1","bCard2",
+							"tCard1","tCard2","tCard3","tCard4","tCard5"];
+			var store;
+			for (var j = 0; j < cardList.length; j++) {
+				if(store = stage.getChildByName(cardList[j])) {
+					stage.removeChild(store);
+				}
+			}
+			
 			var signal = stage.getChildByName("signal");
 			// signal is added before I can delete
 			game_menu.removeChild(signal);
@@ -243,23 +284,69 @@ function nextAction() {
 			
 			againButton();
 			action = 0;
-			//var cardList = ["rCard1","rCard2","lCard1","lCard2","bCard1","bCard2"];
 			break;
-			/*for(var j = 0; i < cardList.length; i += ) {
-				
-			}*/
-			//show all cards 
-			//turn action to 0;
 	}
 }
 
+function lastAction() {
+	action = 4;
+	nextAction();
+}
+
+function assignSignal(data) {
+
+	var userTableIndex;
+	for (var i = 0; i < currentPlayers.length; i++) {
+		if ( currentPlayers[i].getUsername() == data.username ) {
+			userTableIndex = currentPlayers[i].getTableIndex();
+		}
+	}
+	console.log("This is the tableIndex: " + userTableIndex);
+	var storeSignal;
+	if (storeSignal = stage.getChildByName("signal")) {
+		stage.removeChild(storeSignal);
+	}
+	
+	/*var localIndex = currentPlayer.getTableIndex();
+	for (var i = 0; i < numPlayers; i++ ) {
+		nextPlayerIndex = (localIndex + i) % currentPlayers.length;
+	}
+	
+    var nextPlayerIndex;
+	localIndex = currentPlayer.getTableIndex();
+	playerIterator++;
+	nextPlayerIndex = (localIndex + playerIterator) % numPlayers;
+	
+	var userSignal = turn_signal(userTableIndex);*/
+	
+	console.log("Here it is: " + userTableIndex);
+	
+	var userSignal;
+	var index
+	switch(localIndex) {
+		case 0:
+			userSignal = turn_signal(userTableIndex);
+			break;
+		case 1:
+			index = (userTableIndex + 3 ) % maxPlayers; 
+			userSignal = turn_signal(index);
+			break;
+		case 2:
+			index = (userTableIndex + 2 ) % maxPlayers; 
+			userSignal = turn_signal(index);
+			break;
+		case 3:
+			index = (userTableIndex + 1 ) % maxPlayers; 
+			userSignal = turn_signal(index);
+			break;
+	}
+	
+	userSignal.name = "signal";
+	stage.addChild(userSignal);
+	stage.update();
+}
 
 function passingCards() {
-	
-    if( tableCardsPass == false ) {
-    	 tableCard();
-  	     tableCardsPass == true;
-    }
 		
 	localIndex = currentPlayer.getTableIndex();
 	var nextPlayerIndex;
@@ -287,6 +374,10 @@ function passingCards() {
 	}
 }
 
+function tableCardsPassed() {
+	tableCardsPass == true;
+}
+
 // Doesn't work properly
 function onRemovePlayer(data) {
   var i;
@@ -294,6 +385,11 @@ function onRemovePlayer(data) {
   {
     if (currentPlayers[i].id == data.id)
     {
+	  var username = currentPlayers[i].getUsername();
+	  if(username = game_menu.getChildByName(username)) {
+		  console.log("Removing the player: " + username);
+	  	  game_menu.removeChild(username);
+	  }
       currentPlayers.splice(i, 1);
       return;
     }
@@ -345,13 +441,13 @@ function lobby() {
 	
    // This tells the server that the a new player has entered.
    socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
+   //socket.emit("send socket", {username: currentPlayer.getUsername(), socket: socket});
    setEventHandlers();
    socket.emit("new player", {username: currentPlayer.getUsername(), chips: currentPlayer.getChips()});
    
    // All the prepared background for lobby
    pokertable();
    paint_deck();
-   readyButton();
    optionsButton();
    leaveButton(currentPlayer);
 }
@@ -361,17 +457,13 @@ function start_game() {
 
   // This should be filled by the database in a future implementaton
   // This tells the server that the a new player has entered.
-  //socket.emit("new player", {username: currentPlayer.getUsername(), chips: currentPlayer.getChips()});
-
-  //document.getElementById("demoCanvas").style.background = '#FF0000';
+  //socket.emit("new player", {username: currentPlayer.getUsername(), chips: currentPlayer.getChips()}); 
   socket.emit("first turn");
+  console.log("Being called twice");
   passFirstCard();
-  //addButtonContainer();
-  //callButton();
-  //raiseButton();
-  passingCards()
-  //chip();
-  //foldButton();
+  pot(0);
+  passingCards();
+  tableCard();
 }
 
 // Creates the poker table and background
@@ -590,7 +682,7 @@ function cardsToBack() {
    		    bCard2.y -= 4;
          	stage.update();
     	 	if (j > 50) {
-				tableCard();
+				//tableCard();
     			createjs.Ticker.off("tick",backTicker2);
      	    }
 	    }
@@ -598,15 +690,53 @@ function cardsToBack() {
 
 }
 
-function pot(firstAmount, secondAmount, thridAmount, fouthAmount) {
-	var pot_amount = new createjs.Text("Pot: $1000", "16px Bembo", "#FFFF00");
-	pot_amount.x = 340;
-	pot_amount.y = 390;
-	stage.addChild(pot_amount);
+function pot(amount) {
+	var pot;
+	if (pot = stage.getChildByName("pot")) {
+		stage.removeChild(pot);
+	}
+	
+	pot_amount += amount;
+	var pot_text = new createjs.Text("Pot: $" + pot_amount, "16px Bembo", "#FFFF00");
+	pot_text.x = 340;
+	pot_text.y = 390;
+	pot_text.name = "pot";
+	stage.addChild(pot_text);
 	stage.update();
 }
 
+function serverPot(data) {
+	console.log(data.chips);
+	pot(data.chips);
+}
+
+// This function will be called to accumulate the amount
+// of money the player is betting.
+function betAmount(amount) {
+	
+	if ((amount + amountBet) <= currentPlayer.getChips()) {
+		
+		var bet;
+		if (bet = stage.getChildByName("bet_amount")) {
+			stage.removeChild(bet);
+		}
+		
+		amountBet += amount;
+		var bet_amount = new createjs.Text("Bet: $" + amountBet, "16px Bembo", "#FFFF00");
+		bet_amount.name = "bet_amount";
+		bet_amount.x = 180;
+		bet_amount.y = 445;
+		stage.addChild(bet_amount);
+		stage.update();
+	}
+}
+
 function playerAmount(username, amount) {
+	
+  if (chip = game_menu.getChildByName("chip_plate")) {
+	  game_menu.removeChild(chip);
+  }
+  
   var chip_plate = new createjs.Container();
 
   var chip_plate_background = new createjs.Shape();
@@ -625,8 +755,9 @@ function playerAmount(username, amount) {
   user_amount.x = 450;
   user_amount.y = 476;
   chip_plate.addChild(user_amount);
+  chip_plate.name = "chip_plate";
 
-  addToGame(chip_plate)
+  addToGame(chip_plate);
   stage.update();
 }
 
@@ -644,51 +775,54 @@ function leftUserAmount(username, amount) {
   leftAmount.x = 40;
   leftAmount.y = 380;
   left_chip_plate.addChild(chip_plate_background,chip_background,leftAmount);
+  left_chip_plate.name = username;
 
   addToGame(left_chip_plate);
   stage.update();
 }
 
 function rightUserAmount(username, amount) {
-  var chip_plate = new createjs.Container();
+  var right_chip_plate = new createjs.Container();
 
   var chip_plate_background = new createjs.Shape();
   chip_plate_background.graphics.beginFill("black").drawRect(625,380,88,17);
-  chip_plate.addChild(chip_plate_background)
+  right_chip_plate.addChild(chip_plate_background)
 
   var chip_background = new createjs.Shape();
   chip_background.graphics.beginFill("gold").drawCircle(615,390,15);
   chip_background.graphics.beginFill("blue").drawCircle(615,390,12);
-  chip_plate.addChild(chip_background);
+  right_chip_plate.addChild(chip_background);
 
   var rightAmount = new createjs.Text(username + ": " + "$" + amount, "15px Bembo","#FFFF00");
   rightAmount.x = 635;
   rightAmount.y = 380;
-  chip_plate.addChild(rightAmount);
+  right_chip_plate.addChild(rightAmount);
+  right_chip_plate.name = username;
 
-  addToGame(chip_plate)
+  addToGame(right_chip_plate)
   stage.update();
 
 }
 
 function backUserAmount(username, amount) {
-  var chip_plate = new createjs.Container();
+  var back_chip_plate = new createjs.Container();
 
   var chip_plate_background = new createjs.Shape();
   chip_plate_background.graphics.beginFill("black").drawRect(326,175,88,17);
-  chip_plate.addChild(chip_plate_background)
+  back_chip_plate.addChild(chip_plate_background)
 
   var chip_background = new createjs.Shape();
   chip_background.graphics.beginFill("gold").drawCircle(316,187,15);
   chip_background.graphics.beginFill("blue").drawCircle(316,187,12);
-  chip_plate.addChild(chip_background);
+  back_chip_plate.addChild(chip_background);
 
   var backAmount = new createjs.Text(username + ": " + "$" + amount, "15px Bembo","#FFFF00");
   backAmount.x = 335;
   backAmount.y = 175;
-  chip_plate.addChild(backAmount);
+  back_chip_plate.addChild(backAmount);
+  back_chip_plate.name = username;
 
-  addToGame(chip_plate)
+  addToGame(back_chip_plate)
   stage.update();
 }
 
@@ -728,7 +862,12 @@ function playerOptions() {
 	
 }
 
+function test() {
+	console.log("hello");
+}
+
 function addButtonContainer() {
+	console.log("Im in the button container");
 	var user_buttons = new createjs.Container();
 	user_buttons.name = "buttons";
 	var user_raise = raiseButton();
@@ -743,6 +882,15 @@ function removeButtonContainer() {
 	var user_buttons = game_menu.getChildByName("buttons");
 	game_menu.removeChild(user_buttons);
 	stage.update();
+}
+
+function wonPlayer(data) {
+	 var player = new createjs.Text(data.player + " Wins!", "30px Bembo","#FFFF00");
+	 player.x = 280;
+	 player.y = 300;
+	 player.name = "won player";
+	 game_menu.addChild(player);
+	 stage.update();
 }
 
 
