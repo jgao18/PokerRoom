@@ -5,7 +5,7 @@
 // required imports
 var util = require("util");
 var io = require("socket.io");
-var Player = require("./Player").Player;
+var Player = require("./player").Player;
 var Deck = require("./deck").Deck;
 var Card = require("./card").Card;
 

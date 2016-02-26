@@ -1,3 +1,4 @@
+<?php include ("functions.php"); ?>
  <html>
 <head>
  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
@@ -56,7 +57,7 @@
   mysql_select_db('csci3300_poker') or die(mysql_error());
   $name=$_POST['name'];
   $username=$_POST['username'];
-  $password=$_POST['password'];
+  $password=password_encrypt($_POST['password']);
   $mail=$_POST['mail'];  
   $query=mysql_query("select * from login where username='".$username."'or mail='".$mail."' ") or die(mysql_error());
   $row=mysql_fetch_row($query);
