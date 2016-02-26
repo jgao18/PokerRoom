@@ -2,7 +2,14 @@
 
 // required imports for socket.io
 var util = require("util");
-var io = require("socket.io");
+/*var http = require('http');
+var express = require('express');
+var app = express();
+var server = http.createServer(app);
+var io = require("socket.io");*/
+var app = require('express')();
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
 var Player = require("./player").Player;
 var Deck = require("./deck").Deck;
 var Card = require("./card").Card;
@@ -26,30 +33,25 @@ var playerCards;
 
 function init() {
 	
-	// initialize variables once server starts
-    connectedPlayers = [];
-    currentHandPlayers = [];
-	playingPlayers = [];
-    playerCards = [];
-	userSockets = [];
-    maxPlayers = 4
+  // initialize variables once server starts
+  connectedPlayers = [];
+  currentHandPlayers = [];
+  playingPlayers = [];
+  playerCards = [];
+  userSockets = [];
+  maxPlayers = 4
+  
+  server.listen(8000);
+  
+  app.get('/', function (req, res) {
+    res.sendfile(__dirname + '/index.html');
+  });
+  
+  io.on('connection', function (socket) {
+    socket.emit('news', { hello: 'world' });
+    socket.on('new player', onNewPlayer);
+  });
 
-	// listens in the port number
-    socket = io.listen(8000);
-
-	// connects with websockets
-	socket.configure(function() {
-  		socket.set("transports", ["websocket"]);
-  		socket.set("log level", 2);
-    });
-
-	// runs the function throughout the server's life
-    setEventHandlers();
-};
-
-// Allows for socket interaction
-var setEventHandlers = function() {
-    socket.sockets.on("connection", onSocketConnection);
 };
 
 // Occurs when a user first connects to poker.html

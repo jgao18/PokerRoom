@@ -397,7 +397,7 @@ function menu() {
 function lobby() {
 
    // This tells the server that the a new player has entered.
-   socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
+   socket = io.connect("http://localhost");
    // Setting all Events
    setEventHandlers();
    socket.emit("new player", {username: currentPlayer.getUsername(), chips: currentPlayer.getChips()});
@@ -485,7 +485,7 @@ function tableCard() {
     	if (j > 50) {
 			if (i == 4) {
 				createjs.Ticker.off("tick",tableTicker);
-				return;
+// 				return;
 			}
 			j = 0;
 			limit -= 1.2;
