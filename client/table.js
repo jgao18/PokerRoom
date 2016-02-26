@@ -509,7 +509,6 @@ function firstPass(card,x, y, card2, secondX, secondY, front) {
 			// if client 
  			if (front == true) {
 				flip(card,card1,310,504);
-		  		passSecondCard();
  			}
 			// Calls the function to pass the second card
 			secondPass(card2,secondX,secondY, front);
