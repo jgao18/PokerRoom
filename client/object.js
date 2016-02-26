@@ -1,6 +1,7 @@
 // Container for main menu
 var main_menu = new createjs.Container();
 
+// Creates the Heart
 var get_heart_object = function(sm)
 {
   var heart = new createjs.Shape();
@@ -14,6 +15,7 @@ var get_heart_object = function(sm)
   return heart;
 }
 
+// Creates the Spade
 var get_spade_object = function(sm)
 {
   var spade = new createjs.Shape();
@@ -31,6 +33,7 @@ var get_spade_object = function(sm)
   return spade;
 }
 
+// Creates the Diamond
 var get_diamond_object = function(sm)
 {
   var diamond = new createjs.Shape();
@@ -44,6 +47,7 @@ var get_diamond_object = function(sm)
   return diamond;
 }
 
+// Creates the Club 
 var get_club_object = function(sm)
 {
   sm = sm || 6;
@@ -64,23 +68,26 @@ var get_club_object = function(sm)
   return club;
 }
 
-// Access this function to atler the menu Container
+// Adds objects to Menu
 function addToMenu(object) {
 	main_menu.addChild(object);
 	stage.update();
 }
 
+// Deletes certain objects from the Menu
 function deleteItemMenu(object) {
 	main_menu.removeChild(object);
 	stage.update();
 }
-	
+
+// Removes all items from Menu
 function removeMenuChildren() {
 	stage.removeChild(main_menu);
 	main_menu.removeAllChildren();
 	stage.update();
 }
 
+// Creates the value depending on the color
 var get_value_object = function(value, color, font)
 {
   if (color == "red") {
@@ -92,6 +99,7 @@ var get_value_object = function(value, color, font)
   return title;
 }
 
+// ?
 var get_dealer_chip = function(sm)
 {
 	var dealer_chip = new createjs.Container();
@@ -113,7 +121,7 @@ var get_dealer_chip = function(sm)
 	stage.update();
 }
 
-
+// ?
 var get_back_object = function(width, height, strokeColor, strokeThickness, fillColor)
 {
   strokeColor = strokeColor;
@@ -127,6 +135,7 @@ var get_back_object = function(width, height, strokeColor, strokeThickness, fill
   return back;
 }
 
+// ?
 var get_front_object = function(width, height, strokeColor, strokeThickness, fillColor)
 {
   var front = new createjs.Shape();
@@ -136,6 +145,7 @@ var get_front_object = function(width, height, strokeColor, strokeThickness, fil
   return front;
 }
 
+// ?
 var get_container_object = function(front, value, suit)
 {
   var card_container = new createjs.Container();
@@ -144,6 +154,7 @@ var get_container_object = function(front, value, suit)
   return card_container;
 }
 
+// Provides the background for the game 
 var get_room_background_object = function(sm)
 {
   var background = new createjs.Bitmap("../images/pokerfelt.jpg");
@@ -215,20 +226,18 @@ function button(x,y,width,height,label,color,textSize) {
 	
 /* All are buttons for the game */
 
-/* For this button, I'd like an alert popup to occur on-click, but I want
- * it to look nicer than the default popup (background color, font size, 
- * font color, etc.
-*/
+// Provides instructions for the game
 function helpButton() {
 	var help = new button(662,540,80,30,"Help","yellow",20);
 	addToGame(help);
 	stage.update();
 	
 	help.addEventListener("click", function(event) {
-		alert(" Royal Flush: A royal flush is an ace high straight flush. For example, A-K-Q-J-10 all of diamonds. \n Straight Flush: A straight flush is a five-card straight, all in the same suit. For example, 7-6-5-4-3 all of clubs. \n Four of a Kind: Four of a kind, or quads, are four cards of equal value. For example, four jacks. \n Full House: A full house contains a set (3) of cards of one value and a pair of another value. For example, Q-Q-Q-2-2. \n Flush: A flush is any 5 cards, all of the same suit. For example, K-Q-9-6-3 all of diamonds. \n Straight: Five cards of sequential value. Every possible straight will contain either a 5 or a 10. For example, 7-6-5-4-3 with different suits. \n Three of a Kind: Three cards of the same value. For example, three aces. \n Two Pairs: This is two cards of one value and another two cards of another value. For example, two jacks and two 8s. \n Pair: One pair is two cards of the same rank. For example, two queens. \n High Card: The hand with the highest card(s) wins. If two or more players hold the highest card, a kicker comes into play (see below).");
+		alert("Royal Flush: A royal flush is an ace high straight flush. \nEx: A-K-Q-J-10 all of diamonds. \n\nStraight Flush: A straight flush is a five-card straight, all in the same suit. \nEx: 7-6-5-4-3 all of clubs. \n\nFour of a Kind: Four of a kind, or quads, are four cards of equal value. \nFour Jacks. \n\nFull House: A full house contains a set (3) of cards of one value and a pair of another value. \nEx: Q-Q-Q-2-2. \n\nFlush: A flush is any 5 cards, all of the same suit. \nEx: K-Q-9-6-3 all of diamonds. \n\nStraight: Five cards of sequential value. Every possible straight will contain either a 5 or a 10. \nEx: 7-6-5-4-3 with different suits. \n\nThree of a Kind: Three cards of the same value. \nEx: Three aces. \n\nTwo Pairs: This is two cards of one value and another two cards of another value. \nEx: Two jacks and two 8s. \n\nPair: One pair is two cards of the same rank. \nEx: Two queens. \n\nHigh Card: The hand with the highest card(s) wins.\nIf two or more players hold the highest card, a kicker comes into play (see below).");
 	})
 }	
 
+// Will update later
 function optionsButton() {
 	var options = new button(662,575,80,30,"Options","yellow",20);
 	addToGame(options);
@@ -239,12 +248,9 @@ function optionsButton() {
 	})	
 }
 
-/* Good start on the leave Button. 
-   Need to complete:
-	  - Put all other characters into a container for easy deletion
-	  - Once a player leaves a game, all players screens are updated.
-      - Have all Playerlist updated once a player leaves correctly.
-*/
+
+/* Isn't functioning correctly, need to fix it.
+   Will remove player from the current stage. */
 function leaveButton(currentPlayer) {
 	var leave = new button(662,610,80,30,"Leave","yellow",20);
 	addToGame(leave);
@@ -258,31 +264,31 @@ function leaveButton(currentPlayer) {
 }
 
 
-
+// Allows the user to call
 function callButton() {
 	var call = new button(295,475,35,18,"call","yellow",10);
-	//addToGame(call);
-	//stage.update();
+	
 	call.addEventListener("click", function(event) {	
-		//socket.emit("buttons");
 		socket.emit("current turn");
 		socket.emit("buttons");
-		//socket.emit("buttons");
 	})
 	return call;
 }
 
-// If someone raises, then 
+// Allows the user to raise
 function raiseButton() {
 	var raise = new button(335,475,35,18,"raise", "yellow",10);
 	
 	raise.addEventListener("click", function(event) {
 		var show;
+		
+		// Restarts the betting amount
 		if ((show = stage.getChildByName("bet_amount"))) {
 			setAmountBet(0);
 			stage.removeChild(show);
 		}
 		
+		// If user wants to get out of the raise options, then press raise again
 		if ((show = game_menu.getChildByName("raise_amount"))) {
 			game_menu.removeChild(show);
 		} 
@@ -293,21 +299,19 @@ function raiseButton() {
 	return raise;
 }
 
+// Allows the user to fold
 function foldButton() {
 	var fold = new button(375,475,35,18,"fold", "yellow",10);
-	//addToGame(fold);
-	//stage.update();
+	
 	fold.addEventListener("click", function(event) {
-		// We need some way to indicate two things:
-		//socket.emit("buttons");
 		socket.emit("fold");
 		socket.emit("current turn");
 		socket.emit("buttons");
-		//socket.emit("buttons");
 	})
 	return fold;
 }
 
+// Goes into the lobby once the user presses the button
 function startButton() {
 	var start = new button(315,300,100,45,"Start", "#F00",20);
 	addToMenu(start);
@@ -320,20 +324,25 @@ function startButton() {
 	})
 }
 
+// Once everyone presses ready, start the game
 function readyButton() {
 	var ready = new button(315,300,100,45,"Ready", "#F00",20);
 	addToGame(ready);
 	stage.update();
 	
 	ready.addEventListener("click", function(event) {
-		console.log("Why is printing in the readyButton twice");
         deleteItemFromGame(ready);
         socket.emit("ready");
 	})
 }
 
+// Allows the different options for raising
 function raiseAmount() {
+	
 	var raise_amount = new createjs.Container();
+	
+	/* Different button options */
+	
 	var one = new button(260,445,35,18,"1", "yellow",10);
 	one.addEventListener("click", function(event) {
 		betAmount(1);
@@ -359,6 +368,7 @@ function raiseAmount() {
         betAmount(100);
 	})
 	
+	// Once the user presses the button, then bet amount will go into the pot
 	var bet_button = new button(460,445,35,18,"bet", "yellow",10);
 	bet_button.addEventListener("click", function(event) {
 		var done_raising = game_menu.getChildByName("raise_amount");
@@ -382,6 +392,7 @@ function raiseAmount() {
 	stage.update();
 }
 
+// Once the finishes, all players must press this button to play again
 function againButton() {
 	var again = new button(315,245,100,45,"Again?", "#F00",20);
 	addToGame(again);
@@ -389,6 +400,7 @@ function againButton() {
 	
 	again.addEventListener("click", function(event) {
 		
+		// Delete all cards
 		for (var i = 0; i < 13; i ++) {
 			var shape = stage.getChildByName("tableCards");
 			stage.removeChild(shape);
@@ -403,6 +415,7 @@ function againButton() {
 	})
 }
 
+// Produces the background for the game 
 function backgroundFelt() {
     main_background = new createjs.Bitmap("../images/pokerfelt.jpg");
     stage.addChild(main_background);
