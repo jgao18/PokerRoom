@@ -425,7 +425,7 @@ function start_game() {
 // Creates the poker table and background
 function pokertable() {
   // Retrieving the pokertable
-  var table = new createjs.Bitmap("../images/pokertable.png");
+  var table = new createjs.Bitmap("pokertable.png");
 
   // Adjusting the location of the table
   table.x = width/6;

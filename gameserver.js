@@ -41,9 +41,11 @@ function init() {
   userSockets = [];
   maxPlayers = 4
 
-  app.get('/', function (req, res) {
-    res.sendfile(__dirname + '/index.html');
-  });
+  app.get('/*', function(req, res){
+    var file = req.params[0];
+      //Send the requesting client the file.
+     res.sendfile( __dirname + '/client/' + file );
+   });
 
   io.on('connection', function (socket) {
     socket.emit('welcome', { message: 'Welcome to the poker room, client!' });
