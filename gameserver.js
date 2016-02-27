@@ -10,11 +10,13 @@ var Deck = require("./deck").Deck;
 var Card = require("./card").Card;
 
 var socket;
+var serverPort = process.argv[2];
+var userSockets;
+
 var players;
 var connectedPlayers;
 var currentHandPlayers;
 var maxPlayers;
-var userSockets;
 var playerConnected;
 var readyPlayers = 0;
 var numTimesAccess = 0;
@@ -22,6 +24,7 @@ var playingPlayers;
 var roundOver = false;
 var indexPlayer = 1;
 var again = 0;
+
 var deck;
 var playerCards;
 
@@ -75,15 +78,11 @@ function init() {
 		socket.on("increase pot", potIncrease);
   });
 
-  // Thanks to the PoP team for helping with this code
-	var port = 3001;
-	//Set to listen on this ip and this port.
-	server.listen(port, '0.0.0.0', function(){
-		console.log("Listening on port " + port);
+  // Thanks to the Nick/the PoP team for helping with this code
+	// Set to listen on this ip and this port.
+	server.listen(serverPort, '0.0.0.0', function(){
+		console.log("Game server started on port " + serverPort);
 	});
-
-
-	util.log("Game server started on " + server.address());
 };
 
 // Called by sockets when they hit the Play button
