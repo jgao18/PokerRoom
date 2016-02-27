@@ -269,8 +269,8 @@ function callButton() {
 	var call = new button(295,475,35,18,"call","yellow",10);
 	
 	call.addEventListener("click", function(event) {	
-		socket.emit("current turn");
-		socket.emit("buttons");
+		socket.emit("current turn", {action: "call"});
+		socket.emit("buttons", {remove: false});
 	})
 	return call;
 }
@@ -305,8 +305,8 @@ function foldButton() {
 	
 	fold.addEventListener("click", function(event) {
 		socket.emit("fold");
-		socket.emit("current turn");
-		socket.emit("buttons");
+		socket.emit("current turn",{action: "fold"});
+		socket.emit("buttons", {remove: false});
 	})
 	return fold;
 }
@@ -379,10 +379,12 @@ function raiseAmount() {
 		
 		var currentChips = getPlayerChips();
 		var player = getCurrentPlayer();
-		playerAmount(player, currentChips);
+		clientAmounts("main", player, currentChips);
+		// Increase the pot with store
 		socket.emit("increase pot", {chips: store});
-		socket.emit("current turn");
-		socket.emit("buttons");
+		// 
+		socket.emit("current turn", {action: "raise"});
+		socket.emit("buttons", {remove: false});
 	})
 	
 	betAmount(0);
@@ -411,7 +413,7 @@ function againButton() {
 		
 		deleteItemFromGame(again);
 		socket.emit("ready");
-		socket.emit("from again");
+		//socket.emit("from again");
 	})
 }
 

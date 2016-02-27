@@ -779,6 +779,8 @@ function nextAction() {
 			}
 
 			againButton();
+			socket.emit("buttons",{remove: true});
+			socket.emit("restart");
 			action = 0;
 			break;
 		// If all but one player fold, then erase everything
@@ -805,6 +807,8 @@ function nextAction() {
 			}
 			
 			againButton();
+			socket.emit("buttons",{remove: true});
+			socket.emit("restart");
 			action = 0;
 			break;
 	}
