@@ -348,7 +348,7 @@ function menu() {
 function lobby() {
 
    // This tells the server that the a new player has entered.
-	 socket = io.connect("http://localhost:3001");
+	 socket = io.connect();
 
 	 socket.on('welcome', function (data) {
 			console.log(data.message);
