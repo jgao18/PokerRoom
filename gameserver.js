@@ -27,31 +27,6 @@ var playerCards;
 
 
 function init() {
-<<<<<<< HEAD
-=======
-	
-	// initialize variables once server starts
-    connectedPlayers = [];
-    currentHandPlayers = [];
-	playingPlayers = [];
-    playerCards = [];
-	userSockets = [];
-    maxPlayers = 4;
-
-	// listens in the port number
-    socket = io.listen(8000);
-
-	// connects with websockets
-	socket.configure(function() {
-  		socket.set("transports", ["websocket"]);
-  		socket.set("log level", 2);
-    });
-
-	// runs the function throughout the server's life
-    setEventHandlers();
-};
->>>>>>> master
-
   // initialize variables once server starts
   connectedPlayers = [];
   currentHandPlayers = [];
@@ -100,54 +75,15 @@ function init() {
 		socket.on("increase pot", potIncrease);
   });
 
-<<<<<<< HEAD
+  // Thanks to the PoP team for helping with this code
 	var port = 3001;
-	var ip_address = '0.0.0.0';
 	//Set to listen on this ip and this port.
-	server.listen(port, ip_address, function(){
-		console.log("Listening on " + ip_address + ", port " + port);
+	server.listen(port, '0.0.0.0', function(){
+		console.log("Listening on port " + port);
 	});
 
 
 	util.log("Game server started on " + server.address());
-=======
-// Occurs when a user first connects to poker.html
-function onSocketConnection(client) {
-	
-	// When a new player comes in, onNewPlayer runs
-    client.on("new player", onNewPlayer);
-
-	// When client disconnects, call onClientDisconnect
-    client.on("disconnect", onClientDisconnect);
-	
-	// When client presses ready button
-	client.on("ready", startGame);
-	
-	// When client presses the leave button
-	client.on("leave", playerLeft);
-	
-	// Indicates the turn for the user
-	client.on("current turn", currentTurn);
-
-	// Once players press the Ready Button
-	client.on("first turn", firstTurn);
-
-	// Once players press any buttons
-	client.on("buttons", buttons);
-
-	// Once players press fold
-	client.on("fold", fold);
-
-	// Once players press call
-	client.on("call", currentTurn);
-	
-	// Once players bet
-	client.on("increase pot", potIncrease);
-	
-	// Restart the player list 
-	client.on("restart", restartPlayerList);
->>>>>>> master
-
 };
 
 // Called by sockets when they hit the Play button
@@ -235,7 +171,7 @@ function buttons(data) {
 	}
 	// next player
 	indexPlayer++;
-	
+
 	if (data.remove == true) {
 		this.emit("remove buttons");
 		this.broadcast.emit("remove buttons");
@@ -245,19 +181,6 @@ function buttons(data) {
 
 // Enters this phase once players press the Ready Button
 function firstTurn() {
-<<<<<<< HEAD
-	numTimesAccess++;
-
-	// Until all users press the ready
-	if ( numTimesAccess ==  currentHandPlayers.length) {
-
-		// Accesses the first socket that enters the room
-		var userSocket = userSockets[0].socket;
-		userSocket.emit("add buttons");
-    util.log("adding buttons");
-
-=======
-	
 	numTimesAccess++;
 	util.log("numTimesAccess is " + numTimesAccess);
 	util.log("curentHandPlayers is " + currentHandPlayers.length);
@@ -269,8 +192,7 @@ function firstTurn() {
 		var userSocket = userSockets[0].socket;
 		userSocket.emit("add buttons");
 		userSocket.emit("signal", {username: userSockets[0].username});
-		
->>>>>>> master
+
 		// Removes the first player from the remaining round players
 		playerTurn = currentHandPlayers[0];
 		currentHandPlayers.splice(0, 1);
@@ -310,9 +232,9 @@ function currentTurn(data) {
 
 	// If the player raises then until all users fold or call go then don't go to the next
 	if (data.action == "raise") {
-		
+
 	}
-	
+
 	// If all player decided their action for the turn
 	if (currentHandPlayers.length == 0) {
 		currentHandPlayers = connectedPlayers.slice();
@@ -421,7 +343,7 @@ function onsocketDisconnect() {
         break;
       }
     }
-	
+
 	if (connectedPlayers.length == 0) {
 	    connectedPlayers = [];
 	    currentHandPlayers = [];
