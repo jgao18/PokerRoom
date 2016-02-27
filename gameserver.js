@@ -38,7 +38,7 @@ function init() {
   app.get('/*', function(req, res){
     var file = req.params[0];
       //Send the requesting client the file.
-     res.sendfile( __dirname + '/client/' + file );
+     res.sendFile( __dirname + '/client/' + file );
    });
 
   io.on('connection', function (socket) {
@@ -243,13 +243,12 @@ function currentTurn(data) {
 				this.emit("next action");
 				this.broadcast.emit("next action");
 			}
-			else ()
-		}
-	}
+    }
+  }
 
-	// Provide the next player in the list
-    playerTurn = currentHandPlayers[0];
-    currentHandPlayers.splice(0, 1);
+  // Provide the next player in the list
+  playerTurn = currentHandPlayers[0];
+  currentHandPlayers.splice(0, 1);
 	this.emit("current turn", {username: playerTurn.getUsername(),index: playerTurn.getTableIndex()});
 	this.broadcast.emit("current turn", {username: playerTurn.getUsername(),index: playerTurn.getTableIndex()});
 };
