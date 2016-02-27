@@ -27,6 +27,30 @@ var playerCards;
 
 
 function init() {
+<<<<<<< HEAD
+=======
+	
+	// initialize variables once server starts
+    connectedPlayers = [];
+    currentHandPlayers = [];
+	playingPlayers = [];
+    playerCards = [];
+	userSockets = [];
+    maxPlayers = 4;
+
+	// listens in the port number
+    socket = io.listen(8000);
+
+	// connects with websockets
+	socket.configure(function() {
+  		socket.set("transports", ["websocket"]);
+  		socket.set("log level", 2);
+    });
+
+	// runs the function throughout the server's life
+    setEventHandlers();
+};
+>>>>>>> master
 
   // initialize variables once server starts
   connectedPlayers = [];
@@ -76,6 +100,7 @@ function init() {
 		socket.on("increase pot", potIncrease);
   });
 
+<<<<<<< HEAD
 	var port = 3001;
 	var ip_address = '0.0.0.0';
 	//Set to listen on this ip and this port.
@@ -85,6 +110,43 @@ function init() {
 
 
 	util.log("Game server started on " + server.address());
+=======
+// Occurs when a user first connects to poker.html
+function onSocketConnection(client) {
+	
+	// When a new player comes in, onNewPlayer runs
+    client.on("new player", onNewPlayer);
+
+	// When client disconnects, call onClientDisconnect
+    client.on("disconnect", onClientDisconnect);
+	
+	// When client presses ready button
+	client.on("ready", startGame);
+	
+	// When client presses the leave button
+	client.on("leave", playerLeft);
+	
+	// Indicates the turn for the user
+	client.on("current turn", currentTurn);
+
+	// Once players press the Ready Button
+	client.on("first turn", firstTurn);
+
+	// Once players press any buttons
+	client.on("buttons", buttons);
+
+	// Once players press fold
+	client.on("fold", fold);
+
+	// Once players press call
+	client.on("call", currentTurn);
+	
+	// Once players bet
+	client.on("increase pot", potIncrease);
+	
+	// Restart the player list 
+	client.on("restart", restartPlayerList);
+>>>>>>> master
 
 };
 
@@ -144,8 +206,13 @@ function potIncrease(data) {
 	this.broadcast.emit("add to pot", {chips: data.chips});
 }
 
+//Restart the player list
+function restartPlayerList() {
+	currentHandPlayers = connectedPlayers.slice();
+}
+
 // Provides the turn signal and buttons for players
-function buttons() {
+function buttons(data) {
 
 	// Precaution for out of index
 	if (indexPlayer == playingPlayers.length) {
@@ -168,10 +235,17 @@ function buttons() {
 	}
 	// next player
 	indexPlayer++;
+	
+	if (data.remove == true) {
+		this.emit("remove buttons");
+		this.broadcast.emit("remove buttons");
+		return;
+	}
 }
 
 // Enters this phase once players press the Ready Button
 function firstTurn() {
+<<<<<<< HEAD
 	numTimesAccess++;
 
 	// Until all users press the ready
@@ -182,6 +256,21 @@ function firstTurn() {
 		userSocket.emit("add buttons");
     util.log("adding buttons");
 
+=======
+	
+	numTimesAccess++;
+	util.log("numTimesAccess is " + numTimesAccess);
+	util.log("curentHandPlayers is " + currentHandPlayers.length);
+	// Until all users press the ready
+	if ( numTimesAccess == currentHandPlayers.length) {
+		util.log("Inside the first turn");
+		numTimesAccess = 0;
+		// Accesses the first client that enters the room
+		var userSocket = userSockets[0].socket;
+		userSocket.emit("add buttons");
+		userSocket.emit("signal", {username: userSockets[0].username});
+		
+>>>>>>> master
 		// Removes the first player from the remaining round players
 		playerTurn = currentHandPlayers[0];
 		currentHandPlayers.splice(0, 1);
@@ -217,14 +306,22 @@ function fold() {
 	}
 }
 
-function currentTurn() {
+function currentTurn(data) {
 
+	// If the player raises then until all users fold or call go then don't go to the next
+	if (data.action == "raise") {
+		
+	}
+	
 	// If all player decided their action for the turn
 	if (currentHandPlayers.length == 0) {
 		currentHandPlayers = connectedPlayers.slice();
 		if (roundOver == false) {
-			this.emit("next action");
-			this.broadcast.emit("next action");
+			if (data.action != "raise") {
+				this.emit("next action");
+				this.broadcast.emit("next action");
+			}
+			else ()
 		}
 	}
 
@@ -280,8 +377,6 @@ function startGame() {
       var userSocket = userSockets[i].socket;
       userSocket.emit("other cards", outputPlayerCards);
     }
-
-
 		this.emit("start game");
 		this.broadcast.emit("start game");
 	}
@@ -304,7 +399,11 @@ function playerLeft(data) {
     }
 
 	if (connectedPlayers.length == 0) {
-		init();
+	    connectedPlayers = [];
+	    currentHandPlayers = [];
+		playingPlayers = [];
+	    playerCards = [];
+		userSockets = [];
 	}
 };
 
@@ -322,6 +421,14 @@ function onsocketDisconnect() {
         break;
       }
     }
+	
+	if (connectedPlayers.length == 0) {
+	    connectedPlayers = [];
+	    currentHandPlayers = [];
+		playingPlayers = [];
+	    playerCards = [];
+		userSockets = [];
+	}
 };
 
 function turn() {
