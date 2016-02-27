@@ -157,7 +157,7 @@ var get_container_object = function(front, value, suit)
 // Provides the background for the game
 var get_room_background_object = function(sm)
 {
-  var background = new createjs.Bitmap("pokerfelt.jpg");
+  var background = new createjs.Bitmap("/images/pokerfelt.jpg");
   background.scaleX = sm;
   background.scaleY = sm;
 
@@ -417,7 +417,7 @@ function againButton() {
 
 // Produces the background for the game
 function backgroundFelt() {
-    main_background = new createjs.Bitmap("pokerfelt.jpg");
+    main_background = new createjs.Bitmap("/images/pokerfelt.jpg");
     stage.addChild(main_background);
     createjs.Ticker.addEventListener("tick", handleTick);
     function handleTick(event) {

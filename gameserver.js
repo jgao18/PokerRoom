@@ -2,11 +2,6 @@
 
 // required imports for socket.io
 var util = require("util");
-/*var http = require('http');
-var express = require('express');
-var app = express();
-var server = http.createServer(app);
-var io = require("socket.io");*/
 var app = require('express')();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
@@ -185,6 +180,7 @@ function firstTurn() {
 		// Accesses the first socket that enters the room
 		var userSocket = userSockets[0].socket;
 		userSocket.emit("add buttons");
+    util.log("adding buttons");
 
 		// Removes the first player from the remaining round players
 		playerTurn = currentHandPlayers[0];

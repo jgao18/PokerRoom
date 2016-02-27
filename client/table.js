@@ -425,7 +425,7 @@ function start_game() {
 // Creates the poker table and background
 function pokertable() {
   // Retrieving the pokertable
-  var table = new createjs.Bitmap("pokertable.png");
+  var table = new createjs.Bitmap("/images/pokertable.png");
 
   // Adjusting the location of the table
   table.x = width/6;
@@ -857,6 +857,7 @@ function playerOptions() {
 
 // Adds the players buttons
 function addButtonContainer() {
+	console.log("adding button containers");
 	var user_buttons = new createjs.Container();
 	user_buttons.name = "buttons";
 	var user_raise = raiseButton();
