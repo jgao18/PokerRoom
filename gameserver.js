@@ -24,9 +24,12 @@ var playingPlayers;
 var roundOver = false;
 var indexPlayer = 1;
 var again = 0;
+var gameStage = 0;
+var gameStages = ["preflop","flop", "turn", "river", "postriver"]
 
 var deck;
 var playerCards;
+var tableCards;
 
 
 function init() {
@@ -35,6 +38,7 @@ function init() {
   currentHandPlayers = [];
   playingPlayers = [];
   playerCards = [];
+  tableCards = [];
   userSockets = [];
   maxPlayers = 4
 
@@ -180,6 +184,9 @@ function buttons(data) {
 
 // Enters this phase once players press the Ready Button
 function firstTurn() {
+
+  gameStage = 0; // preflop
+
 	numTimesAccess++;
 	util.log("numTimesAccess is " + numTimesAccess);
 	util.log("curentHandPlayers is " + currentHandPlayers.length);
@@ -239,8 +246,40 @@ function currentTurn(data) {
 		currentHandPlayers = connectedPlayers.slice();
 		if (roundOver == false) {
 			if (data.action != "raise") {
-				this.emit("next action");
-				this.broadcast.emit("next action");
+        gameStage = (gameStage + 1) % 5;
+        stage = gameStages[gameStage];
+        util.log("the stage is " + stage);
+
+        if (stage == "flop") {
+          this.emit("flop cards", {value1 : tableCards[0].get_value(), suit1 : tableCards[0].get_suit(), value2 : tableCards[1].get_value(), suit2 : tableCards[1].get_suit(),
+            value3 : tableCards[2].get_value(), suit3 : tableCards[2].get_suit()});
+          this.broadcast.emit("flop cards", {value1 : tableCards[0].get_value(), suit1 : tableCards[0].get_suit(), value2 : tableCards[1].get_value(), suit2 : tableCards[1].get_suit(),
+              value3 : tableCards[2].get_value(), suit3 : tableCards[2].get_suit()});
+        } else if (stage == "turn") {
+          this.emit("turn card", {value : tableCards[3].get_value(), suit : tableCards[3].get_suit()});
+          this.broadcast.emit("turn card", {value : tableCards[3].get_value(), suit : tableCards[3].get_suit()});
+        } else if (stage == "river") {
+          this.emit("river card", {value : tableCards[4].get_value(), suit : tableCards[4].get_suit()});
+          this.broadcast.emit("river card", {value : tableCards[4].get_value(), suit : tableCards[4].get_suit()});
+        } else if (stage == "postriver") {
+          outputPlayerCards = [];
+
+          for (i = 0; i < playerCards.length; i++)
+          {
+            outputPlayerCards.push({value: playerCards[i].get_value(), suit: playerCards[i].get_suit()});
+            util.log("outputting" + playerCards[i].get_value() + playerCards[i].get_suit());
+          }
+
+          for (i = 0; i < playingPlayers.length; i++)
+          {
+            var userSocket = userSockets[i].socket;
+            userSocket.emit("other cards", outputPlayerCards);
+          }
+          playerCards = [];
+        }
+
+        this.emit("next action", gameStages[gameStage]);
+				this.broadcast.emit("next action", gameStages[gameStage]);
 			}
     }
   }
@@ -257,8 +296,8 @@ function startGame() {
 
 	readyPlayers++;
 
-  	deck = new Deck();
-  	deck.get_new_deck();
+	deck = new Deck();
+	deck.get_new_deck();
 
 	if (readyPlayers == connectedPlayers.length) {
 		roundOver = false;
@@ -272,31 +311,8 @@ function startGame() {
       userSocket.emit("client cards", {value1 : card1.get_value(), suit1 : card1.get_suit(), value2 : card2.get_value(), suit2 : card2.get_suit()});
     }
 
-    var tableCard1 = deck.draw_card();
-    var tableCard2 = deck.draw_card();
-    var tableCard3 = deck.draw_card();
-    var tableCard4 = deck.draw_card();
-    var tableCard5 = deck.draw_card();
+    tableCards = [deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card()];
 
-    for (i = 0; i < playingPlayers.length; i++)
-    {
-      var userSocket = userSockets[i].socket;
-      userSocket.emit("table cards", {value1 : tableCard1.get_value(), suit1 : tableCard1.get_suit(), value2 : tableCard2.get_value(), suit2 : tableCard2.get_suit(),
-        value3 : tableCard3.get_value(), suit3 : tableCard3.get_suit(), value4 : tableCard4.get_value(), suit4 : tableCard4.get_suit(), value5 : tableCard5.get_value(), suit5 : tableCard5.get_suit() });
-    }
-
-    outputPlayerCards = [];
-    for (i = 0; i < playerCards.length; i++)
-    {
-      outputPlayerCards.push({value: playerCards[i].get_value(), suit: playerCards[i].get_suit()});
-      util.log("outputting" + playerCards[i].get_value() + playerCards[i].get_suit());
-    }
-
-    for (i = 0; i < playingPlayers.length; i++)
-    {
-      var userSocket = userSockets[i].socket;
-      userSocket.emit("other cards", outputPlayerCards);
-    }
 		this.emit("start game");
 		this.broadcast.emit("start game");
 	}

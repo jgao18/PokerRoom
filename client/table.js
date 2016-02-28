@@ -143,14 +143,21 @@ function assignCards(data)
 	card2 = new Card(data.value2, data.suit2);
 }
 
-// produces table cards
-function tableCards(data)
+function flopCards(data)
 {
-	tableCard1 = new Card(data.value1, data.suit1);
-	tableCard2 = new Card(data.value2, data.suit2);
+	tableCard5 = new Card(data.value1, data.suit1);
+	tableCard4 = new Card(data.value2, data.suit2);
 	tableCard3 = new Card(data.value3, data.suit3);
-	tableCard4 = new Card(data.value4, data.suit4);
-	tableCard5 = new Card(data.value5, data.suit5);
+}
+
+function turnCard(data)
+{
+	tableCard2 = new Card(data.value, data.suit);
+}
+
+function riverCard(data)
+{
+	tableCard1 = new Card(data.value, data.suit);
 }
 
 // Connects the client to the server
@@ -390,10 +397,10 @@ function lobby() {
 		 socket.on("client cards", assignCards)
 
 		 // Assigns cards to the table
-		 socket.on("table cards", tableCards)
-
-		 // Server indicates the cards of the other players
-		 socket.on("other cards", otherCardsFunction)
+		 socket.on("flop cards", flopCards)
+		 socket.on("turn card", turnCard)
+		 socket.on("river card", riverCard)
+		 socket.on("other cards", otherCardsFunction);	// Server indicates the cards of the other players
 		});
 
    // Setting all Events
@@ -775,6 +782,7 @@ function nextAction() {
 				i++;
 			}
 
+			otherCards = [];
 			againButton();
 			socket.emit("buttons",{remove: true});
 			socket.emit("restart");
@@ -803,6 +811,7 @@ function nextAction() {
 				stage.removeChild(shape);
 			}
 
+			otherCards = [];
 			againButton();
 			socket.emit("buttons",{remove: true});
 			socket.emit("restart");
