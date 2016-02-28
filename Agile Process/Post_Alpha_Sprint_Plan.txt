@@ -17,12 +17,10 @@ JS - Algorithm to recognize who won the hand // 40
     - decompose into parts (invidiual hand determinism, 7 choose 5 cards),
 JS - Speed up cards // 0.5
 
-?? - Upgrade socket from 0.8.6 to newest // 40
-
-
-
+?? - Implement a timer system that kicks AFK players
 
 ---COMPLETE---
 
 JG - Set up online play via IP connections// 13
 JG - Server sends client data (card values/suits) at the right time // 8
+JG - Upgrade socket from 0.8.6 to newest // 40  -- was easier than expected, more like 13 points
