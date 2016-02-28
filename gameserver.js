@@ -246,7 +246,6 @@ function currentTurn(data) {
 				this.emit("next action");
 				this.broadcast.emit("next action");
 			}
-			else ()
 		}
 	}
 	
