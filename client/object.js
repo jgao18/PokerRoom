@@ -379,10 +379,11 @@ function raiseAmount() {
 
 		var currentChips = getPlayerChips();
 		var player = getCurrentPlayer();
-		clientAmounts("main", player, currentChips);
+		//clientAmounts("main", player, currentChips);
+		
+		socket.emit("changed amount", {id: player, chips: currentChips});
 		// Increase the pot with store
 		socket.emit("increase pot", {chips: store});
-		//
 		socket.emit("current turn", {action: "raise", id: player});
 		socket.emit("buttons", {remove: false});
 	})
