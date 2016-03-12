@@ -1,5 +1,3 @@
-// http://rawkes.com/articles/creating-a-real-time-multiplayer-game-with-websockets-and-node.html
-
 // required imports for socket.io
 var util = require("util");
 var app = require('express')();
