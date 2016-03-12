@@ -395,6 +395,8 @@ function lobby() {
 
 		 // Assigns cards to the client
 		 socket.on("client cards", assignCards)
+		 
+		 socket.on("change amount", changeAmount);
 
 		 // Assigns cards to the table
 		 socket.on("flop cards", flopCards)
@@ -740,6 +742,51 @@ function clientAmounts(player, username, amount) {
   stage.update();
 }
 
+function changeAmount(data) {
+	
+	var userTableIndex;
+	for (var i = 0; i < currentPlayers.length; i++) {
+		if ( currentPlayers[i].getUsername() == data.username ) {
+			//retrieve the user's index on the table
+			userTableIndex = currentPlayers[i].getTableIndex();
+		}
+	}
+	
+	var index;
+	console.log("This is the localIndex: " + localIndex);
+	switch(localIndex) {
+		case 0:
+			index = userTableIndex;
+			break;
+		case 1:
+			index = (userTableIndex + 3 ) % maxPlayers;
+			break;
+		case 2:
+			index = (userTableIndex + 2 ) % maxPlayers;
+			break;
+		case 3:
+			index = (userTableIndex + 1 ) % maxPlayers;
+			break;
+	}
+	
+	console.log("This is the index: " + index);
+	switch(index) {
+		case 0:
+			clientAmounts("main", data.username, data.chips);
+			break;
+		case 1:
+			clientAmounts("left", data.username, data.chips);
+			break;
+		case 2:
+			clientAmounts("back", data.username, data.chips);
+			break;
+		case 3:
+			clientAmounts("right", data.username, data.chips);
+			break;
+	}
+	
+}
+
 // Once all user have finish their turn, go to the next action
 function nextAction() {
 
@@ -749,6 +796,7 @@ function nextAction() {
 			var tCard5 = stage.getChildByName("tCard5");
 			var tCard4 = stage.getChildByName("tCard4");
 			var tCard3 = stage.getChildByName("tCard3");
+			//console.log("This is the tableCards: " + tableCard5 + " " + tableCard4 + " " + tableCard3);
 			flip(tCard5,tableCard5,260,300);
 			flip(tCard4,tableCard4,320,300);
 			flip(tCard3,tableCard3,380,300);
