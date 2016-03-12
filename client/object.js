@@ -47,7 +47,7 @@ var get_diamond_object = function(sm)
   return diamond;
 }
 
-// Creates the Club 
+// Creates the Club
 var get_club_object = function(sm)
 {
   sm = sm || 6;
@@ -106,13 +106,13 @@ var get_dealer_chip = function(sm)
 	var dealer_chip_text = new createjs.Text("DEALER", "20px Bembo", "#000");
 	dealer_chip_text.textBaseline = "top";
 	dealer_chip_text.textAlign = "center";
-	
+
 	var width = dealer_chip_text.getMeasuredWidth()+15;
 	var height = dealer_chip_text.getMeasuredHeight()+7;
-	
+
 	dealer_chip_text.x = 700;
     dealer_chip_text.y = 579;
-    
+
     var background = new createjs.Shape();
 	background.graphics.beginFill("white").drawCircle(662,575,width,height,10);
 
@@ -154,10 +154,10 @@ var get_container_object = function(front, value, suit)
   return card_container;
 }
 
-// Provides the background for the game 
+// Provides the background for the game
 var get_room_background_object = function(sm)
 {
-  var background = new createjs.Bitmap("../images/pokerfelt.jpg");
+  var background = new createjs.Bitmap("/images/pokerfelt.jpg");
   background.scaleX = sm;
   background.scaleY = sm;
 
@@ -168,7 +168,7 @@ var get_room_background_object = function(sm)
 function turn_signal(user) {
 	var signal = new createjs.Shape();
 	signal.graphics.beginStroke("#FFFF00").beginFill("#FFFF00");
-	
+
 	// Depending on which user, provide the user signal
 	switch (user) {
 		    // left
@@ -179,7 +179,7 @@ function turn_signal(user) {
 		case 2:
 			signal.graphics.moveTo(340, 60).lineTo(400, 60).lineTo(370, 80).lineTo(340, 60);
 			break;
-			// right 
+			// right
 		case 1:
 			signal.graphics.moveTo(43, 260).lineTo(103, 260).lineTo(73, 280).lineTo(43, 260);
 			break;
@@ -210,7 +210,7 @@ function button(x,y,width,height,label,color,textSize) {
 	}
     text.textBaseline = "top";
     text.textAlign = "center";
-	
+
 	// Setting text coordinates
     text.x += x + (width/2);
     text.y += y + (height/4);
@@ -223,7 +223,7 @@ function button(x,y,width,height,label,color,textSize) {
     user_button.addChild(background, text)
     return user_button;
 }
-	
+
 /* All are buttons for the game */
 
 // Provides instructions for the game
@@ -231,21 +231,21 @@ function helpButton() {
 	var help = new button(662,540,80,30,"Help","yellow",20);
 	addToGame(help);
 	stage.update();
-	
+
 	help.addEventListener("click", function(event) {
 		alert("Royal Flush: A royal flush is an ace high straight flush. \nEx: A-K-Q-J-10 all of diamonds. \n\nStraight Flush: A straight flush is a five-card straight, all in the same suit. \nEx: 7-6-5-4-3 all of clubs. \n\nFour of a Kind: Four of a kind, or quads, are four cards of equal value. \nFour Jacks. \n\nFull House: A full house contains a set (3) of cards of one value and a pair of another value. \nEx: Q-Q-Q-2-2. \n\nFlush: A flush is any 5 cards, all of the same suit. \nEx: K-Q-9-6-3 all of diamonds. \n\nStraight: Five cards of sequential value. Every possible straight will contain either a 5 or a 10. \nEx: 7-6-5-4-3 with different suits. \n\nThree of a Kind: Three cards of the same value. \nEx: Three aces. \n\nTwo Pairs: This is two cards of one value and another two cards of another value. \nEx: Two jacks and two 8s. \n\nPair: One pair is two cards of the same rank. \nEx: Two queens. \n\nHigh Card: The hand with the highest card(s) wins.\nIf two or more players hold the highest card, a kicker comes into play (see below).");
 	})
-}	
+}
 
 // Will update later
 function optionsButton() {
 	var options = new button(662,575,80,30,"Options","yellow",20);
 	addToGame(options);
 	stage.update();
-	
+
 	options.addEventListener("click", function(event) {
 		alert("Hi!");
-	})	
+	})
 }
 
 
@@ -255,9 +255,9 @@ function leaveButton(currentPlayer) {
 	var leave = new button(662,610,80,30,"Leave","yellow",20);
 	addToGame(leave);
 	stage.update();
-	
+
 	leave.addEventListener("click", function(event) {
-		removeGameChildren();		
+		removeGameChildren();
         game_init();
 		socket.emit("leave", currentPlayer.id);
 	})
@@ -268,7 +268,7 @@ function leaveButton(currentPlayer) {
 function callButton() {
 	var call = new button(295,475,35,18,"call","yellow",10);
 	
-	call.addEventListener("click", function(event) {	
+	call.addEventListener("click", function(event) {
 		socket.emit("current turn", {action: "call"});
 		socket.emit("buttons", {remove: false});
 	})
@@ -278,20 +278,20 @@ function callButton() {
 // Allows the user to raise
 function raiseButton() {
 	var raise = new button(335,475,35,18,"raise", "yellow",10);
-	
+
 	raise.addEventListener("click", function(event) {
 		var show;
-		
+
 		// Restarts the betting amount
 		if ((show = stage.getChildByName("bet_amount"))) {
 			setAmountBet(0);
 			stage.removeChild(show);
 		}
-		
+
 		// If user wants to get out of the raise options, then press raise again
 		if ((show = game_menu.getChildByName("raise_amount"))) {
 			game_menu.removeChild(show);
-		} 
+		}
 		else {
 			raiseAmount();
 		}
@@ -302,7 +302,7 @@ function raiseButton() {
 // Allows the user to fold
 function foldButton() {
 	var fold = new button(375,475,35,18,"fold", "yellow",10);
-	
+
 	fold.addEventListener("click", function(event) {
 		socket.emit("fold");
 		socket.emit("current turn",{action: "fold"});
@@ -317,7 +317,7 @@ function startButton() {
 	addToMenu(start);
 	stage.addChild(main_menu);
 	stage.update();
-	
+
 	start.addEventListener("click", function(event) {
         removeMenuChildren();
         lobby();
@@ -329,7 +329,7 @@ function readyButton() {
 	var ready = new button(315,300,100,45,"Ready", "#F00",20);
 	addToGame(ready);
 	stage.update();
-	
+
 	ready.addEventListener("click", function(event) {
         deleteItemFromGame(ready);
         socket.emit("ready");
@@ -338,55 +338,55 @@ function readyButton() {
 
 // Allows the different options for raising
 function raiseAmount() {
-	
+
 	var raise_amount = new createjs.Container();
-	
+
 	/* Different button options */
-	
+
 	var one = new button(260,445,35,18,"1", "yellow",10);
 	one.addEventListener("click", function(event) {
 		betAmount(1);
 	})
-	
+
 	var five = new button(300,445,35,18,"5", "yellow",10);
 	five.addEventListener("click", function(event) {
     	betAmount(5);
 	})
-	
+
 	var ten = new button(340,445,35,18,"10", "yellow",10);
 	ten.addEventListener("click", function(event) {
   	    betAmount(10);
 	})
-	
+
 	var twenty = new button(380,445,35,18,"20", "yellow",10);
 	twenty.addEventListener("click", function(event) {
         betAmount(20);
 	})
-	
+
 	var hundred = new button(420,445,35,18,"100", "yellow",10);
 	hundred.addEventListener("click", function(event) {
         betAmount(100);
 	})
-	
+
 	// Once the user presses the button, then bet amount will go into the pot
 	var bet_button = new button(460,445,35,18,"bet", "yellow",10);
 	bet_button.addEventListener("click", function(event) {
 		var done_raising = game_menu.getChildByName("raise_amount");
 		game_menu.removeChild(done_raising);
-       	
+
 		var store = getAmountBet();
 		removePlayerChips(store);
-		
+
 		var currentChips = getPlayerChips();
 		var player = getCurrentPlayer();
 		clientAmounts("main", player, currentChips);
 		// Increase the pot with store
 		socket.emit("increase pot", {chips: store});
-		// 
-		socket.emit("current turn", {action: "raise"});
+		//
+		socket.emit("current turn", {action: "raise", id: player});
 		socket.emit("buttons", {remove: false});
 	})
-	
+
 	betAmount(0);
 	raise_amount.addChild(one,five,ten,twenty,hundred,bet_button);
 	raise_amount.name = "raise_amount";
@@ -399,27 +399,27 @@ function againButton() {
 	var again = new button(315,245,100,45,"Again?", "#F00",20);
 	addToGame(again);
 	stage.update();
-	
+
 	again.addEventListener("click", function(event) {
-		
+
 		// Delete all cards
 		for (var i = 0; i < 13; i ++) {
 			var shape = stage.getChildByName("tableCards");
 			stage.removeChild(shape);
 		}
-		
+
 		var userStore = game_menu.getChildByName("won player");
 		game_menu.removeChild(userStore);
-		
+
 		deleteItemFromGame(again);
 		socket.emit("ready");
 		//socket.emit("from again");
 	})
 }
 
-// Produces the background for the game 
+// Produces the background for the game
 function backgroundFelt() {
-    main_background = new createjs.Bitmap("../images/pokerfelt.jpg");
+    main_background = new createjs.Bitmap("/images/pokerfelt.jpg");
     stage.addChild(main_background);
     createjs.Ticker.addEventListener("tick", handleTick);
     function handleTick(event) {

@@ -1,7 +1,7 @@
 <?php
     include("form_with_validation.php");
     include("header.php");
-    include("session.php");
+    
     ?>
 <html>
 <head>
@@ -140,14 +140,14 @@ input[type=submit]:active {
 </head>
  <li><a href="register.php">new user?</a></li>
 <body>
-   	<center>
-
-        <?php echo message(); ?>
-     
-   
+       <center>  
+    <?php echo message(); ?>
+    <?php echo form_errors($errors); ?>
+    
+  
     <form action="login.php" method="post">
       <p>Username:
-        <input type="text" name="username" value="" />
+        <input type="text" name="username" value="<?php echo htmlentities($username); ?>" />
       </p>
       <p>Password:
             <input type="password" name="password" value="" />
