@@ -143,8 +143,9 @@ function onNewPlayer(data) {
 
 // Increase the pot to all players
 function potIncrease(data) {
-	this.emit("add to pot", {chips: data.chips});
-	this.broadcast.emit("add to pot", {chips: data.chips});
+	this.emit("last bet", {chips: data.amount})
+	this.emit("add to pot", {chips: data.chips, amount: data.amount});
+	this.broadcast.emit("add to pot", {chips: data.chips, amount: data.amount});
 }
 
 //Restart the player list
