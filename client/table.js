@@ -17,6 +17,7 @@ var currentUserBet = 0;
 var lastUserBet = 0;
 var lastBetAmount = 0;
 var pot_amount = 0;
+var positions = {};
 var card1;
 var card2;
 var tableCard1;
@@ -129,6 +130,7 @@ function game_init() {
 
 	// Changes the pace of the Tickers
 	createjs.Ticker.timingMode = createjs.Ticker.RAF;
+	createjs.Ticker.setFPS(40);
 
 	// Assigns the information for the client
 	currentPlayer = new Player();
@@ -224,6 +226,7 @@ function onNewPlayer(data)
   var localIndex = currentPlayer.getTableIndex();
   var nextPlayerIndex;
   var nextPlayerIterator = 0;
+  positons[currentPlayer.getUsername()] = "main";
 
   for (i = 0; i< maxPlayers - 1; i++)
   {
@@ -348,14 +351,17 @@ function drawPlayerAt(playerIndex, indexAfterLocal)
   if (indexAfterLocal == 0)
   {
     clientAmounts("left", currentPlayers[playerIndex].getUsername(), currentPlayers[playerIndex].getChips());
+	positions[currentPlayers[playerIndex].getUsername()] = "left";
   }
   else if (indexAfterLocal == 1)
   {
     clientAmounts("back", currentPlayers[playerIndex].getUsername(), currentPlayers[playerIndex].getChips());
+	positions[currentPlayers[playerIndex].getUsername()] = "back";
   }
   else if (indexAfterLocal == 2)
   {
     clientAmounts("right", currentPlayers[playerIndex].getUsername(), currentPlayers[playerIndex].getChips());
+	positions[currentPlayers[playerIndex].getUsername()] = "right";
   }
 }
 
@@ -376,6 +382,10 @@ function menu() {
   addToMenu(title);
   addToMenu(subtitle);
   startButton();
+  leftPlayer();
+  rightPlayer();
+  mainPlayer();
+  backPlayer();
 
   // update to show title and subtitle
   stage.update();
@@ -429,6 +439,8 @@ function lobby() {
 		 socket.on("change amount", changeAmount);
 		 
 		 socket.on("last bet", setLastUserBet);
+		 
+		 socket.on("player's action", playerAction);
 
 		 // Assigns cards to the table
 		 socket.on("flop cards", flopCards)
@@ -640,7 +652,7 @@ function cardsToBack() {
     stage.addChild(bCard1,bCard2);
 
 	// Passes them to the player
-	firstPass(bCard1,2.2,-4,bCard2,3.5,4,false);
+	firstPass(bCard1,2.2,-4,bCard2,3.4,-4,false);
 }
 
 // Changes the amount of the pot
@@ -787,7 +799,6 @@ function changeAmount(data) {
 	}
 	
 	var index;
-	console.log("This is the localIndex: " + localIndex);
 	switch(localIndex) {
 		case 0:
 			index = userTableIndex;
@@ -803,7 +814,6 @@ function changeAmount(data) {
 			break;
 	}
 	
-	console.log("This is the index: " + index);
 	switch(index) {
 		case 0:
 			clientAmounts("main", data.username, data.chips);
@@ -975,7 +985,6 @@ function playerOptions() {
 
 // Adds the players buttons
 function addButtonContainer() {
-	console.log("adding button containers");
 	var user_buttons = new createjs.Container();
 	user_buttons.name = "buttons";
 	var user_raise = raiseButton();
@@ -1001,4 +1010,44 @@ function wonPlayer(data) {
 	 player.name = "won player";
 	 game_menu.addChild(player);
 	 stage.update();
+}
+
+function playerAction(data) {
+	
+}
+
+function leftPlayer() {
+	var text = new createjs.Text("action", "20px Bembo", "#000");
+	text.x = 650;
+	text.y = 410;
+	text.name = "leftPlayerAction";
+	stage.addChild(text);
+	stage.update();
+}
+
+function backPlayer() {
+	var text = new createjs.Text("action", "20px Bembo", "#000");
+	text.x = 450;
+	text.y = 120;
+	text.name = "backPlayerAction";
+	stage.addChild(text);
+	stage.update();
+}
+
+function rightPlayer() {
+	var text = new createjs.Text("action", "20px Bembo", "#000");
+	text.x = 50;
+	text.y = 410;
+	text.name = "rightPlayerAction";
+	stage.addChild(text);
+	stage.update();
+}
+
+function mainPlayer() {
+	var text = new createjs.Text("action", "20px Bembo", "#000");
+	text.x = 230;
+	text.y = 525;
+	text.name = "mainPlayerAction";
+	stage.addChild(text);
+	stage.update();
 }

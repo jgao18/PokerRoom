@@ -276,7 +276,7 @@ function callButton() {
 		var player = getCurrentPlayer();
 		socket.emit("increase pot", {chips: amount, amount: amount});
 		socket.emit("changed amount", {id: player, chips: currentChips});
-		socket.emit("current turn", {action: "call"});
+		socket.emit("current turn", {action: "call", user: player});
 		socket.emit("buttons", {remove: false});
 	})
 	return call;

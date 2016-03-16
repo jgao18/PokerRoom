@@ -262,6 +262,11 @@ function currentTurn(data) {
 			}
 		}
 	}
+	
+	if (data.action == "call") {
+		this.emit("player's action", {player: data.user, action: "call"});
+		this.broadcast.emit("player's action", {player: data.user, action: "call"});
+	}
 
 	// If all player decided their action for the turn
 	if (currentHandPlayers.length == 0) {
