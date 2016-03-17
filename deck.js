@@ -31,7 +31,7 @@ Deck.prototype.get_new_deck = function()
   {
     for (j=0; j < this.values.length; j++)
     {
-      this.currentDeck.push(new Card(this.values[j], this.suits[i], this.sm, this.font, this.width, this.height, this.strokeColor,
+      this.currentDeck.push(new Card(this.values[j], this.suits[i], "INVALID_USER", this.sm, this.font, this.width, this.height, this.strokeColor,
                                       this.strokeThickness, this.backFillColor, this.frontFillColor));
     }
   }

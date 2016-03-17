@@ -80,7 +80,7 @@ function init() {
 
 		// Once players bet
 		socket.on("increase pot", potIncrease);
-		
+
 		socket.on("changed amount", amountChanged);
   });
 
@@ -155,7 +155,7 @@ function restartPlayerList() {
 
 // Provides the turn signal and buttons for players
 function buttons(data) {
-    
+
 	util.log("Ended in buttons");
 	// Precaution for out of index
 	if (indexPlayer == playingPlayers.length) {
@@ -194,9 +194,9 @@ function amountChanged(data) {
 // Enters this phase once players press the Ready Button
 function firstTurn() {
 	util.log("Ended in firstTurn");
-	
+
 	gameStage = 0; // preflop
-	
+
 	numTimesAccess++;
 	util.log("numTimesAccess is " + numTimesAccess);
 	util.log("curentHandPlayers is " + currentHandPlayers.length);
@@ -224,7 +224,7 @@ function fold() {
 			playingPlayers.splice(i, 1);
 		}
 	}
-	
+
 	// If there is only one player left in the round
 	if (playingPlayers.length == 1) {
 		roundOver = true;
@@ -279,32 +279,32 @@ function currentTurn(data) {
 		    gameStage = (gameStage + 1) % 5;
 		    stage = gameStages[gameStage];
 		    util.log("the stage is " + stage);
-	
-		    if (stage == "flop") 
+
+		    if (stage == "flop")
 			{
 			    this.emit("flop cards", {value1 : tableCards[0].get_value(), suit1 : tableCards[0].get_suit(), value2 : tableCards[1].get_value(), suit2 : tableCards[1].get_suit(),value3 : tableCards[2].get_value(), suit3 : tableCards[2].get_suit()});
 			    this.broadcast.emit("flop cards", {value1 : tableCards[0].get_value(), suit1 : tableCards[0].get_suit(), value2 : tableCards[1].get_value(), suit2 : tableCards[1].get_suit(),value3 : tableCards[2].get_value(), suit3 : tableCards[2].get_suit()});
-			} 
-			else if (stage == "turn") 
+			}
+			else if (stage == "turn")
 			{
 			    this.emit("turn card", {value : tableCards[3].get_value(), suit : tableCards[3].get_suit()});
 			    this.broadcast.emit("turn card", {value : tableCards[3].get_value(), suit : tableCards[3].get_suit()});
-			} 
-			else if (stage == "river") 
+			}
+			else if (stage == "river")
 			{
 			    this.emit("river card", {value : tableCards[4].get_value(), suit : tableCards[4].get_suit()});
 			    this.broadcast.emit("river card", {value : tableCards[4].get_value(), suit : tableCards[4].get_suit()});
-			} 
-			else if (stage == "postriver") 
+			}
+			else if (stage == "postriver")
 			{
 			    outputPlayerCards = [];
 
 			    for (i = 0; i < playerCards.length; i++)
 			    {
-			         outputPlayerCards.push({value: playerCards[i].get_value(), suit: playerCards[i].get_suit()});
+			         outputPlayerCards.push({value: playerCards[i].get_value(), suit: playerCards[i].get_suit(), owner: playerCards[i].get_owner()});
 			         util.log("outputting" + playerCards[i].get_value() + playerCards[i].get_suit());
 			    }
-  
+
 			    for (i = 0; i < playingPlayers.length; i++)
 			    {
 			         var userSocket = userSockets[i].socket;
@@ -338,9 +338,12 @@ function startGame() {
     {
       var userSocket = userSockets[i].socket;
       var card1 = deck.draw_card();
+      var user = playingPlayers[i].getUsername();
+      card1.set_owner(user);
       var card2 = deck.draw_card();
+      card2.set_owner(user);
       playerCards.push(card1, card2);
-      userSocket.emit("client cards", {value1 : card1.get_value(), suit1 : card1.get_suit(), value2 : card2.get_value(), suit2 : card2.get_suit()});
+      userSocket.emit("client cards", {owner: user, value1 : card1.get_value(), suit1 : card1.get_suit(), value2 : card2.get_value(), suit2 : card2.get_suit()});
     }
 
     tableCards = [deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card()];
@@ -379,7 +382,7 @@ function playerLeft(data) {
 function onsocketDisconnect() {
 	util.log("Ended in onSocketDisconnect");
     util.log("Player has disconnected: " + this.id);
-	
+
     var i;
     for (i = 0; i < connectedPlayers.length; i++ )
     {
