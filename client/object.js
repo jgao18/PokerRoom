@@ -267,11 +267,11 @@ function leaveButton(currentPlayer) {
 // Allows the user to call
 function callButton() {
 	var call = new button(295,475,35,18,"call","yellow",10);
-	
+
 	call.addEventListener("click", function(event) {
 		var amount = getTotalBet() - getAmountBet();
 		removePlayerChips(amount);
-		
+
 		var currentChips = getPlayerChips();
 		var player = getCurrentPlayer();
 		socket.emit("increase pot", {chips: amount, amount: amount});
@@ -385,12 +385,12 @@ function raiseAmount() {
 		var store = getAmountBet();
         var lastBet = getLastUserBet();
 		var diffAmount = store - lastBet;
-		
+
 		removePlayerChips(diffAmount);
 
 		var currentChips = getPlayerChips();
 		var player = getCurrentPlayer();
-		
+
 		socket.emit("changed amount", {id: player, chips: currentChips});
 		socket.emit("increase pot", {chips: diffAmount, amount: store});
 		socket.emit("current turn", {action: "raise", id: player});

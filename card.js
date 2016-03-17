@@ -1,9 +1,9 @@
 // Card Class - used by Deck
-// This is a test comment
-function Card(value, suit, sm, font, width, height, strokeColor, strokeThickness, backFillColor, frontFillColor)
+function Card(value, suit, owner, sm, font, width, height, strokeColor, strokeThickness, backFillColor, frontFillColor)
 {
   this.value = value;
   this.suit = suit;
+  this.owner = owner || "INVALID_USER";
   if (suit == "club" || suit == "spade")
     this.color = "black";
   else
@@ -31,6 +31,16 @@ Card.prototype.get_suit = function()
 Card.prototype.get_value = function()
 {
   return this.value;
+}
+
+Card.prototype.get_owner = function()
+{
+  return this.owner;
+}
+
+Card.prototype.set_owner = function(ownerName)
+{
+  this.owner = ownerName;
 }
 
 exports.Card = Card;
