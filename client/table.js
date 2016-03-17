@@ -226,7 +226,7 @@ function onNewPlayer(data)
   var localIndex = currentPlayer.getTableIndex();
   var nextPlayerIndex;
   var nextPlayerIterator = 0;
-  positons[currentPlayer.getUsername()] = "main";
+  positions[currentPlayer.getUsername()] = "main";
 
   for (i = 0; i< maxPlayers - 1; i++)
   {
@@ -351,7 +351,7 @@ function drawPlayerAt(playerIndex, indexAfterLocal)
   if (indexAfterLocal == 0)
   {
     clientAmounts("left", currentPlayers[playerIndex].getUsername(), currentPlayers[playerIndex].getChips());
-	positions[currentPlayers[playerIndex].getUsername()] = "left";
+	positions[currentPlayers[playerIndex].getUsername()] = "right";
   }
   else if (indexAfterLocal == 1)
   {
@@ -361,7 +361,7 @@ function drawPlayerAt(playerIndex, indexAfterLocal)
   else if (indexAfterLocal == 2)
   {
     clientAmounts("right", currentPlayers[playerIndex].getUsername(), currentPlayers[playerIndex].getChips());
-	positions[currentPlayers[playerIndex].getUsername()] = "right";
+	positions[currentPlayers[playerIndex].getUsername()] = "left";
   }
 }
 
@@ -382,10 +382,6 @@ function menu() {
   addToMenu(title);
   addToMenu(subtitle);
   startButton();
-  leftPlayer();
-  rightPlayer();
-  mainPlayer();
-  backPlayer();
 
   // update to show title and subtitle
   stage.update();
@@ -1013,41 +1009,63 @@ function wonPlayer(data) {
 }
 
 function playerAction(data) {
+	var position = positions[data.player];
+	var storeText;
 	
-}
-
-function leftPlayer() {
-	var text = new createjs.Text("action", "20px Bembo", "#000");
-	text.x = 650;
-	text.y = 410;
-	text.name = "leftPlayerAction";
-	stage.addChild(text);
-	stage.update();
-}
-
-function backPlayer() {
-	var text = new createjs.Text("action", "20px Bembo", "#000");
-	text.x = 450;
-	text.y = 120;
-	text.name = "backPlayerAction";
-	stage.addChild(text);
-	stage.update();
-}
-
-function rightPlayer() {
-	var text = new createjs.Text("action", "20px Bembo", "#000");
-	text.x = 50;
-	text.y = 410;
-	text.name = "rightPlayerAction";
-	stage.addChild(text);
-	stage.update();
-}
-
-function mainPlayer() {
-	var text = new createjs.Text("action", "20px Bembo", "#000");
-	text.x = 230;
-	text.y = 525;
-	text.name = "mainPlayerAction";
+	if (position == "main") {
+		if (data.amount) {
+			var text = new createjs.Text("You " + data.action + " to " + data.amount, "15px Bembo", "#FFFF00");
+			text.x -= 25;
+		}
+		else {
+			var text = new createjs.Text("You " + data.action, "15px Bembo", "#FFFF00");
+		}
+	}
+	else {
+		if (data.amount) {
+			var text = new createjs.Text(data.player + " " + data.action + " to " + data.amount, "15px Bembo", "#FFFF00");
+			text.x -= 25;
+		}
+		else {
+			var text = new createjs.Text(data.player + " " + data.action, "15px Bembo", "#FFFF00");
+		}
+	}
+	
+	switch(position) {
+		case "main":
+			if (storeText = stage.getChildByName("mainPlayerAction")) {
+				stage.removeChild(storeText);
+			}
+			text.x += 210;
+			text.y += 525;
+			text.name = "mainPlayerAction";
+			break;
+		case "left":
+			if (storeText = stage.getChildByName("leftPlayerAction")) {
+				stage.removeChild(storeText);
+			}
+			text.x += 630;
+			text.y += 410;
+			text.name = "leftPlayerAction";
+			break;
+		case "right":
+			if (storeText = stage.getChildByName("rightPlayerAction")) {
+				stage.removeChild(storeText);
+			}
+			text.x += 30;
+			text.y += 410;
+			text.name = "rightPlayerAction";
+			break;
+		case "back":
+			if (storeText = stage.getChildByName("backPlayerAction")) {
+				stage.removeChild(storeText);
+			}
+			text.x += 450;
+			text.y += 120;
+			text.name = "backPlayerAction";
+			break;
+	}
+	
 	stage.addChild(text);
 	stage.update();
 }

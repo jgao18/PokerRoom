@@ -249,14 +249,13 @@ function currentTurn(data) {
 
 	// If any player raised
 	if (data.action == "raise") {
-		util.log("User raised");
+		this.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
+		this.broadcast.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
 		// Make a new list with all players
 		currentHandPlayers = playingPlayers.slice();
 		// Look for the user that raised and erased him from list
 		for (var i = 0; i < currentHandPlayers.length; i++) {
-			util.log("This is the currentPlayer: " + currentHandPlayers[i].getUsername());
-			util.log("This is the passed Player: " + data.id);
-			if(data.id == currentHandPlayers[i].getUsername()) {
+			if(data.user == currentHandPlayers[i].getUsername()) {
 				util.log("slicing user");
 				currentHandPlayers.splice(i, 1);
 			}
@@ -264,10 +263,15 @@ function currentTurn(data) {
 	}
 	
 	if (data.action == "call") {
-		this.emit("player's action", {player: data.user, action: "call"});
-		this.broadcast.emit("player's action", {player: data.user, action: "call"});
+		this.emit("player's action", {player: data.user, action: "called", amount: data.amount});
+		this.broadcast.emit("player's action", {player: data.user, action: "called", amount: data.amount});
 	}
-
+	
+	if (data.action == "fold") {
+		this.emit("player's action", {player: data.user, action: "folded", amount: 0});
+		this.broadcast.emit("player's action", {player: data.user, action: "folded", amount: 0});
+	}
+	
 	// If all player decided their action for the turn
 	if (currentHandPlayers.length == 0) {
 		currentHandPlayers = connectedPlayers.slice();
