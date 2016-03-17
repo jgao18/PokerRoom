@@ -380,11 +380,6 @@ function menu() {
   addToMenu(title);
   addToMenu(subtitle);
   startButton();
-  leftPlayer();
-  rightPlayer();
-  mainPlayer();
-  backPlayer();
-
   // update to show title and subtitle
   stage.update();
 }
@@ -813,11 +808,7 @@ function changeAmount(data) {
 			index = (userTableIndex + 1 ) % maxPlayers;
 			break;
 	}
-<<<<<<< HEAD
-	
-=======
 
->>>>>>> upstream/master
 	switch(index) {
 		case 0:
 			clientAmounts("main", data.username, data.chips);
@@ -1060,7 +1051,6 @@ function wonPlayer(data) {
 }
 
 function playerAction(data) {
-<<<<<<< HEAD
 	var position = positions[data.player];
 	var storeText;
 	
@@ -1121,43 +1111,3 @@ function playerAction(data) {
 	stage.addChild(text);
 	stage.update();
 }
-=======
-
-}
-
-function leftPlayer() {
-	var text = new createjs.Text("action", "20px Bembo", "#000");
-	text.x = 650;
-	text.y = 410;
-	text.name = "leftPlayerAction";
-	stage.addChild(text);
-	stage.update();
-}
-
-function backPlayer() {
-	var text = new createjs.Text("action", "20px Bembo", "#000");
-	text.x = 450;
-	text.y = 120;
-	text.name = "backPlayerAction";
-	stage.addChild(text);
-	stage.update();
-}
-
-function rightPlayer() {
-	var text = new createjs.Text("action", "20px Bembo", "#000");
-	text.x = 50;
-	text.y = 410;
-	text.name = "rightPlayerAction";
-	stage.addChild(text);
-	stage.update();
-}
-
-function mainPlayer() {
-	var text = new createjs.Text("action", "20px Bembo", "#000");
-	text.x = 230;
-	text.y = 525;
-	text.name = "mainPlayerAction";
-	stage.addChild(text);
-	stage.update();
-}
->>>>>>> upstream/master
