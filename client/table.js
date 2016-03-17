@@ -99,6 +99,11 @@ function deleteItemFromGame(object) {
 	stage.update();
 }
 
+function removeGameChildren() {
+	game_menu.removeAllChildren();
+	stage.update();
+}
+
 
 function game_init() {
 
@@ -232,11 +237,13 @@ function onNewPlayer(data)
     nextPlayerIterator++;
 	// Provides the location of each connected client to the screen using
     nextPlayerIndex = (localIndex + nextPlayerIterator) % currentPlayers.length;
-
+    var user = currentPlayers[nextPlayerIndex].getUsername();
+	console.log(user);
 	// If player is a connected user
-    if (currentPlayers[nextPlayerIndex].getUsername() != "INVALID_USER")
+    if ((user != "INVALID_USER") && (user != currentPlayer.getUsername()))
     {
 	  // Draw that player location
+	  console.log("This is the user: " + currentPlayers[nextPlayerIndex].getUsername());
       drawPlayerAt(nextPlayerIndex, i);
     }
   }
@@ -332,15 +339,49 @@ function onRemovePlayer(data) {
   {
     if (currentPlayers[i].id == data.id)
     {
+	  console.log("Someone left");
 	  var username = currentPlayers[i].getUsername();
-	  if(username = game_menu.getChildByName(username)) {
+	  console.log("This user is: " + username);
+	  /*if(username = game_menu.getChildByName(username)) {
 	  	  game_menu.removeChild(username);
+	  }*/
+	  // get the position of the player and erase him from the stage
+      //currentPlayers.splice(i, 1);
+	  var position = positions[username];
+	  console.log("This user is: " + username);
+	  console.log("The position is: " + position);
+	  var chip, card1, card2, action;
+	  switch (position) {
+	  	case "left":
+			chip = game_menu.getChildByName("player3_chip_plate");
+			card1 = stage.getChildByName("lCard1");
+			card2 = stage.getChildByName("lCard2");
+			action = stage.getChildByName("leftPlayerAction");
+			break;
+		  
+	  	case "back":
+			chip = game_menu.getChildByName("player4_chip_plate");
+			card1 = stage.getChildByName("bCard1");
+			card2 = stage.getChildByName("bCard2");
+			action = stage.getChildByName("backPlayerAction");
+			break;
+		 
+	  	case "right":
+			chip = game_menu.getChildByName("player2_chip_plate");
+			card1 = stage.getChildByName("rCard1");
+			card2 = stage.getChildByName("rCard2");
+			action = stage.getChildByName("rightPlayerAction");
+			break;
 	  }
-      currentPlayers.splice(i, 1);
-      return;
+	  game_menu.removeChild(chip);
+	  stage.removeChild(card1, card2, action);
+	  stage.update();
+	  currentPlayers.splice(i, 1);
+	  delete positions[username];
     }
   }
 }
+
 
 /* Draws other players on the board
    IndexAfterLocal refers the order they are in the array */
@@ -621,13 +662,13 @@ function cardsToLeft() {
 
 	var lCard1 = deck.card().get_card_back_object();
 	var lCard2 = deck.card().get_card_back_object();
-  lCard1.x = 200;
-  lCard1.y = 300;
-  lCard2.x = 200;
-  lCard2.y = 300;
+    lCard1.x = 200;
+    lCard1.y = 300;
+    lCard2.x = 200;
+    lCard2.y = 300;
 	lCard1.name = "lCard1";
 	lCard2.name = "lCard2";
-  stage.addChild(lCard1,lCard2);
+    stage.addChild(lCard1,lCard2);
 
 	// Passes them to the player
 	firstPass(lCard1,8.2,0,lCard2,9.4,0,false);
@@ -881,7 +922,7 @@ function nextAction() {
 			for (var username in positions)
 			{
 				var card1, card2;
-				if (positions[username] == "left")
+				if (positions[username] == "right")
 				{
 					card1 = stage.getChildByName("rCard1");
 					card2 = stage.getChildByName("rCard2");
@@ -897,7 +938,7 @@ function nextAction() {
 					flip(card1, tempOtherCards[0], 20, 300);
 					flip(card2, tempOtherCards[1], 80, 300);
 				}
-				if (positions[username] == "right")
+				if (positions[username] == "left")
 				{
 					card1 = stage.getChildByName("lCard1");
 					card2 = stage.getChildByName("lCard2");

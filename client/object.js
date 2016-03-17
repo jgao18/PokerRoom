@@ -259,7 +259,7 @@ function leaveButton(currentPlayer) {
 	leave.addEventListener("click", function(event) {
 		removeGameChildren();
         game_init();
-		socket.emit("leave", currentPlayer.id);
+		socket.emit("disconnect", currentPlayer.id);
 	})
 }
 
