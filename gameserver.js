@@ -196,12 +196,13 @@ function firstTurn() {
 	util.log("Ended in firstTurn");
 
 	gameStage = 0; // preflop
-
+    currentHandPlayers = playingPlayers.slice();
 	numTimesAccess++;
 	util.log("numTimesAccess is " + numTimesAccess);
 	util.log("curentHandPlayers is " + currentHandPlayers.length);
 	// Until all users press the ready
 	if ( numTimesAccess == currentHandPlayers.length) {
+		
 		util.log("Inside the first turn");
 		numTimesAccess = 0;
 		// Accesses the first client that enters the room
