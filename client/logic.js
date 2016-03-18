@@ -35,6 +35,33 @@ function suitTest() {
 		console.log(testList[i]);
 	}
 	
+	switch (winner) {
+		case "YYN": 
+			console.log("Royal or Straight Flush");
+			break;
+		case "YYN":
+			console.log("Royal or Straight Flush");
+			break;
+		case "YNY":
+			console.log("Flush");
+			break;
+		case "YNN":
+			console.log("Flush");
+			break;
+		case "NYY":
+			console.log("Straight");
+			break;
+		case "NYN":
+			console.log("Straight");
+			break;
+		case "NNY":
+			console.log("4/3/2 of kind or 2 Pair or Full House");
+			break;
+		case "NNN":
+			console.log("High Card");
+			break;
+	}
+	
 	testing();
 	pairTesting();
 }
