@@ -302,6 +302,7 @@ function currentTurn(data) {
 
 			    for (i = 0; i < playerCards.length; i++)
 			    {
+					 // push the each player's cards into an array to pass into the client
 			         outputPlayerCards.push({value: playerCards[i].get_value(), suit: playerCards[i].get_suit(), owner: playerCards[i].get_owner()});
 			         util.log("outputting" + playerCards[i].get_value() + playerCards[i].get_suit());
 			    }
