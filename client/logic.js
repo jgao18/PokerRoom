@@ -219,7 +219,7 @@ function whichPair() {
 	for (var i = 0; i < (newList.length-1); i++) {
 		if (newList[i] == newList[i+1]) {
 			numOfCards++;
-			if(pairs[newList[i-1]])
+			if(pairs[newList[i]] )
 			pairs[newList[i]] = numOfCards;
 		}
 		else {

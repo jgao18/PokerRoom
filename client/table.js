@@ -161,9 +161,9 @@ function otherCardsFunction(data) {
 	// Pushes all other cards from the temp list into a global list
 	for (i = 0; i < temp.length; i++)
 	{
-		if ( (temp[i].get_value() != card1.get_value()) || (temp[i].get_suit() != card1.get_suit()) )
+		if ( (temp[i].get_value() != card1.get_value()) || (temp[i].get_suit() != card1.get_suit())  )
 		{
-			if ( (temp[i].get_value() != card2.get_value()) || (temp[i].get_suit() != card2.get_suit()) )
+			if ( (temp[i].get_suit() != card2.get_suit()) || (temp[i].get_value() != card2.get_value()) )
 			{
 				otherCards.push(temp[i]);
 			}
