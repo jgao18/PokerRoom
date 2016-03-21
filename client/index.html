@@ -15,7 +15,34 @@
 			<script src="Deck.js"></script>
 			<script src="object.js"></script>
 			<script src="Player.js"></script>
-            <li><a href="../php/logout.php">Logout</a></li>	         		
+            <li><a href="../php/logout.php">Logout</a></li>	
+            <?php include ("logout_button.php"); ?>
+<p>Still here, <?= htmlentities($_SESSION['username']); ?>?</p>
+<form action="<?= $_SERVER['PHP_SELF']; ?>" method="post">
+    <label for="color">Select a color:</label>
+    <select name="color" id="color">
+        <option value="">Choose one</option>
+        <option <?php
+        if (isset($_SESSION['color']) && $_SESSION['color'] == 'Blue') {
+            echo 'selected';
+        }
+        ?>>Blue</option>
+        <option <?php
+        if (isset($_SESSION['color']) && $_SESSION['color'] == 'Green') {
+            echo 'selected';
+        }
+        ?>>Green</option>
+        <option <?php
+        if (isset($_SESSION['color']) && $_SESSION['color'] == 'Red') {
+            echo 'selected';
+        }
+        ?>>Red</option>
+    </select>
+    <input type="submit" name="choose" value="Choose">
+</form>
+<p><a href="restricted1.php">Go to page 1</a></p>
+<p><a href="sensitive.php">Change account details</a></p>
+
 	</head>
 	<body onload="game_init()">
 		<canvas id="demoCanvas" width="750" height="650" style="background-color: green;"></canvas>

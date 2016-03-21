@@ -8,9 +8,11 @@
     <h2>Main Menu</h2>
     <p>Welcome to Home Screen.</p>
     <ul>
-      <li><a href="../client/poker.html">Play Poker</a></li>
+      <li><a href="../client/index.html">Play Poker</a></li>
       <li><a href="">How to Play</a></li>
-      <li><a href="logout.php">Logout</a></li>
+      
+      <?php include "logout_button.php"; ?>
+
     </ul>
   </div>
 </div>
