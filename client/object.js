@@ -259,7 +259,7 @@ function leaveButton(currentPlayer) {
 	leave.addEventListener("click", function(event) {
 		removeGameChildren();
         game_init();
-		socket.emit("leave", currentPlayer.id);
+		socket.emit("disconnect", currentPlayer.id);
 	})
 }
 
@@ -267,9 +267,16 @@ function leaveButton(currentPlayer) {
 // Allows the user to call
 function callButton() {
 	var call = new button(295,475,35,18,"call","yellow",10);
-	
+
 	call.addEventListener("click", function(event) {
-		socket.emit("current turn", {action: "call"});
+		var amount = getTotalBet() - getAmountBet();
+		removePlayerChips(amount);
+
+		var currentChips = getPlayerChips();
+		var player = getCurrentPlayer();
+		socket.emit("increase pot", {chips: amount, amount: amount});
+		socket.emit("changed amount", {id: player, chips: currentChips});
+		socket.emit("current turn", {action: "call", user: player, amount: amount});
 		socket.emit("buttons", {remove: false});
 	})
 	return call;
@@ -293,7 +300,9 @@ function raiseButton() {
 			game_menu.removeChild(show);
 		}
 		else {
+			betAmount(1);
 			raiseAmount();
+			betAmount(getTotalBet());
 		}
 	})
 	return raise;
@@ -304,8 +313,9 @@ function foldButton() {
 	var fold = new button(375,475,35,18,"fold", "yellow",10);
 
 	fold.addEventListener("click", function(event) {
+		var player = getCurrentPlayer();
 		socket.emit("fold");
-		socket.emit("current turn",{action: "fold"});
+		socket.emit("current turn",{action: "fold", user: player});
 		socket.emit("buttons", {remove: false});
 	})
 	return fold;
@@ -373,21 +383,21 @@ function raiseAmount() {
 	bet_button.addEventListener("click", function(event) {
 		var done_raising = game_menu.getChildByName("raise_amount");
 		game_menu.removeChild(done_raising);
-
 		var store = getAmountBet();
-		removePlayerChips(store);
+        var lastBet = getLastUserBet();
+		var diffAmount = store - lastBet;
+
+		removePlayerChips(diffAmount);
 
 		var currentChips = getPlayerChips();
 		var player = getCurrentPlayer();
-		clientAmounts("main", player, currentChips);
-		// Increase the pot with store
-		socket.emit("increase pot", {chips: store});
-		//
-		socket.emit("current turn", {action: "raise"});
+
+		socket.emit("changed amount", {id: player, chips: currentChips});
+		socket.emit("increase pot", {chips: diffAmount, amount: store});
+		socket.emit("current turn", {action: "raise", user: player, amount: diffAmount});
 		socket.emit("buttons", {remove: false});
 	})
 
-	betAmount(0);
 	raise_amount.addChild(one,five,ten,twenty,hundred,bet_button);
 	raise_amount.name = "raise_amount";
 	addToGame(raise_amount);
