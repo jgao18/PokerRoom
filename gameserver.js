@@ -6,6 +6,7 @@ var io = require('socket.io')(server);
 var Player = require("./player").Player;
 var Deck = require("./deck").Deck;
 var Card = require("./card").Card;
+var Logic = require("./logic");
 
 var socket;
 var serverPort = process.argv[2];
@@ -25,6 +26,7 @@ var indexPlayer = 1;
 var again = 0;
 var gameStage = 0;
 var gameStages = ["preflop","flop", "turn", "river", "postriver"];
+var usernames;
 
 var deck;
 var playerCards;
@@ -40,6 +42,7 @@ function init() {
   tableCards = [];
   userSockets = [];
   raisePlayers = [];
+  usernames = [];
   maxPlayers = 4
 
   app.get('/*', function(req, res){
@@ -107,6 +110,7 @@ function onNewPlayer(data) {
   playingPlayers.push(newPlayer);
   connectedPlayers.push(newPlayer);
   currentHandPlayers.push(newPlayer);
+  usernames.push(newPlayer.getUsername());
 
   // Initialize a new list and push 4 players into it.
   outputArray = [];
@@ -298,19 +302,88 @@ function currentTurn(data) {
 			}
 			else if (stage == "postriver")
 			{
+				// Player's Card list
 			    outputPlayerCards = [];
-
-			    for (i = 0; i < playerCards.length; i++)
+				var totalCards = tableCards.slice();
+				var userResults = {};
+				var times = 0;
+				var result;
+				// Push a dictionary int to the card list with information of each card
+				// I could make a private variable for our player class that indicates which player won
+			    for (var i = 0; i < playerCards.length; i++)
 			    {
 			         outputPlayerCards.push({value: playerCards[i].get_value(), suit: playerCards[i].get_suit(), owner: playerCards[i].get_owner()});
-			         util.log("outputting" + playerCards[i].get_value() + playerCards[i].get_suit());
+			         util.log("outputting " + playerCards[i].get_value() + playerCards[i].get_suit());
+					 totalCards.push(playerCards[i]);
+					 times++;
+					 if (times == 2) {
+						result = Logic.determineWinner(totalCards);
+						userResults[playerCards[i].get_owner()] = result;
+						util.log(playerCards[i].get_owner() + " has a " + result);
+						totalCards = tableCards.slice();
+						times = 0;
+					 }
 			    }
+				
+				// Iterate through the dictionary and see which is the higher result
+				// I have 4 players that I have differentiate cards
+				var userPoints = {};
+				for (var i = 0; i < usernames.length; i++) {
+					var str = userResults[usernames[i]];
+					
+					if (str.includes("Royal Flush")) {
+						userPoints[usernames[i]] = 10;
+					}
+					else if(str.includes("Straight Flush")) {
+						userPoints[usernames[i]] = 9;
+					}
+					else if(str.includes("Four of a Kind")) {
+						userPoints[usernames[i]] = 8;
+					}
+					else if(str.includes("Full House")) {
+						userPoints[usernames[i]] = 7;
+					}
+					else if(str.includes("Flush")) {
+						userPoints[usernames[i]] = 6;
+					}
+					else if(str.includes("Straight")) {
+						userPoints[usernames[i]] = 5;
+					}
+					else if(str.includes("Three of a Kind")) {
+						userPoints[usernames[i]] = 4;
+					}
+					else if(str.includes("Two pair")) {
+						userPoints[usernames[i]] = 3;
+					}
+					else if(str.includes("pair")) {
+						userPoints[usernames[i]] = 2;
+					}
+					else if(str.includes("High Card")) {
+						userPoints[usernames[i]] = 1;
+					}
+				}
+				
+				var winner;
+				var high = 0;
+				for (var i = 0; i < usernames.length; i++) {
+					util.log("This is the high: " + high);
+					util.log("This is the userPoints[usernames[i]]: " + userPoints[usernames[i]]);
+					if (userPoints[usernames[i]] > high) {
+						winner = usernames[i];
+						high = userPoints[usernames[i]];
+					}
+				}
+				this.emit("winner",{username: winner});
+				this.broadcast.emit("winner",{username: winner});
 
-			    for (i = 0; i < playingPlayers.length; i++)
+				// Inform every player which cards are who's
+			    for (var i = 0; i < playingPlayers.length; i++)
 			    {
 			         var userSocket = userSockets[i].socket;
 			         userSocket.emit("other cards", outputPlayerCards);
 			    }
+				
+				// Restart the list
 			    playerCards = [];
 			 }
 		     this.emit("next action", gameStages[gameStage]);

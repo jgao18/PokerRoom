@@ -1,0 +1,30 @@
+# For boolean values, use php_flag followed by the name
+# of the configuration directive and on or off.
+
+php_flag session.auto_start off
+php_flag session.use_cookies on
+php_flag session.use_only_cookies on
+php_flag session.use_trans_sid off
+
+# Comment out the following line for PHP < 5.5.2
+php_flag session.use_strict_mode on
+
+# For non-boolean values, use php_value followed by the
+# name of the directive and the value. Set the value to
+# none to clear the value set in php.ini or httpd.conf.
+# Enclose path names and values that contain punctuation
+# in quotes.
+
+php_value session.name LyndaSession
+php_value session.cache_limiter nocache
+
+# Cookie settings
+php_value session.cookie_domain ''
+php_value session.cookie_path '/persistent'
+php_value session.cookie_lifetime 0
+php_flag session.cookie_httponly on
+php_flag session.cookie_secure off
+
+php_value session.gc_maxlifetime 1440
+php_value session.gc_probability 1
+php_value session.gc_divisor 100
