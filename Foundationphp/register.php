@@ -59,6 +59,7 @@ if (isset($_POST['register'])) {
 <!doctype html>
 <html>
 <head>
+
 <meta charset="utf-8">
 <title>Create Account</title>
     <link href="css/styles.css" rel="stylesheet" type="text/css">

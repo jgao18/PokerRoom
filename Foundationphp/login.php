@@ -33,6 +33,8 @@ if (isset($_POST['login'])) {
 <!doctype html>
 <html>
 <head>
+ <li><a href="register.php">new user?</a></li>
+
 <meta charset="utf-8">
 <title>Auto Login</title>
     <style>

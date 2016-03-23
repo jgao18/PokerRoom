@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html>
 	<script src="http://code.jquery.com/jquery-1.12.0.min.js"></script>
 	<!--<script type="text/javascript" src="/i.js"></script><script type="text/javascript">if(typeof(urchinTracker)=='function'){_uacct="UA-230305-2";_udn="none";_uff=false;urchinTracker();}</script>-->
@@ -15,36 +16,11 @@
 			<script src="Deck.js"></script>
 			<script src="object.js"></script>
 			<script src="Player.js"></script>
-            <li><a href="../php/logout.php">Logout</a></li>	
-            <?php include ("logout_button.php"); ?>
-<p>Still here, <?= htmlentities($_SESSION['username']); ?>?</p>
-<form action="<?= $_SERVER['PHP_SELF']; ?>" method="post">
-    <label for="color">Select a color:</label>
-    <select name="color" id="color">
-        <option value="">Choose one</option>
-        <option <?php
-        if (isset($_SESSION['color']) && $_SESSION['color'] == 'Blue') {
-            echo 'selected';
-        }
-        ?>>Blue</option>
-        <option <?php
-        if (isset($_SESSION['color']) && $_SESSION['color'] == 'Green') {
-            echo 'selected';
-        }
-        ?>>Green</option>
-        <option <?php
-        if (isset($_SESSION['color']) && $_SESSION['color'] == 'Red') {
-            echo 'selected';
-        }
-        ?>>Red</option>
-    </select>
-    <input type="submit" name="choose" value="Choose">
-</form>
-<p><a href="restricted1.php">Go to page 1</a></p>
-<p><a href="sensitive.php">Change account details</a></p>
-
+		    <li><a href="../Foundationphp/logout_button.php">Logout</a></li>	
+		              
 	</head>
 	<body onload="game_init()">
 		<canvas id="demoCanvas" width="750" height="650" style="background-color: green;"></canvas>
+		<?php include ("../Foundationphp/logout_button.php"); ?>
 	</body>
 </html>
