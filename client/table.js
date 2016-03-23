@@ -483,6 +483,7 @@ function lobby() {
 		 socket.on("turn card", turnCard)
 		 socket.on("river card", riverCard)
 		 socket.on("other cards", otherCardsFunction);	// Server indicates the cards of the other players
+		 socket.on("winner", displayWinner);
 		});
 
    // Setting all Events
@@ -702,7 +703,7 @@ function pot(amount) {
 
 	pot_amount += amount;
 	var pot_text = new createjs.Text("Pot: $" + pot_amount, "16px Bembo", "#FFFF00");
-	pot_text.x = 340;
+	pot_text.x = 260;
 	pot_text.y = 390;
 	pot_text.name = "pot";
 	stage.addChild(pot_text);
@@ -971,6 +972,8 @@ function nextAction() {
 					flip(card2, tempOtherCards[1], 370, 90);
 				}
 			}
+			
+			var display;
 
 			otherCards = [];
 			againButton();
@@ -978,7 +981,7 @@ function nextAction() {
 			socket.emit("restart");
 			action = 0;
 			break;
-		// If all but one player fold, then erase everything
+		// All other players fold besides one player, then erase everything
 		case 4:
 			//pot(currentBetAmount);
 			currentBetAmount = 0;
@@ -1150,5 +1153,21 @@ function playerAction(data) {
 	}
 	
 	stage.addChild(text);
+	stage.update();
+}
+
+function displayWinner(data) {
+	var display;
+	// Removes the current amount
+	if (display = stage.getChildByName("winner")) {
+		stage.removeChild(display);
+	}
+    
+	
+	var winner = new createjs.Text(data.username + " Won!", "20px Bembo", "#FFFF00");
+	winner.x = 350;
+	winner.y = 385;
+	winner.name = "winner";
+	stage.addChild(winner);
 	stage.update();
 }

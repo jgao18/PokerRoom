@@ -11,59 +11,60 @@ function sortNumber(a,b) {
     return a - b;
 }
 
-function determineWinner(cardList) {
-	//var deck = new Deck();
-	//deck.get_new_deck();
-	//var cardList = [];
-	var testList = [];
+module.exports = {
+	determineWinner: function(cardList) {
+		//var deck = new Deck();
+		//deck.get_new_deck();
+		//var cardList = [];
+		var testList = [];
 
-	for (var i = 0; i < 7; i++) {
-		cardList.push(deck.draw_card());
-		testList.push(cardList[i].get_value());
-	}
+		for (var i = 0; i < 7; i++) {
+			testList.push(cardList[i].get_value());
+		}
 
-	var winner = isSuit(cardList);
-	winner += isOrder(cardList);
-	winner += isPairs(cardList);
-	console.log(winner);
+		var winner = isSuit(cardList);
+		winner += isOrder(cardList);
+		winner += isPairs(cardList);
+		//console.log(winner);
 
-	testList.sort();
+		testList.sort();
 	
-	for (var i =0; i < testList.length; i++) {
-		console.log(testList[i]);
-	}
+		/*for (var i =0; i < testList.length; i++) {
+			console.log(testList[i]);
+		}*/
 	
-	var hand;
-	switch (winner) {
-		// suit/order/value
-		case "YYN": 
-			console.log("Royal or Straight Flush");
-			return whichFlush(cardList);
-			break;
-		case "YNY":
-			console.log("Flush");
-			return "Flush";
-			break;
-		case "YNN":
-			console.log("Flush");
-			return "Flush";
-			break;
-		case "NYY":
-			console.log("Straight");
-			return "Straight";
-			break;
-		case "NYN":
-			console.log("Straight");
-			return "Straight";
-			break;
-		case "NNY":
-			console.log("4/3/2 of kind or 2 Pair or Full House");
-			return whichPair(cardList);
-			break;
-		case "NNN":
-			console.log("High Card");
-			return "High Card";
-			break;
+		var hand;
+		switch (winner) {
+			// suit/order/value
+			case "YYN": 
+				//console.log("Royal or Straight Flush");
+				return whichFlush(cardList);
+				break;
+			case "YNY":
+				//console.log("Flush");
+				return "Flush";
+				break;
+			case "YNN":
+				//console.log("Flush");
+				return "Flush";
+				break;
+			case "NYY":
+				//console.log("Straight");
+				return "Straight";
+				break;
+			case "NYN":
+				//console.log("Straight");
+				return "Straight";
+				break;
+			case "NNY":
+				//console.log("4/3/2 of kind or 2 Pair or Full House");
+				return whichPair(cardList);
+				break;
+			case "NNN":
+				//console.log("High Card");
+				return "High Card";
+				break;
+		}
 	}
 }
 
@@ -111,10 +112,10 @@ function isSuit(cards) {
 		}
 	}
 	
-	console.log("Heart is " + heart);
-	console.log("Spade is " + spade);
-	console.log("Diamond is " + diamond);
-	console.log("Club is " + club);
+	//console.log("Heart is " + heart);
+	//console.log("Spade is " + spade);
+	//console.log("Diamond is " + diamond);
+	//console.log("Club is " + club);
 	if((heart>4) || (spade>4) || (diamond>4) || (club>4)) {
 		points = "Y";
 		return points;
@@ -153,7 +154,7 @@ function isPairs(cards) {
 	var pairList = sortCards(cards);
 	
 	for (var i = 0; i < cards.length; i++) {
-		console.log(pairList[i]);
+		//console.log(pairList[i]);
 		newList.push(values[pairList[i]]);
 	}
 	
@@ -198,8 +199,8 @@ function whichFlush(cards) {
 
 function findValue(dict,keyList,times,extra) {
 	for(var i = 0; i < keyList.length; i++) {
-		console.log("This is keyList[i] " + keyList[i]);
-		console.log(times);
+		//console.log("This is keyList[i] " + keyList[i]);
+		//console.log(times);
 		if(dict[keyList[i]] == times && keyList[i] != extra) {
 			return keyList[i];
 		}
@@ -238,8 +239,6 @@ function whichPair(cards) {
 	}
 
 	var keyList = Object.keys(pairs);
-	console.log(pairs);
-	console.log(keyList);
 	var finalDict = {};
 	var fourOfaKind = 0;
 	var threeOfaKind = 0;
@@ -260,30 +259,38 @@ function whichPair(cards) {
 	
 	var returnValue;
 	var extraValue;
+	var answer;
 	if(fourOfaKind == 1) {
 		returnValue = findValue(pairs,keyList,4);
 		console.log("It is a four of a Kind of " + returnValue);
-		return "Four of a Kind of " + returnValue;
+		answer = "Four of a Kind of " + returnValue;
+		return answer;
 	}
 	else if(threeOfaKind == 1 && pair == 1) {
 		returnValue = findValue(pairs,keyList,3);
 		extraValue = findValue(pairs,keyList,2);
 		console.log("It is a Full House with " + returnValue + " and " + extraValue);
-		return "Full House with " + returnValue + " and " + extraValue;
+		answer = "Full House with " + returnValue + " and " + extraValue;
+		return answer;
 	}
 	else if(threeOfaKind == 1) {
 		returnValue = findValue(pairs,keyList,3);
 		console.log("It is a three of a Kind of " + returnValue);
-		return "Full "
+		answer = "Three of a Kind of " + returnValue;
+		return answer;
 	}
 	else if(pair > 1) {
 		returnValue = findValue(pairs,keyList,2);
 		extraValue = findValue(pairs,keyList,2,returnValue);
-		console.log("It is a two pair with " + returnValue + " and " + extraValue);
+		console.log("It is a pair of " + returnValue);
+		answer = "Two pair with " + returnValue + " and " + extraValue;
+		return answer;
 	}
 	else if(pair == 1) {
 		returnValue = findValue(pairs,keyList,2);
 		console.log("It is a pair of " + returnValue);
+		answer = "It is a pair of " + returnValue;
+		return answer;
 	}
 	
 }
