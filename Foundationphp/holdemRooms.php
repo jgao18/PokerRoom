@@ -12,17 +12,10 @@ if ($stmt->rowCount() > 0){
   while($row = $stmt->fetchAll()){
  //   print_r($row);
     $roomList =$row;
-<<<<<<< HEAD
-=======
-
->>>>>>> explore-conflict
   }
   }else{
      "";
   }
-
-
-
 $errors =[];
 if (isset($_POST['addRoom'])) // This needs to update the database
 {
@@ -219,17 +212,14 @@ input[type=submit]:active {
       <p>
       <form  method="post">
 	<?php
-<<<<<<< HEAD
 	  foreach($roomList as $roomInfo)
 	  {
 	    echo "<li><a href='$roomInfo[1]'>$roomInfo[0]</a></li>";
-=======
 
 	  foreach($roomList as $roomInfo)
 	  {
          
 	    echo "<li><a href='$roomInfo[1]'>$roomInfo[0].  $roomInfo[1]</a></li>";
->>>>>>> explore-conflict
 	  }
 	?>
 	<p></p>
