@@ -304,29 +304,40 @@ function currentTurn(data) {
 			{
 				// Player's Card list
 			    outputPlayerCards = [];
+				var playerHands = {};
 				var totalCards = tableCards.slice();
 				var userResults = {};
 				var times = 0;
 				var result;
+				
+				// Puts each user cards inside a dictionary {user: {Card1: Card2:}}
+				for (var i = 0; i < usernames.length; i++) {
+					playerHands[usernames[i]] = {"Card1": playerCards[times], "Card2": playerCards[times+1]};
+					times += 2;
+				}
+				
+				times = 0;
 				// Push a dictionary int to the card list with information of each card
-				// I could make a private variable for our player class that indicates which player won
 			    for (var i = 0; i < playerCards.length; i++)
 			    {
+					 // inserting the info of the card
 			         outputPlayerCards.push({value: playerCards[i].get_value(), suit: playerCards[i].get_suit(), owner: playerCards[i].get_owner()});
-			         util.log("outputting " + playerCards[i].get_value() + playerCards[i].get_suit());
+			         // Pushing the card value into the logic list
 					 totalCards.push(playerCards[i]);
 					 times++;
+					 
 					 if (times == 2) {
+						// What hand the player has
 						result = Logic.determineWinner(totalCards);
+						// Stores the results of each user
 						userResults[playerCards[i].get_owner()] = result;
-						util.log(playerCards[i].get_owner() + " has a " + result);
+						// Restart the card list 
 						totalCards = tableCards.slice();
 						times = 0;
 					 }
 			    }
 				
 				// Iterate through the dictionary and see which is the higher result
-				// I have 4 players that I have differentiate cards
 				var userPoints = {};
 				for (var i = 0; i < usernames.length; i++) {
 					var str = userResults[usernames[i]];
@@ -337,7 +348,7 @@ function currentTurn(data) {
 					else if(str.includes("Straight Flush")) {
 						userPoints[usernames[i]] = 9;
 					}
-					else if(str.includes("Four of a Kind")) {
+					else if(str.includes("four of a kind")) {
 						userPoints[usernames[i]] = 8;
 					}
 					else if(str.includes("Full House")) {
@@ -346,13 +357,73 @@ function currentTurn(data) {
 					else if(str.includes("Flush")) {
 						userPoints[usernames[i]] = 6;
 					}
-					else if(str.includes("Straight")) {
+					else if(str.includes("Straight")) {// Deck Class -- contains Card objects
+function Deck(sm, font, width, height, strokeColor, strokeThickness, backFillColor, frontFillColor)
+{
+  this.sm = sm || 5.2;
+  this.font = font || "30px Impact";
+  this.width = width || 50
+  this.height = height || 70;
+  this.strokeColor = strokeColor || "gold";
+  this.strokeThickness = strokeThickness || 4;
+  this.backFillColor = backFillColor || "purple";
+  this.frontFillColor = frontFillColor || "white";
+
+  this.cardCount = 52;
+  this.suits = ["heart", "spade", "diamond", "club"]
+  this.values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+
+  this.currentDeck = [];
+
+  this.playerCards = [];
+
+  this.communityCards = [];
+
+}
+
+Deck.prototype.get_new_deck = function()
+{
+  var i, j;
+  for (i=0; i < this.suits.length; i++)
+  {
+    for (j=0; j < this.values.length; j++)
+    {
+      this.currentDeck.push(new Card(this.values[j], this.suits[i], "INVALID_USER", this.sm, this.font, this.width, this.height, this.strokeColor,
+                                      this.strokeThickness, this.backFillColor, this.frontFillColor));
+    }
+  }
+
+  this.cardCount = 52;
+  this.playerCards = [];
+  this.communityCards = [];
+}
+
+Deck.prototype.draw_card = function(type)
+{
+  if (type == "player")
+    this.playerCards.push(card);
+  else if (type == "community")
+    this.communityCards.push(card);
+
+  var cardIndex = Math.floor((Math.random()*this.cardCount));
+  var card = this.currentDeck[cardIndex];
+  this.currentDeck.splice(cardIndex, 1);
+  this.cardCount--;
+
+  return card;
+}
+
+Deck.prototype.card = function()
+{
+  return this.currentDeck[0];
+}
+
 						userPoints[usernames[i]] = 5;
 					}
-					else if(str.includes("Three of a Kind")) {
+					else if(str.includes("three of a kind")) {
 						userPoints[usernames[i]] = 4;
 					}
-					else if(str.includes("Two pair")) {
+					else if(str.includes("two pair")) {
 						userPoints[usernames[i]] = 3;
 					}
 					else if(str.includes("pair")) {
@@ -362,7 +433,34 @@ function currentTurn(data) {
 						userPoints[usernames[i]] = 1;
 					}
 				}
+			 
+			 	// Makes Final Evaluations if there are same results
+				// I need to slice the list of usernames and delete the username for which there is a pair
+				var addPoints;
+				var user1Cards = tableCards.slice();
+				var user2Cards = tableCards.slice();
+				for (var i = 0; i < usernames.length; i++) {
+					for(var j = 0; j < usernames.length; j++) {
+						// If there are multiple of the same results
+						if ((userPoints[usernames[i]] == userPoints[usernames[j]]) && (usernames[i] != usernames[j])) {
+							// Provide the first user's full card list
+							user1Cards.push(playerHands[usernames[j]]["Card1"]);
+							user1Cards.push(playerHands[usernames[j]]["Card2"]);
+							// Provide the second user's full card list
+							user2Cards.push(playerHands[usernames[i]]["Card1"]);
+							user2Cards.push(playerHands[usernames[i]]["Card2"]);
+							// If the cards are bigger then increase the user points by 0.5
+							console.log("This is user1 " + usernames[i]);
+							console.log("This is user2 " + usernames[j]);
+							addPoints = Logic.finalEvaluation(user1Cards,user2Cards,userResults[usernames[i]],userResults[usernames[j]]);
+							console.log("This is the new Points " + addPoints);
+							userPoints[usernames[i]] += addPoints;
+							totalCards = tableCards.slice();
+						}
+					}
+				}
 				
+				// Decides the winner
 				var winner;
 				var high = 0;
 				for (var i = 0; i < usernames.length; i++) {

@@ -1163,7 +1163,6 @@ function displayWinner(data) {
 		stage.removeChild(display);
 	}
     
-	
 	var winner = new createjs.Text(data.username + " Won!", "20px Bembo", "#FFFF00");
 	winner.x = 350;
 	winner.y = 385;

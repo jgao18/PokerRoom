@@ -65,15 +65,74 @@ module.exports = {
 				return "High Card";
 				break;
 		}
+	},
+	
+	finalEvaluation: function(user1List, user2List, user1Results, user2Results) {
+	    var userPoints = 0;
+		
+		console.log("This is the user1Results: " + user1Results);
+		console.log("This is the user2Results: " + user2Results);
+		//What if we looked into the result string and find the values
+		//Need something for pair/two pair/threeokakind/FullHouse/FourofKind
+		if(isPairs(user1List) == "Y") {
+			for(var i = 0; i < values.length; i++) {
+				if(user1Results.includes(values[i])) {
+					user1Value = keyDict[values[i]];
+					break;
+				}
+			}
+		
+			for(var i = 0; i < values.length; i++) {
+				if(user2Results.includes(values[i])) {
+					user2Value = keyDict[values[i]];
+					break;
+				}
+			}
+		
+			console.log("The user1Value is " + user1Value);
+			console.log("The user2Value is " + user2Value);
+			if(user1Value < user2Value) {
+				userPoints = 0.5;
+				console.log("The pair is larger than");
+				return userPoints;
+			}
+			else if(user1Value > user2Value) {
+				userPoints = 0;
+				console.log("The pair is smaller than")
+				return userPoints;
+			}
+		}
+		
+		
+		var List1 = sortCards(user1List);
+		var List2 = sortCards(user2List);
+		// Only works for high card/Straight/Flush/StraightFlush/RoyalFlush
+		for(var i = 0; i < List1.length; i++) {
+			if (List1[i] != List2[i]) {
+				console.log("This is List1: " + List1[i]);
+				console.log("This is List2: " + List2[i]);
+				if (List1[i] < List2[i]) {
+					userPoints = 0.5;
+					break;
+				}
+				else if(List1[i] > List2[i]) {
+					userPoints = 0;
+					break;
+				}
+			}
+		}
+	
+	    return userPoints;
 	}
 }
 
 function sortCards(cards) {
-	//console.log("In sort cards");
+	
 	var valueList = [];
 	var pointList = [];
 	
 	for (var i = 0; i < cards.length; i++) {
+		//console.log(cards[i]);
 		valueList.push(cards[i].get_value());
 	}
 	
@@ -112,10 +171,6 @@ function isSuit(cards) {
 		}
 	}
 	
-	//console.log("Heart is " + heart);
-	//console.log("Spade is " + spade);
-	//console.log("Diamond is " + diamond);
-	//console.log("Club is " + club);
 	if((heart>4) || (spade>4) || (diamond>4) || (club>4)) {
 		points = "Y";
 		return points;
@@ -263,7 +318,7 @@ function whichPair(cards) {
 	if(fourOfaKind == 1) {
 		returnValue = findValue(pairs,keyList,4);
 		console.log("It is a four of a Kind of " + returnValue);
-		answer = "Four of a Kind of " + returnValue;
+		answer = "four of a kind of " + returnValue;
 		return answer;
 	}
 	else if(threeOfaKind == 1 && pair == 1) {
@@ -275,15 +330,15 @@ function whichPair(cards) {
 	}
 	else if(threeOfaKind == 1) {
 		returnValue = findValue(pairs,keyList,3);
-		console.log("It is a three of a Kind of " + returnValue);
-		answer = "Three of a Kind of " + returnValue;
+		console.log("It is a three of a kind of " + returnValue);
+		answer = "three of a kind of " + returnValue;
 		return answer;
 	}
 	else if(pair > 1) {
 		returnValue = findValue(pairs,keyList,2);
 		extraValue = findValue(pairs,keyList,2,returnValue);
 		console.log("It is a pair of " + returnValue);
-		answer = "Two pair with " + returnValue + " and " + extraValue;
+		answer = "two pair with " + returnValue + " and " + extraValue;
 		return answer;
 	}
 	else if(pair == 1) {
