@@ -63,6 +63,11 @@ function getLastUserBet() {
 	currentUserBet = data.chips;
 }*/
 
+function setPotToZero() {
+	pot_amount = 0;
+	pot(0);
+}
+
 function getNumPlayers() {
 	return numPlayers;
 }
@@ -483,7 +488,6 @@ function lobby() {
 		 socket.on("turn card", turnCard)
 		 socket.on("river card", riverCard)
 		 socket.on("other cards", otherCardsFunction);	// Server indicates the cards of the other players
-		 socket.on("winner", displayWinner);
 		});
 
    // Setting all Events
@@ -832,6 +836,16 @@ function changeAmount(data) {
 		if ( currentPlayers[i].getUsername() == data.username ) {
 			//retrieve the user's index on the table
 			userTableIndex = currentPlayers[i].getTableIndex();
+			console.log("This is the player's amount: " + currentPlayers[i].getChips());
+			console.log("This is the chips that was passed in: " + data.chips);
+			var amount = data.chips - currentPlayers[i].getChips();
+			if (amount => 0) {
+				currentPlayers[i].addChips(amount);
+			}
+			else {
+				currentPlayers[i].deleteChips(amount);
+			}
+			console.log("This is the added amount: " + amount);
 		}
 	}
 
@@ -1086,9 +1100,25 @@ function removeButtonContainer() {
 
 // Shows the player that won the game
 function wonPlayer(data) {
-	 var player = new createjs.Text(data.player + " Wins!", "30px Bembo","#FFFF00");
-	 player.x = 280;
-	 player.y = 300;
+	 var display;
+	 if (display = game_menu.getChildByName("won player")) {
+	 	 stage.removeChild(display);
+	 }
+	 
+	 var amount = 0;
+	 for (var i = 0; i < currentPlayers.length; i++) {
+		 if(currentPlayers[i].getUsername() == data.player) {
+			amount = currentPlayers[i].getChips() + pot_amount;
+		 }
+	 }
+	 
+	 socket.emit("changed amount",{id: data.player, chips: amount});
+	 setPotToZero();
+	 
+	 console.log("This is the pot amount: " + pot_amount);
+	 var player = new createjs.Text(data.player + " Wins!", "20px Bembo","#FFFF00");
+ 	 player.x = 350;
+ 	 player.y = 385;
 	 player.name = "won player";
 	 game_menu.addChild(player);
 	 stage.update();
@@ -1153,20 +1183,5 @@ function playerAction(data) {
 	}
 	
 	stage.addChild(text);
-	stage.update();
-}
-
-function displayWinner(data) {
-	var display;
-	// Removes the current amount
-	if (display = stage.getChildByName("winner")) {
-		stage.removeChild(display);
-	}
-    
-	var winner = new createjs.Text(data.username + " Won!", "20px Bembo", "#FFFF00");
-	winner.x = 350;
-	winner.y = 385;
-	winner.name = "winner";
-	stage.addChild(winner);
 	stage.update();
 }

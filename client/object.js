@@ -300,6 +300,7 @@ function raiseButton() {
 			game_menu.removeChild(show);
 		}
 		else {
+			setAmountBet(0);
 			betAmount(1);
 			raiseAmount();
 			betAmount(getTotalBet());
@@ -381,17 +382,24 @@ function raiseAmount() {
 	// Once the user presses the button, then bet amount will go into the pot
 	var bet_button = new button(460,445,35,18,"bet", "yellow",10);
 	bet_button.addEventListener("click", function(event) {
+		
 		var done_raising = game_menu.getChildByName("raise_amount");
 		game_menu.removeChild(done_raising);
 		var store = getAmountBet();
         var lastBet = getLastUserBet();
 		var diffAmount = store - lastBet;
+       
+		//removePlayerChips(diffAmount);
 
-		removePlayerChips(diffAmount);
-
-		var currentChips = getPlayerChips();
+		var currentChips = getPlayerChips() - diffAmount;
 		var player = getCurrentPlayer();
+		
+		var bet;
+		if (bet = stage.getChildByName("bet_amount")) {
+			stage.removeChild(bet);
+		}
 
+		console.log("This is the currentChips: " + currentChips);
 		socket.emit("changed amount", {id: player, chips: currentChips});
 		socket.emit("increase pot", {chips: diffAmount, amount: store});
 		socket.emit("current turn", {action: "raise", user: player, amount: diffAmount});
