@@ -63,6 +63,10 @@ function getLastUserBet() {
 	currentUserBet = data.chips;
 }*/
 
+function getPotAmount() {
+	return pot_amount;
+}
+
 function setPotToZero() {
 	pot_amount = 0;
 	pot(0);
@@ -284,7 +288,7 @@ function assignSignal(data) {
 
 
 	var userSignal;
-	var index
+	var index;
 	// Takes in the current client's position
 	switch(localIndex) {
 		case 0:
@@ -882,6 +886,21 @@ function changeAmount(data) {
 
 }
 
+function newTurn() {
+	currentBetAmount = 0;
+	currentUserBet = 0;
+	lastUserBet = 0;
+	setAmountBet(0);
+	
+	var actionList = ["mainPlayerAction","leftPlayerAction","rightPlayerAction","backPlayerAction"];
+	var store;
+	for(var i = 0; i < actionList.length; i++) {
+		if (store = stage.getChildByName(actionList[i])) {
+			stage.removeChild(store);
+		}
+	}
+}
+
 // Once all user have finish their turn, go to the next action
 function nextAction() {
 
@@ -889,10 +908,7 @@ function nextAction() {
 		// Flips the first three cards on the table
 		case 0:
 			//pot(currentBetAmount);
-			currentBetAmount = 0;
-			currentUserBet = 0;
-			lastUserBet = 0;
-			setAmountBet(0);
+			newTurn();
 			var tCard5 = stage.getChildByName("tCard5");
 			var tCard4 = stage.getChildByName("tCard4");
 			var tCard3 = stage.getChildByName("tCard3");
@@ -904,10 +920,7 @@ function nextAction() {
 		// Flips the fourth card on the table
 		case 1:
 			//pot(currentBetAmount);
-			currentBetAmount = 0;
-			currentUserBet = 0;
-			lastUserBet = 0;
-			setAmountBet(0);
+			newTurn();
 			var tCard2 = stage.getChildByName("tCard2");
 			flip(tCard2,tableCard2,440,300);
 			action++;
@@ -915,10 +928,7 @@ function nextAction() {
 		// Flips the fifth card on the table
 		case 2:
 			//pot(currentBetAmount);
-			currentBetAmount = 0;
-			currentUserBet = 0;
-			lastUserBet = 0;
-			setAmountBet(0);
+			newTurn();
 			var tCard1 = stage.getChildByName("tCard1");
 			flip(tCard1,tableCard1,500,300);
 			action++;
@@ -926,10 +936,7 @@ function nextAction() {
 		// Flips all player's cards and allows players to play again
 		case 3:
 			//pot(currentBetAmount);
-			currentBetAmount = 0;
-			currentUserBet = 0;
-			lastUserBet = 0;
-			setAmountBet(0);
+			newTurn();
 			var cardList = ["rCard1","rCard2","lCard1","lCard2","bCard1","bCard2"];
 			var placement = [20,300,80,300,615,300,675,300,310,90,370,90];
 			var j = 0;
@@ -998,10 +1005,7 @@ function nextAction() {
 		// All other players fold besides one player, then erase everything
 		case 4:
 			//pot(currentBetAmount);
-			currentBetAmount = 0;
-			currentUserBet = 0;
-			lastUserBet = 0;
-			setAmountBet(0);
+			newTurn();
 			var store;
 			// Erases all unfolded cards
 			var cardList = ["rCard1","rCard2","lCard1","lCard2","bCard1","bCard2",

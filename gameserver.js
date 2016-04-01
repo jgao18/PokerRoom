@@ -251,31 +251,19 @@ function fold() {
 
 function currentTurn(data) {
 	util.log("Ended in currentTurn");
-
+	
 	// If any player raised
-	if (data.action == "raise") {
-		this.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
-		this.broadcast.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
-		// Make a new list with all players
-		currentHandPlayers = playingPlayers.slice();
-		// Look for the user that raised and erased him from list
-		for (var i = 0; i < currentHandPlayers.length; i++) {
-			if(data.user == currentHandPlayers[i].getUsername()) {
-				util.log("slicing user");
-				currentHandPlayers.splice(i, 1);
-			}
-		}
-	}
-	
-	if (data.action == "call") {
-		this.emit("player's action", {player: data.user, action: "called", amount: data.amount});
-		this.broadcast.emit("player's action", {player: data.user, action: "called", amount: data.amount});
-	}
-	
-	if (data.action == "fold") {
-		this.emit("player's action", {player: data.user, action: "folded", amount: 0});
-		this.broadcast.emit("player's action", {player: data.user, action: "folded", amount: 0});
-	}
+ 	if (data.action == "raise") {
+ 		// Make a new list with all players
+ 		currentHandPlayers = playingPlayers.slice();
+ 		// Look for the user that raised and erased him from list
+ 		for (var i = 0; i < currentHandPlayers.length; i++) {
+ 			if(data.user == currentHandPlayers[i].getUsername()) {
+ 				util.log("slicing user");
+ 				currentHandPlayers.splice(i, 1);
+ 			}
+ 		}
+ 	}
 	
 	// If all player decided their action for the turn
 	if (currentHandPlayers.length == 0) {
@@ -428,6 +416,19 @@ function currentTurn(data) {
 			 this.broadcast.emit("next action", gameStages[gameStage]);
 		 }
 	 }
+	
+ 	if (data.action == "raise") {
+ 		this.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
+ 		this.broadcast.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
+	}
+	else if (data.action == "call") {
+ 		this.emit("player's action", {player: data.user, action: "called", amount: data.amount});
+ 		this.broadcast.emit("player's action", {player: data.user, action: "called", amount: data.amount});
+ 	}
+	else if (data.action == "fold") {
+ 		this.emit("player's action", {player: data.user, action: "folded", amount: 0});
+ 		this.broadcast.emit("player's action", {player: data.user, action: "folded", amount: 0});
+ 	}
 
 	// Provide the next player in the list
     playerTurn = currentHandPlayers[0];

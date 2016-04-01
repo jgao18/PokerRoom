@@ -270,13 +270,15 @@ function callButton() {
 
 	call.addEventListener("click", function(event) {
 		var amount = getTotalBet() - getAmountBet();
+		var highBet = getTotalBet();
 		removePlayerChips(amount);
 
 		var currentChips = getPlayerChips();
 		var player = getCurrentPlayer();
+		
 		socket.emit("increase pot", {chips: amount, amount: amount});
 		socket.emit("changed amount", {id: player, chips: currentChips});
-		socket.emit("current turn", {action: "call", user: player, amount: amount});
+		socket.emit("current turn", {action: "call", user: player, amount: highBet});
 		socket.emit("buttons", {remove: false});
 	})
 	return call;
@@ -388,6 +390,8 @@ function raiseAmount() {
 		var store = getAmountBet();
         var lastBet = getLastUserBet();
 		var diffAmount = store - lastBet;
+		var highBet = getAmountBet();
+		console.log("This is the high bet right now: " + highBet);
        
 		//removePlayerChips(diffAmount);
 
@@ -399,10 +403,9 @@ function raiseAmount() {
 			stage.removeChild(bet);
 		}
 
-		console.log("This is the currentChips: " + currentChips);
 		socket.emit("changed amount", {id: player, chips: currentChips});
 		socket.emit("increase pot", {chips: diffAmount, amount: store});
-		socket.emit("current turn", {action: "raise", user: player, amount: diffAmount});
+		socket.emit("current turn", {action: "raise", user: player, amount: highBet});
 		socket.emit("buttons", {remove: false});
 	})
 
