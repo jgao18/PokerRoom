@@ -1,6 +1,8 @@
 <?php include("header.php"); ?>
 <?php include ("authenticate.php"); ?>
 <?php include("db_connect.php"); ?>
+<?php session_start(); ?>
+
 
 <div id="main">
   <div id="navigation">

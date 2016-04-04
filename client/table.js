@@ -31,6 +31,9 @@ var otherCards;
 // Holds all items for the game
 var game_menu = new createjs.Container();
 
+console.log(document.cookie);
+
+
 // Will incoporate this function for starting games with
 // with a random user
 function randomUserStart() {
@@ -106,7 +109,7 @@ function removeGameChildren() {
 
 
 function game_init() {
-
+  
 	deck = new Deck();
 	deck.get_new_deck();
 	otherCards = [];
@@ -238,7 +241,6 @@ function onNewPlayer(data)
 	// Provides the location of each connected client to the screen using
     nextPlayerIndex = (localIndex + nextPlayerIterator) % currentPlayers.length;
     var user = currentPlayers[nextPlayerIndex].getUsername();
-	console.log(user);
 	// If player is a connected user
     if ((user != "INVALID_USER") && (user != currentPlayer.getUsername()))
     {

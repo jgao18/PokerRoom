@@ -47,52 +47,74 @@ function init() {
 
   app.get('/*', function(req, res){
     var file = req.params[0];
+        util.log(file);
+
       //Send the requesting client the file.
      res.sendFile( __dirname + '/client/' + file );
+     
    });
-
+  
+  app.get('/*', function(req, res){
+    var file = req.params[0];
+    util.log(file);
+    if (file == "link.php")
+      res.sendFile( __dirname + file );
+     
+   });
+  
+  
   io.on('connection', function (socket) {
+    util.log('found someone');
+    socket.on('broadcast', testing);
+    
     socket.emit('welcome', { message: 'Welcome to the poker room, client!' });
+    
+    // When a new player comes in, onNewPlayer runs
+    socket.on("new player", onNewPlayer);
 
-		// When a new player comes in, onNewPlayer runs
-		socket.on("new player", onNewPlayer);
+    // When socket disconnects, call onsocketDisconnect
+    socket.on("disconnect", onsocketDisconnect);
 
-		// When socket disconnects, call onsocketDisconnect
-		socket.on("disconnect", onsocketDisconnect);
+    // When socket presses ready button
+    socket.on("ready", startGame);
 
-		// When socket presses ready button
-		socket.on("ready", startGame);
+    // When socket presses the leave button
+    socket.on("leave", playerLeft);
 
-		// When socket presses the leave button
-		socket.on("leave", playerLeft);
+    // Indicates the turn for the user
+    socket.on("current turn", currentTurn);
 
-		// Indicates the turn for the user
-		socket.on("current turn", currentTurn);
+    // Once players press the Ready Button
+    socket.on("first turn", firstTurn);
 
-		// Once players press the Ready Button
-		socket.on("first turn", firstTurn);
+    // Once players press any buttons
+    socket.on("buttons", buttons);
 
-		// Once players press any buttons
-		socket.on("buttons", buttons);
+    // Once players press fold
+    socket.on("fold", fold);
 
-		// Once players press fold
-		socket.on("fold", fold);
+    // Once players press call
+    socket.on("call", currentTurn);
 
-		// Once players press call
-		socket.on("call", currentTurn);
+    // Once players bet
+    socket.on("increase pot", potIncrease);
 
-		// Once players bet
-		socket.on("increase pot", potIncrease);
-
-		socket.on("changed amount", amountChanged);
+    socket.on("changed amount", amountChanged);
   });
 
   // Thanks to the Nick/the PoP team for helping with this code
-	// Set to listen on this ip and this port.
-	server.listen(serverPort, '0.0.0.0', function(){
-		console.log("Game server started on port " + serverPort);
-	});
+  // Set to listen on this ip and this port.
+  server.listen(serverPort, '0.0.0.0', function(){
+	  console.log("Game server started on port " + serverPort);
+  });
+  
 };
+
+
+function retrieveUser(data)
+{
+ util.log(username); 
+}
 
 // Called by sockets when they hit the Play button
 function onNewPlayer(data) {

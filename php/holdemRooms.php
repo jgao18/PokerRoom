@@ -1,5 +1,21 @@
 <?php 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
     require_once ("db_connect.php");
+    require_once ("authenticate.php");
+
+$username = $_SESSION['username'];
+$sql = 'SELECT username FROM users WHERE username = :username';
+$stmt = $db->prepare($sql);
+$stmt->bindParam(':username', $username);
+$stmt->execute();
+$stored = $stmt->fetchColumn();
+echo $stored;
+
+setcookie("user_cookie", $stored , time() + (86400 * 30), "/"); // 86400 = 1 day
+
 
 // pull list of room and ip from the database
 $roomList = array(); 
@@ -94,6 +110,17 @@ if (isset($_POST['refresh'])) // This needs to pull from the database
 {
   header("Refresh:0");
 }
+
+if (isset($_POST['join_server'])) 
+{
+  header('Location: ../link.php/');
+  
+  $ip = $_POST['servers'];
+
+  setcookie('server_cookie', $ip , time() + (86400*30), '/');
+}
+
+
 ?>
 
 <style>
@@ -199,7 +226,6 @@ input[type=submit]:active {
 }
 </style>
 
-
 <div id="main">
   <div id="navigation">
     &nbsp;
@@ -208,20 +234,20 @@ input[type=submit]:active {
     <h2>Texas Hold'em Rooms</h2>
     <p>Public Rooms:</p>
     <ul>
-      <p>
       <form  method="post">
-	<?php
-	  foreach($roomList as $roomInfo)
-	  {
-         
-	    echo "<li><a href='$roomInfo[1]'>$roomInfo[0].  $roomInfo[1]</a></li>";
-	  }
-	?>
-	<p></p>
-	
+	<select id ="servers" name="servers" onchange="document.getElementById('selected_text').value=this.options[this.selectedIndex].text">
+	  <?php
+	    foreach($roomList as $roomInfo)
+	    {  ?>
+	      <option value=<?php echo $roomInfo[1] ?> > <?php echo $roomInfo[0]?> </option>
+	    <?php
+	      }
+	  ?>
+	</select>
+	<input type="hidden" name="selected_text" id="selected_text" value="" />
 	<input type="submit" name="refresh" id="refresh" value="Refresh">
+	<input type="submit" name="join_server" id="join_server" value="Enter">
       </form>
-      </p>
     </ul>
     
     <div id="page2">
