@@ -69,6 +69,8 @@ module.exports = {
 	
 	finalEvaluation: function(user1List, user2List, user1Results, user2Results) {
 	    var userPoints = 0;
+		var user1Value;
+		var user2Value;
 		
 		console.log("This is the user1Results: " + user1Results);
 		console.log("This is the user2Results: " + user2Results);
@@ -92,7 +94,7 @@ module.exports = {
 			console.log("The user1Value is " + user1Value);
 			console.log("The user2Value is " + user2Value);
 			if(user1Value < user2Value) {
-				userPoints = 0.5;
+				userPoints = 0.25;
 				console.log("The pair is larger than");
 				return userPoints;
 			}
@@ -105,14 +107,20 @@ module.exports = {
 		
 		
 		var List1 = sortCards(user1List);
+		console.log("\n");
+		console.log(user1List);
 		var List2 = sortCards(user2List);
+		console.log("\n");
+		console.log(user2List);
 		// Only works for high card/Straight/Flush/StraightFlush/RoyalFlush
 		for(var i = 0; i < List1.length; i++) {
+			console.log("This is List1: " + List1[i]);
+			console.log("This is List2: " + List2[i]);
 			if (List1[i] != List2[i]) {
 				console.log("This is List1: " + List1[i]);
 				console.log("This is List2: " + List2[i]);
 				if (List1[i] < List2[i]) {
-					userPoints = 0.5;
+					userPoints = 0.25;
 					break;
 				}
 				else if(List1[i] > List2[i]) {
@@ -253,7 +261,8 @@ function whichFlush(cards) {
 }
 
 function findValue(dict,keyList,times,extra) {
-	for(var i = 0; i < keyList.length; i++) {
+	var lastIndex = keyList.length - 1;
+	for(var i = lastIndex; i => 0; i--) {
 		//console.log("This is keyList[i] " + keyList[i]);
 		//console.log(times);
 		if(dict[keyList[i]] == times && keyList[i] != extra) {
@@ -337,7 +346,7 @@ function whichPair(cards) {
 	else if(pair > 1) {
 		returnValue = findValue(pairs,keyList,2);
 		extraValue = findValue(pairs,keyList,2,returnValue);
-		console.log("It is a pair of " + returnValue);
+		console.log("It is a pair of " + returnValue + " and " + extraValue);
 		answer = "two pair with " + returnValue + " and " + extraValue;
 		return answer;
 	}

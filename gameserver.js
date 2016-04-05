@@ -162,9 +162,6 @@ function buttons(data) {
 
 	util.log("Ended in buttons");
 	// Precaution for out of index
-	if (indexPlayer == playingPlayers.length) {
-		indexPlayer = 0;
-	}
 
 	// Remove the access sockets buttons
 	this.emit("remove buttons");
@@ -172,6 +169,9 @@ function buttons(data) {
 	// Provide the next player in the list buttons
 	for (var i = 0; i < userSockets.length; i++) {
 		if(playingPlayers[indexPlayer].getUsername() == userSockets[i].username) {
+			console.log("This is the user: " + userSockets[i].username);
+			console.log("This is the length of playingPlayers: " + playingPlayers.length);
+			console.log("This is the indexPlayer: " + indexPlayer);
 			// Access the next player's socket
 			var userSocket = userSockets[i].socket;
 			// Provide that player the turn signal and buttons
@@ -181,7 +181,12 @@ function buttons(data) {
 		}
 	}
 	// next player
+	util.log("INNNNNNNNDEXXXXX PLAYER IS INCREASING!!!!: " + indexPlayer);
 	indexPlayer++;
+	
+	if (indexPlayer >= playingPlayers.length) {
+		indexPlayer = 0;
+	}
 
 	if (data.remove == true) {
 		this.emit("remove buttons");
@@ -196,7 +201,7 @@ function amountChanged(data) {
 }
 
 // Enters this phase once players press the Ready Button
-function firstTurn() {
+function firstTurn(data) {
 	util.log("Ended in firstTurn");
 
 	gameStage = 0; // preflop
@@ -207,12 +212,22 @@ function firstTurn() {
 	// Until all users press the ready
 	if ( numTimesAccess == currentHandPlayers.length) {
 		
+		if (playingPlayers[indexPlayer].getUsername() == userSockets[0].username) {
+			console.log("This is the future!!!!!!!!!");
+			indexPlayer++;
+		}
+		
 		util.log("Inside the first turn");
 		numTimesAccess = 0;
 		// Accesses the first client that enters the room
+		console.log("This is the userSocket[0].socket :" + userSockets[0].username);
 		var userSocket = userSockets[0].socket;
 		userSocket.emit("add buttons");
 		userSocket.emit("signal", {username: userSockets[0].username});
+		for(var i = 1; i < userSockets.length; i++) {
+			userSocket = userSockets[i].socket;
+			userSocket.emit("signal", {username: userSockets[0].username});
+		}
 
 		// Removes the first player from the remaining round players
 		playerTurn = currentHandPlayers[0];
@@ -372,18 +387,20 @@ function currentTurn(data) {
 						// If there are multiple of the same results
 						if ((userPoints[usernames[i]] == userPoints[usernames[j]]) && (usernames[i] != usernames[j])) {
 							// Provide the first user's full card list
-							user1Cards.push(playerHands[usernames[j]]["Card1"]);
-							user1Cards.push(playerHands[usernames[j]]["Card2"]);
+							user1Cards.push(playerHands[usernames[i]]["Card1"]);
+							user1Cards.push(playerHands[usernames[i]]["Card2"]);
 							// Provide the second user's full card list
-							user2Cards.push(playerHands[usernames[i]]["Card1"]);
-							user2Cards.push(playerHands[usernames[i]]["Card2"]);
+							user2Cards.push(playerHands[usernames[j]]["Card1"]);
+							user2Cards.push(playerHands[usernames[j]]["Card2"]);
 							// If the cards are bigger then increase the user points by 0.5
 							console.log("This is user1 " + usernames[i]);
 							console.log("This is user2 " + usernames[j]);
 							addPoints = Logic.finalEvaluation(user1Cards,user2Cards,userResults[usernames[i]],userResults[usernames[j]]);
 							console.log("This is the new Points " + addPoints);
 							userPoints[usernames[i]] += addPoints;
-							totalCards = tableCards.slice();
+							//totalCards = tableCards.slice();
+							user1Cards = tableCards.slice();
+							user2Cards = tableCards.slice();
 						}
 					}
 				}
@@ -392,12 +409,12 @@ function currentTurn(data) {
 				var winner;
 				var high = 0;
 				for (var i = 0; i < usernames.length; i++) {
-					util.log("This is the high: " + high);
 					util.log("This is the userPoints[usernames[i]]: " + userPoints[usernames[i]]);
 					if (userPoints[usernames[i]] > high) {
 						winner = usernames[i];
 						high = userPoints[usernames[i]];
 					}
+					util.log("This is the high: " + high);
 				}
 				this.emit("winning player",{player: winner});
 				this.broadcast.emit("winning player",{player: winner});

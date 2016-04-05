@@ -1134,7 +1134,7 @@ function playerAction(data) {
 	
 	if (position == "main") {
 		if (data.amount) {
-			var text = new createjs.Text("You " + data.action + " to " + data.amount, "15px Bembo", "#FFFF00");
+			var text = new createjs.Text("You " + data.action + ": " + data.amount, "15px Bembo", "#FFFF00");
 			text.x -= 25;
 		}
 		else {
@@ -1143,11 +1143,11 @@ function playerAction(data) {
 	}
 	else {
 		if (data.amount) {
-			var text = new createjs.Text(data.player + " " + data.action + " to " + data.amount, "15px Bembo", "#FFFF00");
+			var text = new createjs.Text(data.action + ": " + data.amount, "15px Bembo", "#FFFF00");
 			text.x -= 25;
 		}
 		else {
-			var text = new createjs.Text(data.player + " " + data.action, "15px Bembo", "#FFFF00");
+			var text = new createjs.Text(data.action, "15px Bembo", "#FFFF00");
 		}
 	}
 	
@@ -1164,7 +1164,7 @@ function playerAction(data) {
 			if (storeText = stage.getChildByName("leftPlayerAction")) {
 				stage.removeChild(storeText);
 			}
-			text.x += 630;
+			text.x += 665;
 			text.y += 410;
 			text.name = "leftPlayerAction";
 			break;
@@ -1172,7 +1172,7 @@ function playerAction(data) {
 			if (storeText = stage.getChildByName("rightPlayerAction")) {
 				stage.removeChild(storeText);
 			}
-			text.x += 30;
+			text.x += 75;
 			text.y += 410;
 			text.name = "rightPlayerAction";
 			break;
