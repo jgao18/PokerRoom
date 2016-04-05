@@ -46,8 +46,8 @@ function getLastBetAmount() {
 }
 
 function betDifference(amount) {
-	console.log("Passing in the amount :" + amount);
-	console.log("currentUserBet :" + currentUserBet);
+	//console.log("Passing in the amount :" + amount);
+	//console.log("currentUserBet :" + currentUserBet);
 	return (amount - currentUserBet);
 }
 
@@ -236,7 +236,7 @@ function onNewPlayer(data)
     if ((user != "INVALID_USER") && (user != currentPlayer.getUsername()))
     {
 	  // Draw that player location
-	  console.log("This is the user: " + currentPlayers[nextPlayerIndex].getUsername());
+	  //console.log("This is the user: " + currentPlayers[nextPlayerIndex].getUsername());
       drawPlayerAt(nextPlayerIndex, i);
     }
   }
@@ -332,9 +332,9 @@ function onRemovePlayer(data) {
   {
     if (currentPlayers[i].id == data.id)
     {
-	  console.log("Someone left");
+	  //console.log("Someone left");
 	  var username = currentPlayers[i].getUsername();
-	  console.log("This user is: " + username);
+	  //console.log("This user is: " + username);
 	  /*if(username = game_menu.getChildByName(username)) {
 	  	  game_menu.removeChild(username);
 	  }*/
@@ -430,10 +430,10 @@ function lobby() {
     currentPlayer = new Player();
     currentPlayer.setUsername(data.message.toString().split(" ")[0]);
     currentPlayer.addChips((data.message.toString().split(" ")[1]));
-    console.log(data.message);
-    console.log(data.message.toString().split(" ")[0]);
-    console.log(data.message.toString().split(" ")[1]);
-    console.log("my username is " + currentPlayer.getUsername() + " " + currentPlayer.getChips());
+    //console.log(data.message);
+    //console.log(data.message.toString().split(" ")[0]);
+    //console.log(data.message.toString().split(" ")[1]);
+    //console.log("my username is " + currentPlayer.getUsername() + " " + currentPlayer.getChips());
     
     // Setting all Events
     socket.emit("new player", {username: currentPlayer.getUsername(), chips: currentPlayer.getChips()});
