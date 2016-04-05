@@ -28,6 +28,9 @@ var gameStage = 0;
 var gameStages = ["preflop","flop", "turn", "river", "postriver"];
 var usernames;
 
+var latestPlayerUsername;
+var latestPlayerChipAmount;
+
 var deck;
 var playerCards;
 var tableCards;
@@ -47,52 +50,82 @@ function init() {
 
   app.get('/*', function(req, res){
     var file = req.params[0];
+        util.log(file);
+
       //Send the requesting client the file.
      res.sendFile( __dirname + '/client/' + file );
+     
    });
-
+  
+  app.get('/*', function(req, res){
+    var file = req.params[0];
+    util.log(file);
+    if (file == "link.php")
+      res.sendFile( __dirname + file );
+     
+   });
+  
+  
   io.on('connection', function (socket) {
-    socket.emit('welcome', { message: 'Welcome to the poker room, client!' });
+    
+    socket.emit('welcome', { message: latestPlayerUsername + " " + latestPlayerChipAmount });
+    
+    socket.on('linkUsername', retrieveUsername);
+    socket.on('linkChipAmount', retrieveChipAmount);
+    
+    // When a new player comes in, onNewPlayer runs
+    socket.on("new player", onNewPlayer);
 
-		// When a new player comes in, onNewPlayer runs
-		socket.on("new player", onNewPlayer);
+    // When socket disconnects, call onsocketDisconnect
+    socket.on("disconnect", onsocketDisconnect);
 
-		// When socket disconnects, call onsocketDisconnect
-		socket.on("disconnect", onsocketDisconnect);
+    // When socket presses ready button
+    socket.on("ready", startGame);
 
-		// When socket presses ready button
-		socket.on("ready", startGame);
+    // When socket presses the leave button
+    socket.on("leave", playerLeft);
 
-		// When socket presses the leave button
-		socket.on("leave", playerLeft);
+    // Indicates the turn for the user
+    socket.on("current turn", currentTurn);
 
-		// Indicates the turn for the user
-		socket.on("current turn", currentTurn);
+    // Once players press the Ready Button
+    socket.on("first turn", firstTurn);
 
-		// Once players press the Ready Button
-		socket.on("first turn", firstTurn);
+    // Once players press any buttons
+    socket.on("buttons", buttons);
 
-		// Once players press any buttons
-		socket.on("buttons", buttons);
+    // Once players press fold
+    socket.on("fold", fold);
 
-		// Once players press fold
-		socket.on("fold", fold);
+    // Once players press call
+    socket.on("call", currentTurn);
 
-		// Once players press call
-		socket.on("call", currentTurn);
+    // Once players bet
+    socket.on("increase pot", potIncrease);
 
-		// Once players bet
-		socket.on("increase pot", potIncrease);
-
-		socket.on("changed amount", amountChanged);
+    socket.on("changed amount", amountChanged);
   });
 
   // Thanks to the Nick/the PoP team for helping with this code
-	// Set to listen on this ip and this port.
-	server.listen(serverPort, '0.0.0.0', function(){
-		console.log("Game server started on port " + serverPort);
-	});
+  // Set to listen on this ip and this port.
+  server.listen(serverPort, '0.0.0.0', function(){
+	  console.log("Game server started on port " + serverPort);
+  });
+  
 };
+
+
+function retrieveUsername(data)
+{
+  latestPlayerUsername = data[0];
+  util.log(latestPlayerUsername);
+}
+
+function retrieveChipAmount(data)
+{
+  latestPlayerChipAmount = data[0];
+  util.log(latestPlayerChipAmount);
+}
 
 // Called by sockets when they hit the Play button
 function onNewPlayer(data) {
@@ -101,10 +134,10 @@ function onNewPlayer(data) {
 
   var i, existingPlayer;
   // Stores each user's sockets by username
-  userSockets.push({username: data.username, socket: this });
+  userSockets.push({username: latestPlayerUsername, socket: this });
 
 
-  var newPlayer = new Player(this.id, data.username, data.chips, connectedPlayers.length);
+  var newPlayer = new Player(this.id, latestPlayerUsername, 1000, connectedPlayers.length);
 
   // Store new player in each list
   playingPlayers.push(newPlayer);

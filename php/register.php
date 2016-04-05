@@ -1,136 +1,114 @@
-<?php include ("functions.php"); ?>
- <html>
-<head>
- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<style type="text/css">
- body {
-   color:white;
- font-size:14px;
- }
- .contact {
-    text-align:center;
-    background: none repeat scroll 0% 0% #A52A2A;
-    padding: 20px 10px;
-    box-shadow: 1px 2px 1px #8FBF73;
-    border-radius: 10px;
- width:520px;
- }
- #name, #username,#password, #mail {
-    width: 250px;
-    margin-bottom: 15px;
-    background: none repeat scroll 0% 0% #AFCF9C;
-    border: 1px solid #91B57C;
-    height: 30px;
-    color: #A52A2A;
-    border-radius: 8px;
-    box-shadow: 1px 2px 3px;
-}
-#submit
-{
-    background:none repeat scroll 0% 0% #8FCB73;
-    display: inline-block;
-    padding: 5px 10px;
-    line-height: 1.05em;
- box-shadow: 1px 2px 3px #8FCB73;
-    border-radius: 8px;
-    border: 1px solid #8FCB73;
-    text-decoration: none;
-    opacity: 0.9;
-    cursor: pointer;
- color:white;
-}
-#er {
-    color: #F00;
-    text-align: center;
-    margin: 10px 0px;
-    font-size: 17px;
-}
-</style>
-</head>
-<body>
-
 <?php
- error_reporting('E_ALL ^ E_NOTICE');
- if(isset($_POST['submit']))
- {
-  mysql_connect('localhost','csci3300_poker','8duK8rat2ehuyedR') or die(mysql_error());
-  mysql_select_db('csci3300_poker') or die(mysql_error());
-  $name=$_POST['name'];
-  $username=$_POST['username'];
-  $password=password_encrypt($_POST['password']);
-  $mail=$_POST['mail'];  
-  $query=mysql_query("select * from login where username='".$username."'or mail='".$mail."' ") or die(mysql_error());
-  $row=mysql_fetch_row($query);
-  if($row>0)
-  {
-   $er='The username '.$username.' or email '.$mail.' is already present in our database';
-  }
-  else
-  {
-   $insert=mysql_query("insert into login values('".$name."','".$username."','".$password."','".$mail."')") or die(mysql_error());
-   if($insert)
-   {
-    $er='Successfully registered.Click on Login.';
-   }
-   else
-   {
-    $er='Values are not registered';
-   }
-  }
- }
+$errors = [];
+if (isset($_POST['register'])) {
+    require_once ("db_connect.php");
+    $expected = ['username', 'pwd', 'confirm'];
+    // Assign $_POST variables to simple variables and check all fields have values
+    foreach ($_POST as $key => $value) {
+        if (in_array($key, $expected)) {
+            $$key = trim($value);
+            if (empty($$key)) {
+                $errors[$key] = 'This field requires a value.';
+            }
+        }
+    }
+    // Proceed only if there are no errors
+    if (!$errors) {
+        if ($pwd != $confirm) {
+            $errors['nomatch'] = 'Passwords do not match.';
+        } else {
+            // Check that the username hasn't already been registered
+            $sql = 'SELECT COUNT(*) FROM users WHERE username = :username';
+            $stmt = $db->prepare($sql);
+            $stmt->bindParam(':username', $username);
+            $stmt->execute();
+            if ($stmt->fetchColumn() != 0) {
+                $errors['failed'] = "$username is already registered. Choose another name.";
+            } else {
+                try {
+                    // Generate a random 8-character user key and insert values into the database
+                    $chipamount = 1000;
+                    $user_key = hash('crc32', microtime(true) . mt_rand() . $username);
+                    $sql = 'INSERT INTO users (user_key, username, pwd,chipamount)
+                            VALUES (:key, :username, :pwd, :chipamount)';
+                    $stmt = $db->prepare($sql);
+                    $stmt->bindParam(':key', $user_key);
+                    $stmt->bindParam(':username', $username);
+                    // Store an encrypted version of the password
+                    $stmt->bindValue(':pwd', password_hash($pwd, PASSWORD_DEFAULT));
+                    $stmt->bindParam(':chipamount', $chipamount);
+                    $stmt->execute();
+                } catch (\PDOException $e) {
+                    if (0 === strpos($e->getCode(), '23')) {
+                        // If the user key is a duplicate, regenerate, and execute INSERT statement again
+                        $user_key = hash('crc32', microtime(true) . mt_rand() . $username);
+                        if (!$stmt->execute()) {
+                            throw $e;
+                        }
+                    }
+                }
+                // The rowCount() method returns 1 if the record is inserted,
+                // so redirect the user to the login page
+                if ($stmt->rowCount()) {
+                    header('Location: login.php');
+                    exit;
+                }
+            }
+        }
+    }
+}
 ?>
-<div class="contact">
-  <li><a href="login.php">Login</a></li>
-<h1>Registration Form</h1>
-     <div id="er"><?php echo $er; ?></div>
-     <form action="#" method="post">
-      <table id="tbl" align="center">
-       <tr><td>Full Name:</td><td><input type="text" name="name" id="name"></td></tr>
-       <tr><td>UserName:</td><td><input type="text" name="username" id="username"></td></tr>
-            <tr><td>Password:</td><td><input type="password" name="password" id="password"></td></tr>
-        <tr><td>Email:</td><td><input type="text" name="mail" id="mail"></td></tr>
-       <tr><td></td><td><input type="submit" name="submit" id="submit" value="Submit"></td></tr>
-      </table>
-     </form>
-</div>
+<!doctype html>
+<html>
+<head>
 
-<script type="text/javascript">
-$(document).ready(function() {
-$('#submit').click(function() {
-var name=document.getElementById('name').value;
-var username=document.getElementById('username').value;
-var password=document.getElementById('password').value;
-var mail=document.getElementById('mail').value;
-var chk = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
-if(name=='')
-{
- $('#er').html('Enter your name');
- return false;
-}
-if(username=='')
-{
- $('#er').html('Enter your username');
- return false;
-}
-if(password=='')
-{
- $('#er').html('Enter your password');
- return false;
-}
- if(mail=='')
-{
- $('#er').html('Enter your email');
- return false;
-}
-if(!chk.test(mail))
-{
- $('#er').html('Enter valid email');
- return false;
-}
+<meta charset="utf-8">
+<title>Create Account</title>
+    <link href="css/styles.css" rel="stylesheet" type="text/css">
+</head>
 
-});
-});
-</script>
+<body id="create">
+<h1>Create Account</h1>
+<form action="<?= $_SERVER['PHP_SELF']; ?>" method="post">
+    <p>
+        <label for="username">Username:</label>
+        <input type="text" name="username" id="username"
+        <?php
+        if (isset($username) && !isset($errors['username'])) {
+            echo 'value="' . htmlentities($username) . '">';
+        } else {
+            echo '>';
+        }
+        if (isset($errors['username'])) {
+            echo $errors['username'];
+        } elseif (isset($errors['failed'])) {
+            echo $errors['failed'];
+        }
+        ?>
+    </p>
+    <p>
+        <label for="pwd">Password:</label>
+        <input type="password" name="pwd" id="pwd">
+        <?php
+        if (isset($errors['pwd'])) {
+            echo $errors['pwd'];
+        }
+        ?>
+    </p>
+    <p>
+        <label for="confirm">Confirm Password:</label>
+        <input type="password" name="confirm" id="confirm">
+        <?php
+        if (isset($errors['confirm'])) {
+            echo $errors['confirm'];
+        } elseif (isset($errors['nomatch'])) {
+            echo $errors['nomatch'];
+        }
+        ?>
+    </p>
+    <p>
+        <input type="submit" name="register" id="register" value="Create Account">
+    </p>
+</form>
 </body>
-
 </html>

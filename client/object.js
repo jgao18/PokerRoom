@@ -447,3 +447,21 @@ function backgroundFelt() {
       	stage.update();
     }
 }
+
+// Provides the username and the user amount for each player
+function pokerChip(x, y) {
+  // Used by all users
+  var chip_plate = new createjs.Container();
+  var chip_background = new createjs.Shape();
+
+  // x = 490, y = 398
+	chip_background.graphics.beginFill("red").drawCircle(x,y,15);
+    chip_background.graphics.beginFill("white").drawCircle(x,y,12);
+	chip_background.graphics.beginFill("red").drawCircle(x,y,9);
+	chip_background.graphics.beginFill("red").drawPolyStar(x,y,15,8,0.5,90);
+	chip_background.graphics.beginFill("white").drawCircle(x,y,2);
+	chip_plate.addChild(chip_background);
+	chip_plate.name = "player1_chip_plate";
+	stage.addChild(chip_plate)
+	stage.update();
+}

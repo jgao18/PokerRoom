@@ -1,12 +1,44 @@
 <?php
-    include("form_with_validation.php");
-    include("header.php");
-    
-    ?>
+include ("init.php");
+//require_once ("db_connect.php");
+include ("AutoLogin.php");
+include ("header.php");
+
+
+//use Foundationphp\Sessions\AutoLogin;
+
+if (isset($_POST['login'])) {
+    $username = trim($_POST['username']);
+    $pwd = trim($_POST['pwd']);
+    $stmt = $db->prepare('SELECT pwd FROM users WHERE username = :username');
+    $stmt->bindParam(':username', $username);
+    $stmt->execute();
+    $stored = $stmt->fetchColumn();
+    if (password_verify($pwd, $stored)) {
+        session_regenerate_id(true);
+        $_SESSION['username'] = $username;
+        $_SESSION['authenticated'] = true;
+        if (isset($_POST['remember'])) {
+            // create persistent login
+            $autologin = new AutoLogin($db);
+            $autologin->persistentLogin();
+        }
+        header('Location: lobby.php');
+        exit;
+    } else {
+        $error = 'Login failed. Check username and password.';
+    }
+}
+?>
+<!doctype html>
 <html>
 <head>
-	<title>Login Form Validation</title>
-	<center>
+ <li><a href="register.php">new user?</a></li>
+
+<meta charset="utf-8">
+<title>Auto Login</title>
+    <style>
+    <center>
 		<h1> User Login</h1>
 	</center>
 	<style>
@@ -135,27 +167,46 @@ input[type=submit]:active {
     background-image: -moz-linear-gradient(top left 90deg, #6ec2e8 0%, #b6e2ff 100%);
     background-image: linear-gradient(top left 90deg, #6ec2e8 0%, #b6e2ff 100%);
 }
-</style>
-
+        body {
+            background-color: #fff;
+            color: #1B1B1B;
+            font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;
+            margin-left: 50px;
+        }
+        label {
+            display: inline-block;
+            width: 5em;
+            text-align: right;
+        }
+        label[for=remember] {
+            width: auto;
+        }
+    </style>
 </head>
- <li><a href="register.php">new user?</a></li>
-<body>
-       <center>  
-    <?php echo message(); ?>
-    <?php echo form_errors($errors); ?>
-    
-  
-    <form action="login.php" method="post">
-      <p>Username:
-        <input type="text" name="username" value="<?php echo htmlentities($username); ?>" />
-      </p>
-      <p>Password:
-            <input type="password" name="password" value="" />
-      </p>
-           <input type="submit" name="submit" value="Login" /><br />
 
-    </form>
-	</center>
-	</body>
-	</html>
-	
+<body>
+<h1>User Login</h1>
+<?php
+if (isset($error)) {
+    echo "<p>$error</p>";
+}
+?>
+<form action="<?= $_SERVER['PHP_SELF']; ?>" method="post">
+    <p>
+        <label for="username">Username:</label>
+        <input type="text" name="username" id="username">
+    </p>
+    <p>
+        <label for="pwd">Password:</label>
+        <input type="password" name="pwd" id="pwd">
+    </p>
+    <p>
+        <input type="checkbox" name="remember" id="remember">
+        <label for="remember">Remember me </label>
+    </p>
+    <p>
+        <input type="submit" name="login" id="login" value="Log In">
+    </p>
+</form>
+</body>
+</html>
