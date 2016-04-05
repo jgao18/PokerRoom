@@ -29,7 +29,7 @@ if ($server == $turingIP) {
 <html>
   <head>
     <title>Poker Room Redirect</title>
-    <META http-equiv="refresh" content="5; url=<?php echo $_COOKIE["server_cookie"] ?>">
+    <META http-equiv="refresh" content="0; url=<?php echo $_COOKIE["server_cookie"] ?>">
   </head>
   <body bgcolor="#ffffff">
     <center>Hi, <?php echo $_COOKIE["user_cookie"] ?>, you will be redirected to your game server (<?php echo $_COOKIE["server_cookie"] ?>) shortly...</a>

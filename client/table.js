@@ -850,8 +850,8 @@ function changeAmount(data) {
 		if ( currentPlayers[i].getUsername() == data.username ) {
 			//retrieve the user's index on the table
 			userTableIndex = currentPlayers[i].getTableIndex();
-			console.log("This is the player's amount: " + currentPlayers[i].getChips());
-			console.log("This is the chips that was passed in: " + data.chips);
+			//console.log("This is the player's amount: " + currentPlayers[i].getChips());
+			//console.log("This is the chips that was passed in: " + data.chips);
 			var amount = data.chips - currentPlayers[i].getChips();
 			if (amount => 0) {
 				currentPlayers[i].addChips(amount);
@@ -859,7 +859,7 @@ function changeAmount(data) {
 			else {
 				currentPlayers[i].deleteChips(amount);
 			}
-			console.log("This is the added amount: " + amount);
+			//console.log("This is the added amount: " + amount);
 		}
 	}
 
@@ -1129,7 +1129,7 @@ function wonPlayer(data) {
 	 socket.emit("changed amount",{id: data.player, chips: amount});
 	 setPotToZero();
 	 
-	 console.log("This is the pot amount: " + pot_amount);
+	 //console.log("This is the pot amount: " + pot_amount);
 	 var player = new createjs.Text(data.player + " Wins!", "20px Bembo","#FFFF00");
  	 player.x = 350;
  	 player.y = 385;
