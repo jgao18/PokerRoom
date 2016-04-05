@@ -270,13 +270,15 @@ function callButton() {
 
 	call.addEventListener("click", function(event) {
 		var amount = getTotalBet() - getAmountBet();
+		var highBet = getTotalBet();
 		removePlayerChips(amount);
 
 		var currentChips = getPlayerChips();
 		var player = getCurrentPlayer();
+		
 		socket.emit("increase pot", {chips: amount, amount: amount});
 		socket.emit("changed amount", {id: player, chips: currentChips});
-		socket.emit("current turn", {action: "call", user: player, amount: amount});
+		socket.emit("current turn", {action: "call", user: player, amount: highBet});
 		socket.emit("buttons", {remove: false});
 	})
 	return call;
@@ -300,6 +302,7 @@ function raiseButton() {
 			game_menu.removeChild(show);
 		}
 		else {
+			setAmountBet(0);
 			betAmount(1);
 			raiseAmount();
 			betAmount(getTotalBet());
@@ -381,20 +384,28 @@ function raiseAmount() {
 	// Once the user presses the button, then bet amount will go into the pot
 	var bet_button = new button(460,445,35,18,"bet", "yellow",10);
 	bet_button.addEventListener("click", function(event) {
+		
 		var done_raising = game_menu.getChildByName("raise_amount");
 		game_menu.removeChild(done_raising);
 		var store = getAmountBet();
         var lastBet = getLastUserBet();
 		var diffAmount = store - lastBet;
+		var highBet = getAmountBet();
+		console.log("This is the high bet right now: " + highBet);
+       
+		//removePlayerChips(diffAmount);
 
-		removePlayerChips(diffAmount);
-
-		var currentChips = getPlayerChips();
+		var currentChips = getPlayerChips() - diffAmount;
 		var player = getCurrentPlayer();
+		
+		var bet;
+		if (bet = stage.getChildByName("bet_amount")) {
+			stage.removeChild(bet);
+		}
 
 		socket.emit("changed amount", {id: player, chips: currentChips});
 		socket.emit("increase pot", {chips: diffAmount, amount: store});
-		socket.emit("current turn", {action: "raise", user: player, amount: diffAmount});
+		socket.emit("current turn", {action: "raise", user: player, amount: highBet});
 		socket.emit("buttons", {remove: false});
 	})
 

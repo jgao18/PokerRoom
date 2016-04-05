@@ -150,10 +150,9 @@ function isOrder(cards) {
 
 function isPairs(cards) {
 	var newList = [];
-	var pairList = sortCards(cards);
+	var pairList = cards;
 	
 	for (var i = 0; i < cards.length; i++) {
-		console.log(pairList[i]);
 		newList.push(values[pairList[i]]);
 	}
 	
@@ -262,7 +261,7 @@ function whichPair(cards) {
 	var extraValue;
 	if(fourOfaKind == 1) {
 		returnValue = findValue(pairs,keyList,4);
-		console.log("It is a four of a Kind of " + returnValue);
+		console.log("It is a four of a kind of " + returnValue);
 		return "Four of a Kind of " + returnValue;
 	}
 	else if(threeOfaKind == 1 && pair == 1) {
@@ -273,7 +272,7 @@ function whichPair(cards) {
 	}
 	else if(threeOfaKind == 1) {
 		returnValue = findValue(pairs,keyList,3);
-		console.log("It is a three of a Kind of " + returnValue);
+		console.log("It is a three of a kind of " + returnValue);
 		return "Full "
 	}
 	else if(pair > 1) {
@@ -287,6 +286,99 @@ function whichPair(cards) {
 	}
 	
 }
+
+function finalEvaluation(user1List, user2List, user1Results,user2Results) {
+    var userPoints = 0;
+
+	//What if we looked into the result string and find the values
+	//Need something for pair/two pair/threeokakind/FullHouse/FourofKind
+	var user1Value;
+	var user2Value;
+	//var userValueList = [];
+	//userValueList.push(user1Value);
+	//userValueList.push(user2Value);
+	// What happens when both users have the same pair, then we must evaluate by highest card
+	if(isPairs(user1List) == "Y") {
+		for(var i = 0; i < values.length; i++) {
+			if(user1Results.includes(values[i])) {
+				user1Value = keyDict[values[i]];
+				break;
+			}
+		}
+		
+		for(var i = 0; i < values.length; i++) {
+			if(user2Results.includes(values[i])) {
+				user2Value = keyDict[values[i]];
+				break;
+			}
+		}
+		
+		console.log("The user1Value is " + user1Value);
+		console.log("The user2Value is " + user2Value);
+		if(user1Value < user2Value) {
+			userPoints = 0.5;
+			console.log("The pair is larger than");
+			return userPoints;
+		}
+		else if(user1Value > user2Value) {
+			userPoints = 0;
+			console.log("The pair is smaller than")
+			return userPoints;
+		}
+	}
+	//console.log("The value " + search + " appears " + count + " times");
+	/*
+	if(isPairs(user1List) == "Y") {
+		console.log("Its in the function");
+		for(var i = 0; i < 2; i++) {
+			for(var j = 0; j < values.length; j++) {
+				// Looks through the results for the values
+				if(userResults.includes(values[j])) {
+					userValueList[i] = keyDict[values[i]];
+					console.log("The userValueList[i] is " + keyDict[values[i]]);
+					continue;
+				}
+			}
+		}
+	
+		if (userValueList[0] < userValueList[1]) {
+			console.log("user1Value is less than user2Value");
+			userPoints = 0.5;
+		}
+		else {
+			console.log("It is not less");
+			userPoints = 0;
+		}
+	
+	}*/
+	// This is good
+	var List1 = user1List;
+	var List2 = user2List;
+	// Only works for high card/Straight/Flush/StraightFlush/RoyalFlush
+	for(var i = 0; i < List1.length; i++) {
+		if (List1[i] != List2[i]) {
+			console.log("This is List1: " + List1[i]);
+			console.log("This is List2: " + List2[i]);
+			if (List1[i] < List2[i]) {
+				userPoints = 0.5;
+				break;
+			}
+			else if(List1[i] > List2[i]) {
+				userPoints = 0;
+				break;
+			}
+		}
+	}
+	
+    console.log("The value at the end " + userPoints);
+}
+
+finalEvaluation([0,0,2,5,6,8,9],[1,1,2,3,5,7,8],"It is a pair of A", "It is a pair of K");
+finalEvaluation([0,2,2,2,2,3,6],[1,2,4,4,4,4,7],"It is a four of a kind of Q", "It is a four of kind of 10");
+finalEvaluation([3,4,6,7,7,9,10],[2,3,5,5,6,8,9],"It is a pair of 7", "It is a pair of 9");
+finalEvaluation([0,1,3,5,6,8,9],[1,3,4,4,9,10,11],"High Card");
+finalEvaluation([3,4,6,7,8,9,10],[0,1,3,5,6,8,9], "High card");
+finalEvaluation([0,1,2,4,5,5,6],[0,1,3,4,5,5,6],"It is a pair of 9", "It is a pair of 9");
 
 /*
 function orderTesting() {
