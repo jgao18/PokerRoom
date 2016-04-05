@@ -494,7 +494,7 @@ function lobby() {
     socket.on("turn card", turnCard)
     socket.on("river card", riverCard)
     socket.on("other cards", otherCardsFunction);	// Server indicates the cards of the other players
-    socket.on("winner", displayWinner);
+   // socket.on("winner", displayWinner);
   });
 
    // All background for the lobby

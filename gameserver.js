@@ -378,34 +378,34 @@ function currentTurn(data) {
 				for (var i = 0; i < usernames.length; i++) {
 					var str = userResults[usernames[i]];
 					
-					if (str.includes("Royal Flush")) {
+					if (str.indexOf("Royal Flush") >= 0) {
 						userPoints[usernames[i]] = 10;
 					}
-					else if(str.includes("Straight Flush")) {
+					else if(str.indexOf("Straight Flush") >= 0) {
 						userPoints[usernames[i]] = 9;
 					}
-					else if(str.includes("four of a kind")) {
+					else if(str.indexOf("four of a kind") >= 0) {
 						userPoints[usernames[i]] = 8;
 					}
-					else if(str.includes("Full House")) {
+					else if(str.indexOf("Full House") >= 0) {
 						userPoints[usernames[i]] = 7;
 					}
-					else if(str.includes("Flush")) {
+					else if(str.indexOf("Flush") >= 0) {
 						userPoints[usernames[i]] = 6;
 					}
-					else if(str.includes("Straight")) {
+					else if(str.indexOf("Straight") >= 0) {
 						userPoints[usernames[i]] = 5;
 					}
-					else if(str.includes("three of a kind")) {
+					else if(str.indexOf("three of a kind") >= 0) {
 						userPoints[usernames[i]] = 4;
 					}
-					else if(str.includes("two pair")) {
+					else if(str.indexOf("two pair") >= 0) {
 						userPoints[usernames[i]] = 3;
 					}
-					else if(str.includes("pair")) {
+					else if(str.indexOf("pair") >= 0) {
 						userPoints[usernames[i]] = 2;
 					}
-					else if(str.includes("High Card")) {
+					else if(str.indexOf("High Card") >= 0) {
 						userPoints[usernames[i]] = 1;
 					}
 				}
