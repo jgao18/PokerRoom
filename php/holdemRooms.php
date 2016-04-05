@@ -1,7 +1,8 @@
 <?php 
     require_once ("db_connect.php");
-
-// pull list of room and ip from the database
+    require_once ("authenticate.php");
+    
+  // pull list of room and ip from the database
 $roomList = array(); 
 $sql = 'SELECT roomName, roomIP FROM holdemRooms';
 $stmt = $db->prepare($sql);
@@ -61,9 +62,7 @@ if (!$errors){
                 }
               }
 
-  //$newRoom = array($roomName, $roomIP);
-  //$array_push($roomList, $newRoom);
-}
+  }
 
 if (isset($_POST['removeRoom'])) // This needs to update the database
 {
@@ -95,7 +94,6 @@ if (isset($_POST['refresh'])) // This needs to pull from the database
   header("Refresh:0");
 }
 ?>
-
 <style>
   html, body {
     width: 100%;

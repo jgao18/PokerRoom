@@ -134,12 +134,24 @@ function game_init() {
 	// Changes the pace of the Tickers
 	createjs.Ticker.timingMode = createjs.Ticker.RAF;
 	createjs.Ticker.setFPS(60);
+	
+	/*$.ajax({  
+    type: 'POST',  
+    url: '../php/holdemRooms.php', 
+    data: { "username": "amount" },
+    success: function( response ) {
+       console.log( response );
+    }
+ });*/
 
 	// Assigns the information for the client
 	currentPlayer = new Player();
-	currentPlayer.setUsername("testUser" + Math.floor((Math.random() * 100) + 1));
-	currentPlayer.setPassword("testPassword" + Math.floor((Math.random() * 10) + 1));
-	currentPlayer.addChips(Math.floor((Math.random() * 10000) + 1));
+	//currentPlayer.setUsername("testUser" + Math.floor((Math.random() * 100) + 1));
+	//currentPlayer.setPassword("testPassword" + Math.floor((Math.random() * 10) + 1));
+	//currentPlayer.addChips(Math.floor((Math.random() * 10000) + 1));
+	var myPhpValue = $("#myPhpValue").val();
+	
+	currentPlayer.setUsername(myPhpValue);
 
   // The menu automatically starts
   menu();
