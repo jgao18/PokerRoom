@@ -493,6 +493,9 @@ function currentTurn(data) {
 function startGame() {
 
 	readyPlayers++;
+	
+	util.log("ready # " + readyPlayers);
+	util.log("connected # " + connectedPlayers.length);
 
 	deck = new Deck();
 	deck.get_new_deck();
