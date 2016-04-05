@@ -46,8 +46,8 @@ function getLastBetAmount() {
 }
 
 function betDifference(amount) {
-	console.log("Passing in the amount :" + amount);
-	console.log("currentUserBet :" + currentUserBet);
+	//console.log("Passing in the amount :" + amount);
+	//console.log("currentUserBet :" + currentUserBet);
 	return (amount - currentUserBet);
 }
 
@@ -106,7 +106,7 @@ function removeGameChildren() {
 
 
 function game_init() {
-
+  
 	deck = new Deck();
 	deck.get_new_deck();
 	otherCards = [];
@@ -134,24 +134,6 @@ function game_init() {
 	// Changes the pace of the Tickers
 	createjs.Ticker.timingMode = createjs.Ticker.RAF;
 	createjs.Ticker.setFPS(60);
-	
-	/*$.ajax({  
-    type: 'POST',  
-    url: '../php/holdemRooms.php', 
-    data: { "username": "amount" },
-    success: function( response ) {
-       console.log( response );
-    }
- });*/
-
-	// Assigns the information for the client
-	currentPlayer = new Player();
-	//currentPlayer.setUsername("testUser" + Math.floor((Math.random() * 100) + 1));
-	//currentPlayer.setPassword("testPassword" + Math.floor((Math.random() * 10) + 1));
-	//currentPlayer.addChips(Math.floor((Math.random() * 10000) + 1));
-	var myPhpValue = $("#myPhpValue").val();
-	
-	currentPlayer.setUsername(myPhpValue);
 
   // The menu automatically starts
   menu();
@@ -250,12 +232,11 @@ function onNewPlayer(data)
 	// Provides the location of each connected client to the screen using
     nextPlayerIndex = (localIndex + nextPlayerIterator) % currentPlayers.length;
     var user = currentPlayers[nextPlayerIndex].getUsername();
-	console.log(user);
 	// If player is a connected user
     if ((user != "INVALID_USER") && (user != currentPlayer.getUsername()))
     {
 	  // Draw that player location
-	  console.log("This is the user: " + currentPlayers[nextPlayerIndex].getUsername());
+	  //console.log("This is the user: " + currentPlayers[nextPlayerIndex].getUsername());
       drawPlayerAt(nextPlayerIndex, i);
     }
   }
@@ -351,17 +332,17 @@ function onRemovePlayer(data) {
   {
     if (currentPlayers[i].id == data.id)
     {
-	  console.log("Someone left");
+	  //console.log("Someone left");
 	  var username = currentPlayers[i].getUsername();
-	  console.log("This user is: " + username);
+	  //console.log("This user is: " + username);
 	  /*if(username = game_menu.getChildByName(username)) {
 	  	  game_menu.removeChild(username);
 	  }*/
 	  // get the position of the player and erase him from the stage
-      //currentPlayers.splice(i, 1);
+          //currentPlayers.splice(i, 1);
 	  var position = positions[username];
-	  console.log("This user is: " + username);
-	  console.log("The position is: " + position);
+	  // console.log("This user is: " + username);
+	  //console.log("The position is: " + position);
 	  var chip, card1, card2, action;
 	  switch (position) {
 	  	case "left":
@@ -440,66 +421,74 @@ function menu() {
 // Before all users presses ready
 function lobby() {
 
-   // This tells the server that the a new player has entered.
-	 socket = io.connect();
+  // This tells the server that the a new player has entered.
+  socket = io.connect();
 
-	 socket.on('welcome', function (data) {
-			console.log(data.message);
+  socket.on('welcome', function (data) {
+    
+    // Assigns the information for the client
+    currentPlayer = new Player();
+    currentPlayer.setUsername(data.message.toString().split(" ")[0]);
+    currentPlayer.addChips((data.message.toString().split(" ")[1]));
+    //console.log(data.message);
+    //console.log(data.message.toString().split(" ")[0]);
+    //console.log(data.message.toString().split(" ")[1]);
+    //console.log("my username is " + currentPlayer.getUsername() + " " + currentPlayer.getChips());
+    
+    // Setting all Events
+    socket.emit("new player", {username: currentPlayer.getUsername(), chips: currentPlayer.getChips()});
 
-		 // New player message received by server
-		 socket.on("new player", onNewPlayer);
+    // New player message received by server
+    socket.on("new player", onNewPlayer);
 
-		 // Player removed message received
-		 socket.on("remove player", onRemovePlayer);
+    // Player removed message received
+    socket.on("remove player", onRemovePlayer);
 
-		 // Game is activated
-		 socket.on("start game", start_game);
+    // Game is activated
+    socket.on("start game", start_game);
 
-		 // Calls for the next action
-		 socket.on("next action", nextAction);
+    // Calls for the next action
+    socket.on("next action", nextAction);
 
-		 // Adds buttons to the client
-		 socket.on("add buttons", addButtonContainer);
+    // Adds buttons to the client
+    socket.on("add buttons", addButtonContainer);
 
-		 // Deletes buttons from the client
-		 socket.on("remove buttons", removeButtonContainer);
+    // Deletes buttons from the client
+    socket.on("remove buttons", removeButtonContainer);
 
-		 // Ready Button is shown to players
-		 socket.on("ready", readyButton);
+    // Ready Button is shown to players
+    socket.on("ready", readyButton);
 
-		 // Server indicates aditions to the pot
-		 socket.on("add to pot", serverPot);
+    // Server indicates aditions to the pot
+    socket.on("add to pot", serverPot);
 
-		 // Occurs when everyone has fold
-		 socket.on("round over", lastAction);
+    // Occurs when everyone has fold
+    socket.on("round over", lastAction);
 
-		 // Indicates the winning player
-		 socket.on("winning player", wonPlayer);
+    // Indicates the winning player
+    socket.on("winning player", wonPlayer);
 
-		 // Assigns the current turn signal
-		 socket.on("signal", assignSignal);
+    // Assigns the current turn signal
+    socket.on("signal", assignSignal);
 
-		 // Assigns cards to the client
-		 socket.on("client cards", assignCards)
+    // Assigns cards to the client
+    socket.on("client cards", assignCards)
 
-		 socket.on("change amount", changeAmount);
+    socket.on("change amount", changeAmount);
 
-		 socket.on("last bet", setLastUserBet);
-		 
-		 socket.on("player's action", playerAction);
+    socket.on("last bet", setLastUserBet);
 
-		 socket.on("player's action", playerAction);
+    socket.on("player's action", playerAction);
 
-		 // Assigns cards to the table
-		 socket.on("flop cards", flopCards)
-		 socket.on("turn card", turnCard)
-		 socket.on("river card", riverCard)
-		 socket.on("other cards", otherCardsFunction);	// Server indicates the cards of the other players
-		 socket.on("winner", displayWinner);
-		});
+    socket.on("player's action", playerAction);
 
-   // Setting all Events
-   socket.emit("new player", {username: currentPlayer.getUsername(), chips: currentPlayer.getChips()});
+    // Assigns cards to the table
+    socket.on("flop cards", flopCards)
+    socket.on("turn card", turnCard)
+    socket.on("river card", riverCard)
+    socket.on("other cards", otherCardsFunction);	// Server indicates the cards of the other players
+    socket.on("winner", displayWinner);
+  });
 
    // All background for the lobby
    pokerChip(490, 398);
