@@ -195,9 +195,6 @@ function buttons(data) {
 
 	util.log("Ended in buttons");
 	// Precaution for out of index
-	if (indexPlayer == playingPlayers.length) {
-		indexPlayer = 0;
-	}
 
 	// Remove the access sockets buttons
 	this.emit("remove buttons");
@@ -205,6 +202,9 @@ function buttons(data) {
 	// Provide the next player in the list buttons
 	for (var i = 0; i < userSockets.length; i++) {
 		if(playingPlayers[indexPlayer].getUsername() == userSockets[i].username) {
+			console.log("This is the user: " + userSockets[i].username);
+			console.log("This is the length of playingPlayers: " + playingPlayers.length);
+			console.log("This is the indexPlayer: " + indexPlayer);
 			// Access the next player's socket
 			var userSocket = userSockets[i].socket;
 			// Provide that player the turn signal and buttons
@@ -214,7 +214,12 @@ function buttons(data) {
 		}
 	}
 	// next player
+	util.log("INNNNNNNNDEXXXXX PLAYER IS INCREASING!!!!: " + indexPlayer);
 	indexPlayer++;
+	
+	if (indexPlayer >= playingPlayers.length) {
+		indexPlayer = 0;
+	}
 
 	if (data.remove == true) {
 		this.emit("remove buttons");
@@ -229,7 +234,7 @@ function amountChanged(data) {
 }
 
 // Enters this phase once players press the Ready Button
-function firstTurn() {
+function firstTurn(data) {
 	util.log("Ended in firstTurn");
 
 	gameStage = 0; // preflop
@@ -240,12 +245,22 @@ function firstTurn() {
 	// Until all users press the ready
 	if ( numTimesAccess == currentHandPlayers.length) {
 		
+		if (playingPlayers[indexPlayer].getUsername() == userSockets[0].username) {
+			console.log("This is the future!!!!!!!!!");
+			indexPlayer++;
+		}
+		
 		util.log("Inside the first turn");
 		numTimesAccess = 0;
 		// Accesses the first client that enters the room
+		console.log("This is the userSocket[0].socket :" + userSockets[0].username);
 		var userSocket = userSockets[0].socket;
 		userSocket.emit("add buttons");
 		userSocket.emit("signal", {username: userSockets[0].username});
+		for(var i = 1; i < userSockets.length; i++) {
+			userSocket = userSockets[i].socket;
+			userSocket.emit("signal", {username: userSockets[0].username});
+		}
 
 		// Removes the first player from the remaining round players
 		playerTurn = currentHandPlayers[0];
@@ -284,31 +299,19 @@ function fold() {
 
 function currentTurn(data) {
 	util.log("Ended in currentTurn");
-
+	
 	// If any player raised
-	if (data.action == "raise") {
-		this.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
-		this.broadcast.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
-		// Make a new list with all players
-		currentHandPlayers = playingPlayers.slice();
-		// Look for the user that raised and erased him from list
-		for (var i = 0; i < currentHandPlayers.length; i++) {
-			if(data.user == currentHandPlayers[i].getUsername()) {
-				util.log("slicing user");
-				currentHandPlayers.splice(i, 1);
-			}
-		}
-	}
-	
-	if (data.action == "call") {
-		this.emit("player's action", {player: data.user, action: "called", amount: data.amount});
-		this.broadcast.emit("player's action", {player: data.user, action: "called", amount: data.amount});
-	}
-	
-	if (data.action == "fold") {
-		this.emit("player's action", {player: data.user, action: "folded", amount: 0});
-		this.broadcast.emit("player's action", {player: data.user, action: "folded", amount: 0});
-	}
+ 	if (data.action == "raise") {
+ 		// Make a new list with all players
+ 		currentHandPlayers = playingPlayers.slice();
+ 		// Look for the user that raised and erased him from list
+ 		for (var i = 0; i < currentHandPlayers.length; i++) {
+ 			if(data.user == currentHandPlayers[i].getUsername()) {
+ 				util.log("slicing user");
+ 				currentHandPlayers.splice(i, 1);
+ 			}
+ 		}
+ 	}
 	
 	// If all player decided their action for the turn
 	if (currentHandPlayers.length == 0) {
@@ -337,29 +340,40 @@ function currentTurn(data) {
 			{
 				// Player's Card list
 			    outputPlayerCards = [];
+				var playerHands = {};
 				var totalCards = tableCards.slice();
 				var userResults = {};
 				var times = 0;
 				var result;
+				
+				// Puts each user cards inside a dictionary {user: {Card1: Card2:}}
+				for (var i = 0; i < usernames.length; i++) {
+					playerHands[usernames[i]] = {"Card1": playerCards[times], "Card2": playerCards[times+1]};
+					times += 2;
+				}
+				
+				times = 0;
 				// Push a dictionary int to the card list with information of each card
-				// I could make a private variable for our player class that indicates which player won
 			    for (var i = 0; i < playerCards.length; i++)
 			    {
+					 // inserting the info of the card
 			         outputPlayerCards.push({value: playerCards[i].get_value(), suit: playerCards[i].get_suit(), owner: playerCards[i].get_owner()});
-			         util.log("outputting " + playerCards[i].get_value() + playerCards[i].get_suit());
+			         // Pushing the card value into the logic list
 					 totalCards.push(playerCards[i]);
 					 times++;
+					 
 					 if (times == 2) {
+						// What hand the player has
 						result = Logic.determineWinner(totalCards);
+						// Stores the results of each user
 						userResults[playerCards[i].get_owner()] = result;
-						util.log(playerCards[i].get_owner() + " has a " + result);
+						// Restart the card list 
 						totalCards = tableCards.slice();
 						times = 0;
 					 }
 			    }
 				
 				// Iterate through the dictionary and see which is the higher result
-				// I have 4 players that I have differentiate cards
 				var userPoints = {};
 				for (var i = 0; i < usernames.length; i++) {
 					var str = userResults[usernames[i]];
@@ -370,7 +384,7 @@ function currentTurn(data) {
 					else if(str.includes("Straight Flush")) {
 						userPoints[usernames[i]] = 9;
 					}
-					else if(str.includes("Four of a Kind")) {
+					else if(str.includes("four of a kind")) {
 						userPoints[usernames[i]] = 8;
 					}
 					else if(str.includes("Full House")) {
@@ -382,10 +396,10 @@ function currentTurn(data) {
 					else if(str.includes("Straight")) {
 						userPoints[usernames[i]] = 5;
 					}
-					else if(str.includes("Three of a Kind")) {
+					else if(str.includes("three of a kind")) {
 						userPoints[usernames[i]] = 4;
 					}
-					else if(str.includes("Two pair")) {
+					else if(str.includes("two pair")) {
 						userPoints[usernames[i]] = 3;
 					}
 					else if(str.includes("pair")) {
@@ -395,19 +409,48 @@ function currentTurn(data) {
 						userPoints[usernames[i]] = 1;
 					}
 				}
+			 
+			 	// Makes Final Evaluations if there are same results
+				// I need to slice the list of usernames and delete the username for which there is a pair
+				var addPoints;
+				var user1Cards = tableCards.slice();
+				var user2Cards = tableCards.slice();
+				for (var i = 0; i < usernames.length; i++) {
+					for(var j = 0; j < usernames.length; j++) {
+						// If there are multiple of the same results
+						if ((userPoints[usernames[i]] == userPoints[usernames[j]]) && (usernames[i] != usernames[j])) {
+							// Provide the first user's full card list
+							user1Cards.push(playerHands[usernames[i]]["Card1"]);
+							user1Cards.push(playerHands[usernames[i]]["Card2"]);
+							// Provide the second user's full card list
+							user2Cards.push(playerHands[usernames[j]]["Card1"]);
+							user2Cards.push(playerHands[usernames[j]]["Card2"]);
+							// If the cards are bigger then increase the user points by 0.5
+							console.log("This is user1 " + usernames[i]);
+							console.log("This is user2 " + usernames[j]);
+							addPoints = Logic.finalEvaluation(user1Cards,user2Cards,userResults[usernames[i]],userResults[usernames[j]]);
+							console.log("This is the new Points " + addPoints);
+							userPoints[usernames[i]] += addPoints;
+							//totalCards = tableCards.slice();
+							user1Cards = tableCards.slice();
+							user2Cards = tableCards.slice();
+						}
+					}
+				}
 				
+				// Decides the winner
 				var winner;
 				var high = 0;
 				for (var i = 0; i < usernames.length; i++) {
-					util.log("This is the high: " + high);
 					util.log("This is the userPoints[usernames[i]]: " + userPoints[usernames[i]]);
 					if (userPoints[usernames[i]] > high) {
 						winner = usernames[i];
 						high = userPoints[usernames[i]];
 					}
+					util.log("This is the high: " + high);
 				}
-				this.emit("winner",{username: winner});
-				this.broadcast.emit("winner",{username: winner});
+				this.emit("winning player",{player: winner});
+				this.broadcast.emit("winning player",{player: winner});
 
 				// Inform every player which cards are who's
 			    for (var i = 0; i < playingPlayers.length; i++)
@@ -423,6 +466,19 @@ function currentTurn(data) {
 			 this.broadcast.emit("next action", gameStages[gameStage]);
 		 }
 	 }
+	
+ 	if (data.action == "raise") {
+ 		this.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
+ 		this.broadcast.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
+	}
+	else if (data.action == "call") {
+ 		this.emit("player's action", {player: data.user, action: "called", amount: data.amount});
+ 		this.broadcast.emit("player's action", {player: data.user, action: "called", amount: data.amount});
+ 	}
+	else if (data.action == "fold") {
+ 		this.emit("player's action", {player: data.user, action: "folded", amount: 0});
+ 		this.broadcast.emit("player's action", {player: data.user, action: "folded", amount: 0});
+ 	}
 
 	// Provide the next player in the list
     playerTurn = currentHandPlayers[0];

@@ -63,6 +63,15 @@ function getLastUserBet() {
 	currentUserBet = data.chips;
 }*/
 
+function getPotAmount() {
+	return pot_amount;
+}
+
+function setPotToZero() {
+	pot_amount = 0;
+	pot(0);
+}
+
 function getNumPlayers() {
 	return numPlayers;
 }
@@ -272,7 +281,7 @@ function assignSignal(data) {
 
 
 	var userSignal;
-	var index
+	var index;
 	// Takes in the current client's position
 	switch(localIndex) {
 		case 0:
@@ -480,8 +489,6 @@ function lobby() {
 
     socket.on("player's action", playerAction);
 
-    socket.on("player's action", playerAction);
-
     // Assigns cards to the table
     socket.on("flop cards", flopCards)
     socket.on("turn card", turnCard)
@@ -491,7 +498,7 @@ function lobby() {
   });
 
    // All background for the lobby
-   pokerChip(490, 398);
+   //pokerChip(490, 398);
    pokertable();
    paint_deck();
    optionsButton();
@@ -843,6 +850,16 @@ function changeAmount(data) {
 		if ( currentPlayers[i].getUsername() == data.username ) {
 			//retrieve the user's index on the table
 			userTableIndex = currentPlayers[i].getTableIndex();
+			console.log("This is the player's amount: " + currentPlayers[i].getChips());
+			console.log("This is the chips that was passed in: " + data.chips);
+			var amount = data.chips - currentPlayers[i].getChips();
+			if (amount => 0) {
+				currentPlayers[i].addChips(amount);
+			}
+			else {
+				currentPlayers[i].deleteChips(amount);
+			}
+			console.log("This is the added amount: " + amount);
 		}
 	}
 
@@ -879,6 +896,21 @@ function changeAmount(data) {
 
 }
 
+function newTurn() {
+	currentBetAmount = 0;
+	currentUserBet = 0;
+	lastUserBet = 0;
+	setAmountBet(0);
+	
+	var actionList = ["mainPlayerAction","leftPlayerAction","rightPlayerAction","backPlayerAction"];
+	var store;
+	for(var i = 0; i < actionList.length; i++) {
+		if (store = stage.getChildByName(actionList[i])) {
+			stage.removeChild(store);
+		}
+	}
+}
+
 // Once all user have finish their turn, go to the next action
 function nextAction() {
 
@@ -886,10 +918,7 @@ function nextAction() {
 		// Flips the first three cards on the table
 		case 0:
 			//pot(currentBetAmount);
-			currentBetAmount = 0;
-			currentUserBet = 0;
-			lastUserBet = 0;
-			setAmountBet(0);
+			newTurn();
 			var tCard5 = stage.getChildByName("tCard5");
 			var tCard4 = stage.getChildByName("tCard4");
 			var tCard3 = stage.getChildByName("tCard3");
@@ -901,10 +930,7 @@ function nextAction() {
 		// Flips the fourth card on the table
 		case 1:
 			//pot(currentBetAmount);
-			currentBetAmount = 0;
-			currentUserBet = 0;
-			lastUserBet = 0;
-			setAmountBet(0);
+			newTurn();
 			var tCard2 = stage.getChildByName("tCard2");
 			flip(tCard2,tableCard2,440,300);
 			action++;
@@ -912,10 +938,7 @@ function nextAction() {
 		// Flips the fifth card on the table
 		case 2:
 			//pot(currentBetAmount);
-			currentBetAmount = 0;
-			currentUserBet = 0;
-			lastUserBet = 0;
-			setAmountBet(0);
+			newTurn();
 			var tCard1 = stage.getChildByName("tCard1");
 			flip(tCard1,tableCard1,500,300);
 			action++;
@@ -923,10 +946,7 @@ function nextAction() {
 		// Flips all player's cards and allows players to play again
 		case 3:
 			//pot(currentBetAmount);
-			currentBetAmount = 0;
-			currentUserBet = 0;
-			lastUserBet = 0;
-			setAmountBet(0);
+			newTurn();
 			var cardList = ["rCard1","rCard2","lCard1","lCard2","bCard1","bCard2"];
 			var placement = [20,300,80,300,615,300,675,300,310,90,370,90];
 			var j = 0;
@@ -995,10 +1015,7 @@ function nextAction() {
 		// All other players fold besides one player, then erase everything
 		case 4:
 			//pot(currentBetAmount);
-			currentBetAmount = 0;
-			currentUserBet = 0;
-			lastUserBet = 0;
-			setAmountBet(0);
+			newTurn();
 			var store;
 			// Erases all unfolded cards
 			var cardList = ["rCard1","rCard2","lCard1","lCard2","bCard1","bCard2",
@@ -1097,9 +1114,25 @@ function removeButtonContainer() {
 
 // Shows the player that won the game
 function wonPlayer(data) {
-	 var player = new createjs.Text(data.player + " Wins!", "30px Bembo","#FFFF00");
-	 player.x = 280;
-	 player.y = 300;
+	 var display;
+	 if (display = game_menu.getChildByName("won player")) {
+	 	 stage.removeChild(display);
+	 }
+	 
+	 var amount = 0;
+	 for (var i = 0; i < currentPlayers.length; i++) {
+		 if(currentPlayers[i].getUsername() == data.player) {
+			amount = currentPlayers[i].getChips() + pot_amount;
+		 }
+	 }
+	 
+	 socket.emit("changed amount",{id: data.player, chips: amount});
+	 setPotToZero();
+	 
+	 console.log("This is the pot amount: " + pot_amount);
+	 var player = new createjs.Text(data.player + " Wins!", "20px Bembo","#FFFF00");
+ 	 player.x = 350;
+ 	 player.y = 385;
 	 player.name = "won player";
 	 game_menu.addChild(player);
 	 stage.update();
@@ -1111,7 +1144,7 @@ function playerAction(data) {
 	
 	if (position == "main") {
 		if (data.amount) {
-			var text = new createjs.Text("You " + data.action + " to " + data.amount, "15px Bembo", "#FFFF00");
+			var text = new createjs.Text("You " + data.action + ": " + data.amount, "15px Bembo", "#FFFF00");
 			text.x -= 25;
 		}
 		else {
@@ -1120,11 +1153,11 @@ function playerAction(data) {
 	}
 	else {
 		if (data.amount) {
-			var text = new createjs.Text(data.player + " " + data.action + " to " + data.amount, "15px Bembo", "#FFFF00");
+			var text = new createjs.Text(data.action + ": " + data.amount, "15px Bembo", "#FFFF00");
 			text.x -= 25;
 		}
 		else {
-			var text = new createjs.Text(data.player + " " + data.action, "15px Bembo", "#FFFF00");
+			var text = new createjs.Text(data.action, "15px Bembo", "#FFFF00");
 		}
 	}
 	
@@ -1141,7 +1174,7 @@ function playerAction(data) {
 			if (storeText = stage.getChildByName("leftPlayerAction")) {
 				stage.removeChild(storeText);
 			}
-			text.x += 630;
+			text.x += 665;
 			text.y += 410;
 			text.name = "leftPlayerAction";
 			break;
@@ -1149,7 +1182,7 @@ function playerAction(data) {
 			if (storeText = stage.getChildByName("rightPlayerAction")) {
 				stage.removeChild(storeText);
 			}
-			text.x += 30;
+			text.x += 75;
 			text.y += 410;
 			text.name = "rightPlayerAction";
 			break;
@@ -1165,6 +1198,8 @@ function playerAction(data) {
 	
 	stage.addChild(text);
 	stage.update();
+}
+/*
 }
 
 function displayWinner(data) {
@@ -1184,7 +1219,6 @@ function displayWinner(data) {
 }
 
 //Countdown timer used to detect AFK players
-/*
 function getTimeRemaining(endtime) {
   var t = Date.parse(endtime) - Date.parse(new Date());
   var seconds = Math.floor((t / 1000) % 60);
