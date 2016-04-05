@@ -5,6 +5,7 @@ error_reporting(E_ALL);
 
     require_once ("db_connect.php");
     require_once ("authenticate.php");
+<<<<<<< HEAD
 
 $username = $_SESSION['username'];
 $sql = 'SELECT username FROM users WHERE username = :username';
@@ -18,6 +19,10 @@ setcookie("user_cookie", $stored , time() + (86400 * 30), "/"); // 86400 = 1 day
 
 
 // pull list of room and ip from the database
+=======
+    
+  // pull list of room and ip from the database
+>>>>>>> 0bce2376d80f0de77d8bc7c0997de91b1a5143fa
 $roomList = array(); 
 $sql = 'SELECT roomName, roomIP FROM holdemRooms';
 $stmt = $db->prepare($sql);
@@ -77,9 +82,7 @@ if (!$errors){
                 }
               }
 
-  //$newRoom = array($roomName, $roomIP);
-  //$array_push($roomList, $newRoom);
-}
+  }
 
 if (isset($_POST['removeRoom'])) // This needs to update the database
 {
@@ -122,7 +125,6 @@ if (isset($_POST['join_server']))
 
 
 ?>
-
 <style>
   html, body {
     width: 100%;
