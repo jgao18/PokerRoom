@@ -72,6 +72,7 @@ function init() {
     
     socket.on('linkUsername', retrieveUsername);
     socket.on('linkChipAmount', retrieveChipAmount);
+    socket.on('disconnectLink', function (data) { util.log(this.id) ; io.sockets.connected[this.id].disconnect(); });
     
     // When a new player comes in, onNewPlayer runs
     socket.on("new player", onNewPlayer);
@@ -376,8 +377,10 @@ function currentTurn(data) {
 				// Iterate through the dictionary and see which is the higher result
 				var userPoints = {};
 				for (var i = 0; i < usernames.length; i++) {
-					var str = userResults[usernames[i]];
+					util.log("len: " + usernames.length);
+					util.log("i: " + usernames[i]);
 					
+					var str = userResults[usernames[i]];
 					if (str.indexOf("Royal Flush") >= 0) {
 						userPoints[usernames[i]] = 10;
 					}
@@ -472,8 +475,8 @@ function currentTurn(data) {
  		this.broadcast.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
 	}
 	else if (data.action == "call") {
- 		this.emit("player's action", {player: data.user, action: "called", amount: data.amount});
- 		this.broadcast.emit("player's action", {player: data.user, action: "called", amount: data.amount});
+ 		this.emit("player's action", {player: data.user, action: "checked/called", amount: data.amount});
+ 		this.broadcast.emit("player's action", {player: data.user, action: "checked/called", amount: data.amount});
  	}
 	else if (data.action == "fold") {
  		this.emit("player's action", {player: data.user, action: "folded", amount: 0});
@@ -490,6 +493,9 @@ function currentTurn(data) {
 function startGame() {
 
 	readyPlayers++;
+	
+	util.log("ready # " + readyPlayers);
+	util.log("connected # " + connectedPlayers.length);
 
 	deck = new Deck();
 	deck.get_new_deck();

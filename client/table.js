@@ -494,7 +494,7 @@ function lobby() {
     socket.on("turn card", turnCard)
     socket.on("river card", riverCard)
     socket.on("other cards", otherCardsFunction);	// Server indicates the cards of the other players
-   // socket.on("winner", displayWinner);
+    //socket.on("winner", displayWinner);
   });
 
    // All background for the lobby
@@ -767,16 +767,16 @@ function clientAmounts(player, username, amount) {
 		    if (chip = game_menu.getChildByName("player1_chip_plate")) {
 		  	  game_menu.removeChild(chip);
 		    }
-		    chip_plate_background.graphics.beginFill("black").drawRect(420,475,70,17);
+		    chip_plate_background.graphics.beginFill("black").drawRect(330,601,100,17);
 
-		    chip_background.graphics.beginFill("red").drawCircle(430,483,15);
-		    chip_background.graphics.beginFill("white").drawCircle(430,483,12);
-		    chip_background.graphics.beginFill("red").drawCircle(430,483,9);
-		    chip_background.graphics.beginFill("red").drawPolyStar(430,483,15,8,0.5,90);
-		    chip_background.graphics.beginFill("white").drawCircle(430,483,2);
+		    chip_background.graphics.beginFill("red").drawCircle(320,610,15);
+		    chip_background.graphics.beginFill("white").drawCircle(320,610,12);
+		    chip_background.graphics.beginFill("red").drawCircle(320,610,9);
+		    chip_background.graphics.beginFill("red").drawPolyStar(320,610,15,8,0.5,90);
+		    chip_background.graphics.beginFill("white").drawCircle(320,610,2);
 
-		    user_amount.x = 450;
-		    user_amount.y = 476;
+		    user_amount.x = 338;
+		    user_amount.y = 601;
 		    chip_plate.addChild(chip_plate_background, chip_background, user_amount);
 		    chip_plate.name = "player1_chip_plate";
 			break;
@@ -786,7 +786,7 @@ function clientAmounts(player, username, amount) {
 		    if (chip = game_menu.getChildByName("player2_chip_plate")) {
 		  	  game_menu.removeChild(chip);
 		    }
-			chip_plate_background.graphics.beginFill("black").drawRect(30,380,88,17);
+			chip_plate_background.graphics.beginFill("black").drawRect(30,380,100,17);
 
 		    chip_background.graphics.beginFill("blue").drawCircle(20,390,15);
 		    chip_background.graphics.beginFill("white").drawCircle(20,390,12);
@@ -805,7 +805,7 @@ function clientAmounts(player, username, amount) {
 		    if (chip = game_menu.getChildByName("player3_chip_plate")) {
 		  	  game_menu.removeChild(chip);
 		    }
-			chip_plate_background.graphics.beginFill("black").drawRect(625,380,88,17);
+			chip_plate_background.graphics.beginFill("black").drawRect(625,380,100,17);
 
 		    chip_background.graphics.beginFill("blue").drawCircle(615,390,15);
 		    chip_background.graphics.beginFill("white").drawCircle(615,390,12);
@@ -824,10 +824,10 @@ function clientAmounts(player, username, amount) {
 		    if (chip = game_menu.getChildByName("player4_chip_plate")) {
 		  	  game_menu.removeChild(chip);
 		    }
-			chip_plate_background.graphics.beginFill("black").drawRect(326,175,88,17);
+			chip_plate_background.graphics.beginFill("black").drawRect(326,175,100,17);
 
 		    chip_background.graphics.beginFill("blue").drawCircle(316,187,15);
-		    chip_background.graphics.beginFill("white").drawCircle(431,187,12);
+		    chip_background.graphics.beginFill("white").drawCircle(316,187,12);
 		    chip_background.graphics.beginFill("blue").drawCircle(316,187,9);
 		    chip_background.graphics.beginFill("blue").drawPolyStar(316,187,15,8,0.5,90);
 		    chip_background.graphics.beginFill("white").drawCircle(316,187,2);
@@ -850,8 +850,8 @@ function changeAmount(data) {
 		if ( currentPlayers[i].getUsername() == data.username ) {
 			//retrieve the user's index on the table
 			userTableIndex = currentPlayers[i].getTableIndex();
-			console.log("This is the player's amount: " + currentPlayers[i].getChips());
-			console.log("This is the chips that was passed in: " + data.chips);
+			//console.log("This is the player's amount: " + currentPlayers[i].getChips());
+			//console.log("This is the chips that was passed in: " + data.chips);
 			var amount = data.chips - currentPlayers[i].getChips();
 			if (amount => 0) {
 				currentPlayers[i].addChips(amount);
@@ -859,7 +859,7 @@ function changeAmount(data) {
 			else {
 				currentPlayers[i].deleteChips(amount);
 			}
-			console.log("This is the added amount: " + amount);
+			//console.log("This is the added amount: " + amount);
 		}
 	}
 
@@ -1129,7 +1129,7 @@ function wonPlayer(data) {
 	 socket.emit("changed amount",{id: data.player, chips: amount});
 	 setPotToZero();
 	 
-	 console.log("This is the pot amount: " + pot_amount);
+	 //console.log("This is the pot amount: " + pot_amount);
 	 var player = new createjs.Text(data.player + " Wins!", "20px Bembo","#FFFF00");
  	 player.x = 350;
  	 player.y = 385;
@@ -1166,7 +1166,7 @@ function playerAction(data) {
 			if (storeText = stage.getChildByName("mainPlayerAction")) {
 				stage.removeChild(storeText);
 			}
-			text.x += 210;
+			text.x += 160;
 			text.y += 525;
 			text.name = "mainPlayerAction";
 			break;
@@ -1174,7 +1174,7 @@ function playerAction(data) {
 			if (storeText = stage.getChildByName("leftPlayerAction")) {
 				stage.removeChild(storeText);
 			}
-			text.x += 665;
+			text.x += 645;
 			text.y += 410;
 			text.name = "leftPlayerAction";
 			break;

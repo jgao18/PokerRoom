@@ -78,14 +78,14 @@ module.exports = {
 		//Need something for pair/two pair/threeokakind/FullHouse/FourofKind
 		if(isPairs(user1List) == "Y") {
 			for(var i = 0; i < values.length; i++) {
-				if(user1Results.includes(values[i])) {
+				if(user1Results.indexOf(values[i]) >= 0) {
 					user1Value = keyDict[values[i]];
 					break;
 				}
 			}
 		
 			for(var i = 0; i < values.length; i++) {
-				if(user2Results.includes(values[i])) {
+				if(user2Results.indexOf(values[i]) >= 0) {
 					user2Value = keyDict[values[i]];
 					break;
 				}
