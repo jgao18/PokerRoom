@@ -28,6 +28,9 @@ var gameStage = 0;
 var gameStages = ["preflop","flop", "turn", "river", "postriver"];
 var usernames;
 
+var latestPlayerUsername;
+var latestPlayerChipAmount;
+
 var deck;
 var playerCards;
 var tableCards;
@@ -64,10 +67,11 @@ function init() {
   
   
   io.on('connection', function (socket) {
-    util.log('found someone');
-    socket.on('broadcast', testing);
     
-    socket.emit('welcome', { message: 'Welcome to the poker room, client!' });
+    socket.emit('welcome', { message: latestPlayerUsername + " " + latestPlayerChipAmount });
+    
+    socket.on('linkUsername', retrieveUsername);
+    socket.on('linkChipAmount', retrieveChipAmount);
     
     // When a new player comes in, onNewPlayer runs
     socket.on("new player", onNewPlayer);
@@ -111,9 +115,18 @@ function init() {
 };
 
 
-function retrieveUser(data)
+function retrieveUsername(data)
 {
- util.log(username); 
+  latestPlayerUsername = data[0];
+  latestPlayerChipAmount = 1000;
+  util.log(latestPlayerUsername);
+  util.log(latestPlayerChipAmount);
+}
+
+function retrieveChipAmount(data)
+{
+  latestPlayerChipAmount = data[1];
+  util.log(latestPlayerChipAmount);
 }
 
 // Called by sockets when they hit the Play button
@@ -123,10 +136,10 @@ function onNewPlayer(data) {
 
   var i, existingPlayer;
   // Stores each user's sockets by username
-  userSockets.push({username: data.username, socket: this });
+  userSockets.push({username: latestPlayerUsername, socket: this });
 
 
-  var newPlayer = new Player(this.id, data.username, data.chips, connectedPlayers.length);
+  var newPlayer = new Player(this.id, latestPlayerUsername, 1000, connectedPlayers.length);
 
   // Store new player in each list
   playingPlayers.push(newPlayer);

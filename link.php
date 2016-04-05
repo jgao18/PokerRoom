@@ -12,17 +12,15 @@ $username = $_COOKIE["user_cookie"];
 
 $client = new Client(new Version1X('http://192.168.1.97:3000'));
 $client->initialize();
-$client->emit('broadcast', [$username]);
+$client->emit('linkUsername', [$username]);
+//$client->emit('linkChipAmount', [1000]);
 $client->close();
-
-echo 'tryin to send `bar` to the event `foo`';
-//192.168.1.97:3000
 ?>
 
 <html>
   <head>
     <title>Poker Room Redirect</title>
-    <META http-equiv="refresh" content="20;URL=<?php echo $_COOKIE["server_cookie"]?>" >
+    <META http-equiv="refresh" content="1;URL=<?php echo $_COOKIE["server_cookie"]?>" >
   </head>
   <body bgcolor="#ffffff">
     <center>Hi, <?php echo $_COOKIE["user_cookie"] ?>, you will be redirected to your game server shortly...</a>
