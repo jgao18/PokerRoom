@@ -233,7 +233,7 @@ function helpButton() {
 	stage.update();
 
 	help.addEventListener("click", function(event) {
-		alert("Royal Flush: A royal flush is an ace high straight flush. \nEx: A-K-Q-J-10 all of diamonds. \n\nStraight Flush: A straight flush is a five-card straight, all in the same suit. \nEx: 7-6-5-4-3 all of clubs. \n\nFour of a Kind: Four of a kind, or quads, are four cards of equal value. \nFour Jacks. \n\nFull House: A full house contains a set (3) of cards of one value and a pair of another value. \nEx: Q-Q-Q-2-2. \n\nFlush: A flush is any 5 cards, all of the same suit. \nEx: K-Q-9-6-3 all of diamonds. \n\nStraight: Five cards of sequential value. Every possible straight will contain either a 5 or a 10. \nEx: 7-6-5-4-3 with different suits. \n\nThree of a Kind: Three cards of the same value. \nEx: Three aces. \n\nTwo Pairs: This is two cards of one value and another two cards of another value. \nEx: Two jacks and two 8s. \n\nPair: One pair is two cards of the same rank. \nEx: Two queens. \n\nHigh Card: The hand with the highest card(s) wins.\nIf two or more players hold the highest card, a kicker comes into play (see below).");
+		alert("RANK OF HANDS\n\n1) Royal Flush\n2) Straight Flush\n3) Four of a Kind\n4) Full House\n5) Flush\n6) Straight\n7) Three of a Kind\n8) Two Pair\n9) One Pair\n10) High Card");
 	})
 }
 
@@ -244,7 +244,7 @@ function optionsButton() {
 	stage.update();
 
 	options.addEventListener("click", function(event) {
-		alert("Hi!");
+		alert("The options button is still in development.");
 	})
 }
 
@@ -252,21 +252,27 @@ function optionsButton() {
 /* Isn't functioning correctly, need to fix it.
    Will remove player from the current stage. */
 function leaveButton(currentPlayer) {
+        
 	var leave = new button(662,610,80,30,"Leave","yellow",20);
 	addToGame(leave);
 	stage.update();
+    
+        leave.addEventListener("click", function(event) {
+               alert("The leave button is still in development.");
+        })
+        /*
 
 	leave.addEventListener("click", function(event) {
 		removeGameChildren();
         game_init();
 		socket.emit("disconnect", currentPlayer.id);
-	})
+	})*/
 }
 
 
 // Allows the user to call
 function callButton() {
-	var call = new button(295,475,35,18,"call","yellow",10);
+	var call = new button(290,475,50,18,"check/call","yellow",10);
 
 	call.addEventListener("click", function(event) {
 		var amount = getTotalBet() - getAmountBet();
@@ -286,7 +292,7 @@ function callButton() {
 
 // Allows the user to raise
 function raiseButton() {
-	var raise = new button(335,475,35,18,"raise", "yellow",10);
+	var raise = new button(345,475,50,18,"raise", "yellow",10);
 
 	raise.addEventListener("click", function(event) {
 		var show;
@@ -313,7 +319,7 @@ function raiseButton() {
 
 // Allows the user to fold
 function foldButton() {
-	var fold = new button(375,475,35,18,"fold", "yellow",10);
+	var fold = new button(400,475,50,18,"fold", "yellow",10);
 
 	fold.addEventListener("click", function(event) {
 		var player = getCurrentPlayer();

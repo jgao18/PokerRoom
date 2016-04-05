@@ -262,7 +262,7 @@ function whichFlush(cards) {
 
 function findValue(dict,keyList,times,extra) {
 	var lastIndex = keyList.length - 1;
-	for(var i = lastIndex; i => 0; i--) {
+	for(var i = lastIndex; i >= 0; i--) {
 		//console.log("This is keyList[i] " + keyList[i]);
 		//console.log(times);
 		if(dict[keyList[i]] == times && keyList[i] != extra) {

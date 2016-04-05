@@ -16,6 +16,7 @@ $client = new Client(new Version1X('http://192.168.1.97:3000'));
 $client->initialize();
 $client->emit('linkUsername', [$username, $chipAmount]);
 $client->emit('linkChipAmount', [$chipAmount]);
+$client->emit('disconnectLink', []);
 $client->close();
 ?>
 
