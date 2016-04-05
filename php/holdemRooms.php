@@ -3,26 +3,9 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-    require_once ("db_connect.php");
-    require_once ("authenticate.php");
-<<<<<<< HEAD
+require_once ("db_connect.php");
+require_once ("authenticate.php");
 
-$username = $_SESSION['username'];
-$sql = 'SELECT username FROM users WHERE username = :username';
-$stmt = $db->prepare($sql);
-$stmt->bindParam(':username', $username);
-$stmt->execute();
-$stored = $stmt->fetchColumn();
-echo $stored;
-
-setcookie("user_cookie", $stored , time() + (86400 * 30), "/"); // 86400 = 1 day
-
-
-// pull list of room and ip from the database
-=======
-    
-  // pull list of room and ip from the database
->>>>>>> 0bce2376d80f0de77d8bc7c0997de91b1a5143fa
 $roomList = array(); 
 $sql = 'SELECT roomName, roomIP FROM holdemRooms';
 $stmt = $db->prepare($sql);
@@ -58,7 +41,7 @@ if (!$errors){
   $stmt->bindParam(':roomName', $roomName);
   $stmt->execute();
   if ($stmt->fetchColumn() !=0){
-    $errors['failed'] = "$roomName is already exist.";
+    $errors['failed'] = "$roomName already exists.";
   }else {
     try {
       // Generate a random 8-character user key and insert values into the database
@@ -86,28 +69,32 @@ if (!$errors){
 
 if (isset($_POST['removeRoom'])) // This needs to update the database
 {
-        $roomName = trim($_POST['removeRoomName']);
-        //validations
- $field_required = "removeRoomName";
-$value = trim($_POST[$field_required]);
-   if (empty($value)) {
-                $errors[$field_required] = 'This field requires a value.';
-     }else{           
-
-    // Check that if room exists
-  $sql = 'SELECT COUNT(*) FROM holdemRooms WHERE roomName = :removeRoomName';
-  $stmt = $db->prepare($sql);
-  $stmt->bindParam(':removeRoomName', $roomName);
-   $stmt->execute();
-  if ($stmt->fetchColumn()==0){
-    $errors['notfound'] = "$roomName doesn't exist.";
-  }else {
-  $sql = 'DELETE FROM holdemRooms WHERE roomName=:removeRoomName';
-  $stmt = $db->prepare($sql);
-  $stmt->bindParam(':removeRoomName',$roomName);
-  $stmt->execute();
-}
-}
+  $dirtyRoomName = trim($_POST['removeRoomName']);
+  $password = substr($dirtyRoomName, 0, 8);
+  $roomName = substr($dirtyRoomName, 8);
+  //validations
+  $field_required = "removeRoomName";
+  $value = trim($_POST[$field_required]);
+  
+  if (empty($value)) {
+    $errors[$field_required] = 'This field requires a value.';
+  } else if ($password != "adminpwd") {
+    $errors['notadmin'] = 'You are not an admin!';
+    } else {
+      // Check that if room exists
+      $sql = 'SELECT COUNT(*) FROM holdemRooms WHERE roomName = :removeRoomName';
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam(':removeRoomName', $roomName);
+      $stmt->execute();
+      if ($stmt->fetchColumn()==0){
+	$errors['notfound'] = "$roomName does not exist.";
+      } else {
+	$sql = 'DELETE FROM holdemRooms WHERE roomName=:removeRoomName';
+	$stmt = $db->prepare($sql);
+	$stmt->bindParam(':removeRoomName',$roomName);
+	$stmt->execute();
+      }
+  }
 }
 if (isset($_POST['refresh'])) // This needs to pull from the database
 {
@@ -230,11 +217,9 @@ input[type=submit]:active {
 
 <div id="main">
   <div id="navigation">
-    &nbsp;
-  </div>
+    </div>
   <div id="page">
     <h2>Texas Hold'em Rooms</h2>
-    <p>Public Rooms:</p>
     <ul>
       <form  method="post">
 	<select id ="servers" name="servers" onchange="document.getElementById('selected_text').value=this.options[this.selectedIndex].text">
@@ -247,13 +232,14 @@ input[type=submit]:active {
 	  ?>
 	</select>
 	<input type="hidden" name="selected_text" id="selected_text" value="" />
-	<input type="submit" name="refresh" id="refresh" value="Refresh">
 	<input type="submit" name="join_server" id="join_server" value="Enter">
+	<p></p>
+	<input type="submit" name="refresh" id="refresh" value="Refresh">
       </form>
     </ul>
-    
+    <h2> <br> </h2>
     <div id="page2">
-      <h2>Admin Access: Create Room</h2>
+      <p>Create Custom Rooms</p>
       <form  method="post">
 	<p>
 	<label for="roomName"> Room Name:</label>
@@ -281,8 +267,10 @@ input[type=submit]:active {
       </form>
     </div>
     
+    <h2> <br> </h2>
+    
     <div id="page2">
-      <h2>Admin Access: Remove Room</h2>
+      <p>Remove Rooms (Admins only)</h2>
       <form  method="post">
 	<p>
 	<label for="removeRoomName">Room Name:</label>
@@ -290,9 +278,11 @@ input[type=submit]:active {
    <?php
         if (isset($errors['removeRoomName'])) {
             echo $errors['removeRoomName'];
-        }elseif (isset($errors['notfound'])) {
+        } elseif (isset($errors['notfound'])) {
             echo $errors['notfound'];
-        }
+        } elseif (isset($errors['notadmin'])) {
+	    echo $errors['notadmin'];
+	}
         ?>
   
 	</p>

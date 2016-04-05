@@ -118,14 +118,12 @@ function init() {
 function retrieveUsername(data)
 {
   latestPlayerUsername = data[0];
-  latestPlayerChipAmount = 1000;
   util.log(latestPlayerUsername);
-  util.log(latestPlayerChipAmount);
 }
 
 function retrieveChipAmount(data)
 {
-  latestPlayerChipAmount = data[1];
+  latestPlayerChipAmount = data[0];
   util.log(latestPlayerChipAmount);
 }
 

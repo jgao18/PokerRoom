@@ -11,7 +11,11 @@
   $stmt->bindParam(':username', $username);
   $stmt->execute();
   $stored = $stmt->fetchColumn();
-        ?>
+  
+  setcookie("user_cookie", $username , time() + (86400 * 30), "/");
+  setcookie("chip_cookie", $stored , time() + (86400 * 30), "/"); 
+
+?>
         
 <div id="main">
   <div id="navigation">

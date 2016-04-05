@@ -429,7 +429,10 @@ function lobby() {
     // Assigns the information for the client
     currentPlayer = new Player();
     currentPlayer.setUsername(data.message.toString().split(" ")[0]);
-    currentPlayer.addChips(parseInt(data.message.toString().split(" ")[1]));
+    currentPlayer.addChips((data.message.toString().split(" ")[1]));
+    console.log(data.message);
+    console.log(data.message.toString().split(" ")[0]);
+    console.log(data.message.toString().split(" ")[1]);
     console.log("my username is " + currentPlayer.getUsername() + " " + currentPlayer.getChips());
     
     // Setting all Events
