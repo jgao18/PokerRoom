@@ -317,9 +317,10 @@ function foldButton() {
 
 	fold.addEventListener("click", function(event) {
 		var player = getCurrentPlayer();
-		socket.emit("fold");
+		socket.emit("buttons", {remove: false, action: "fold"});
+		socket.emit("fold",{username: player});
 		socket.emit("current turn",{action: "fold", user: player});
-		socket.emit("buttons", {remove: false});
+		//socket.emit("buttons", {remove: false, action: "fold"});
 	})
 	return fold;
 }

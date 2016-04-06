@@ -1035,6 +1035,7 @@ function nextAction() {
 	}
 }
 
+
 // Flips any cards pass into this function
 // x and y corresponds to where the new card should be placed
 function flip(card,cardObj,x,y) {
