@@ -230,7 +230,6 @@ function buttons(data) {
     	}
     }
 
->>>>>>> master
 	if (indexPlayer >= playingPlayers.length) {
 		indexPlayer = 0;
 	}
