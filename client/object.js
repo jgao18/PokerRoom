@@ -224,7 +224,47 @@ function button(x,y,width,height,label,color,textSize) {
     return user_button;
 }
 
+var sounds = [
+	{src:"backgroundMusic.mp3", id:"background"},
+	{src:"buttonClick.wav", id:"buttonClick"}
+]
+
+createjs.Sound.alternateExtensions = ["mp3"];
+// createjs.Sound.on("fileload", this.loadHandler, this);
+createjs.Sound.registerSounds(sounds, /sounds/);
+
+var instance;
+instance = createjs.Sound.play("background");
+
+function loadHandler(event) {
+	instance = createjs.Sound.play("background");
+	instance.on("complete", this.handleComplete, this);
+	instance.volume = 0.9;
+	addToGame(instance);
+	stage.update();
+}
+
 /* All are buttons for the game */
+	
+function soundOff() {
+	var sound = new button(15,610,75,30,"Off","red",20);
+	addToGame(sound);
+	stage.update();
+
+	sound.addEventListener("click", function(event) {
+		instance.volume = 0.0; 
+	})
+}
+
+function soundOn() {
+	var sound = new button(100,610,75,30,"On","red",20);
+	addToGame(sound);
+	stage.update();
+
+	sound.addEventListener("click", function(event) {
+		instance.volume = 0.9; 
+	})
+}
 
 // Provides instructions for the game
 function helpButton() {

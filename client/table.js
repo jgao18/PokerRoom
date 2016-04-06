@@ -423,6 +423,8 @@ function menu() {
   addToMenu(title);
   addToMenu(subtitle);
   startButton();
+  soundOff();
+  soundOn();
   // update to show title and subtitle
   stage.update();
 }
@@ -501,6 +503,9 @@ function lobby() {
    //pokerChip(490, 398);
    pokertable();
    paint_deck();
+   loadHandler(event);
+   soundOff();
+   soundOn();
    optionsButton();
    helpButton();
    leaveButton(currentPlayer);
