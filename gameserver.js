@@ -28,8 +28,11 @@ var gameStage = 0;
 var gameStages = ["preflop","flop", "turn", "river", "postriver"];
 var usernames;
 
-var latestPlayerUsername;
-var latestPlayerChipAmount;
+var localUserNames = ["res_Homer", "res_Bart", "res_Marge", "res_Lisa"]
+var localUserCount = 0;
+
+var latestPlayerUsername = localUserNames[localUserCount];
+var latestPlayerChipAmount = 1000;
 
 var deck;
 var playerCards;
@@ -54,26 +57,26 @@ function init() {
 
       //Send the requesting client the file.
      res.sendFile( __dirname + '/client/' + file );
-     
+
    });
-  
+
   app.get('/*', function(req, res){
     var file = req.params[0];
     util.log(file);
     if (file == "link.php")
       res.sendFile( __dirname + file );
-     
+
    });
-  
-  
+
+
   io.on('connection', function (socket) {
-    
+
     socket.emit('welcome', { message: latestPlayerUsername + " " + latestPlayerChipAmount });
-    
+
     socket.on('linkUsername', retrieveUsername);
     socket.on('linkChipAmount', retrieveChipAmount);
     socket.on('disconnectLink', function (data) { util.log(this.id) ; io.sockets.connected[this.id].disconnect(); });
-    
+
     // When a new player comes in, onNewPlayer runs
     socket.on("new player", onNewPlayer);
 
@@ -112,7 +115,7 @@ function init() {
   server.listen(serverPort, '0.0.0.0', function(){
 	  console.log("Game server started on port " + serverPort);
   });
-  
+
 };
 
 
@@ -138,7 +141,7 @@ function onNewPlayer(data) {
   userSockets.push({username: latestPlayerUsername, socket: this });
 
 
-  var newPlayer = new Player(this.id, latestPlayerUsername, 1000, connectedPlayers.length);
+  var newPlayer = new Player(this.id, latestPlayerUsername, latestPlayerChipAmount, connectedPlayers.length);
 
   // Store new player in each list
   playingPlayers.push(newPlayer);
@@ -176,6 +179,9 @@ function onNewPlayer(data) {
   if (connectedPlayers.length > 2) {
 	  this.emit("ready");
   }
+
+  localUserCount+=1;
+  latestPlayerUsername = localUserNames[localUserCount];
 
 };
 
@@ -217,7 +223,7 @@ function buttons(data) {
 	// next player
 	util.log("INNNNNNNNDEXXXXX PLAYER IS INCREASING!!!!: " + indexPlayer);
 	indexPlayer++;
-	
+
 	if (indexPlayer >= playingPlayers.length) {
 		indexPlayer = 0;
 	}
@@ -245,12 +251,12 @@ function firstTurn(data) {
 	util.log("curentHandPlayers is " + currentHandPlayers.length);
 	// Until all users press the ready
 	if ( numTimesAccess == currentHandPlayers.length) {
-		
+
 		if (playingPlayers[indexPlayer].getUsername() == userSockets[0].username) {
 			console.log("This is the future!!!!!!!!!");
 			indexPlayer++;
 		}
-		
+
 		util.log("Inside the first turn");
 		numTimesAccess = 0;
 		// Accesses the first client that enters the room
@@ -300,7 +306,7 @@ function fold() {
 
 function currentTurn(data) {
 	util.log("Ended in currentTurn");
-	
+
 	// If any player raised
  	if (data.action == "raise") {
  		// Make a new list with all players
@@ -313,7 +319,7 @@ function currentTurn(data) {
  			}
  		}
  	}
-	
+
 	// If all player decided their action for the turn
 	if (currentHandPlayers.length == 0) {
 		currentHandPlayers = connectedPlayers.slice();
@@ -346,13 +352,13 @@ function currentTurn(data) {
 				var userResults = {};
 				var times = 0;
 				var result;
-				
+
 				// Puts each user cards inside a dictionary {user: {Card1: Card2:}}
 				for (var i = 0; i < usernames.length; i++) {
 					playerHands[usernames[i]] = {"Card1": playerCards[times], "Card2": playerCards[times+1]};
 					times += 2;
 				}
-				
+
 				times = 0;
 				// Push a dictionary int to the card list with information of each card
 			    for (var i = 0; i < playerCards.length; i++)
@@ -362,24 +368,24 @@ function currentTurn(data) {
 			         // Pushing the card value into the logic list
 					 totalCards.push(playerCards[i]);
 					 times++;
-					 
+
 					 if (times == 2) {
 						// What hand the player has
 						result = Logic.determineWinner(totalCards);
 						// Stores the results of each user
 						userResults[playerCards[i].get_owner()] = result;
-						// Restart the card list 
+						// Restart the card list
 						totalCards = tableCards.slice();
 						times = 0;
 					 }
 			    }
-				
+
 				// Iterate through the dictionary and see which is the higher result
 				var userPoints = {};
 				for (var i = 0; i < usernames.length; i++) {
 					util.log("len: " + usernames.length);
 					util.log("i: " + usernames[i]);
-					
+
 					var str = userResults[usernames[i]];
 					if (str.indexOf("Royal Flush") >= 0) {
 						userPoints[usernames[i]] = 10;
@@ -412,7 +418,7 @@ function currentTurn(data) {
 						userPoints[usernames[i]] = 1;
 					}
 				}
-			 
+
 			 	// Makes Final Evaluations if there are same results
 				// I need to slice the list of usernames and delete the username for which there is a pair
 				var addPoints;
@@ -440,7 +446,7 @@ function currentTurn(data) {
 						}
 					}
 				}
-				
+
 				// Decides the winner
 				var winner;
 				var high = 0;
@@ -461,7 +467,7 @@ function currentTurn(data) {
 			         var userSocket = userSockets[i].socket;
 			         userSocket.emit("other cards", outputPlayerCards);
 			    }
-				
+
 				// Restart the list
 			    playerCards = [];
 			 }
@@ -469,7 +475,7 @@ function currentTurn(data) {
 			 this.broadcast.emit("next action", gameStages[gameStage]);
 		 }
 	 }
-	
+
  	if (data.action == "raise") {
  		this.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
  		this.broadcast.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
@@ -493,7 +499,7 @@ function currentTurn(data) {
 function startGame() {
 
 	readyPlayers++;
-	
+
 	util.log("ready # " + readyPlayers);
 	util.log("connected # " + connectedPlayers.length);
 
