@@ -373,7 +373,7 @@ function currentTurn(data) {
 				}
 
 				times = 0;
-				console.log("This is the playerCards length: " + playerCards.length);
+				//console.log("This is the playerCards length: " + playerCards.length);
 				// Push a dictionary int to the card list with information of each card
 			    for (var i = 0; i < playerCards.length; i++)
 			    {
@@ -386,9 +386,9 @@ function currentTurn(data) {
 					 if (times == 2) {
 						// What hand the player has
 						result = Logic.determineWinner(totalCards);
-						console.log("\n");
-						console.log("This is the result: " + result);
-						console.log("\n");
+						//console.log("\n");
+						//console.log("This is the result: " + result);
+						//console.log("\n");
 						// Stores the results of each user
 						userResults[playerCards[i].get_owner()] = result;
 						// Restart the card list
