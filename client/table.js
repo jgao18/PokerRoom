@@ -409,6 +409,7 @@ function drawPlayerAt(playerIndex, indexAfterLocal)
 // main menu to game
 function menu() {
 
+  /*
   // Title of Game
   title = new createjs.Text("Poker Room", "50px Bembo", "#FF0000");
   title.x = width/3.1;
@@ -424,7 +425,9 @@ function menu() {
   addToMenu(subtitle);
   startButton();
   // update to show title and subtitle
-  stage.update();
+  stage.update();*/
+  
+  lobby();
 }
 
 // Before all users presses ready
@@ -439,6 +442,8 @@ function lobby() {
     currentPlayer = new Player();
     currentPlayer.setUsername(data.message.toString().split(" ")[0]);
     currentPlayer.addChips((data.message.toString().split(" ")[1]));
+    console.log(currentPlayer.getUsername());
+    console.log(currentPlayer.getUsername() == "undefined");
     //console.log(data.message);
     //console.log(data.message.toString().split(" ")[0]);
     //console.log(data.message.toString().split(" ")[1]);
