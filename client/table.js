@@ -115,7 +115,7 @@ function removeGameChildren() {
 
 
 function game_init() {
-  
+
 	deck = new Deck();
 	deck.get_new_deck();
 	otherCards = [];
@@ -212,15 +212,16 @@ function onNewPlayer(data)
 
   for (i = 0; i < playerList.length; i++)
   {
-	// Makes a new player with current iteration information
+		// Makes a new player with current iteration information
     var existingPlayer = new Player(playerList[i].id, playerList[i].username, playerList[i].chips, playerList[i].index);
-	// If player is a connected user
+
+		// If player is a connected user
     if (existingPlayer.getUsername() != "INVALID_USER")
     {
-	  // If the stored player is the client player
+	  	// If the stored player is the client player
       if (existingPlayer.getUsername() == currentPlayer.getUsername())
       {
-		// Then assign the current player to the stored player
+				// Then assign the current player to the stored player
         currentPlayer = existingPlayer;
         clientAmounts("main",currentPlayer.getUsername(), currentPlayer.getChips());
       }
@@ -230,6 +231,7 @@ function onNewPlayer(data)
   }
 
   var localIndex = currentPlayer.getTableIndex();
+
   var nextPlayerIndex;
   var nextPlayerIterator = 0;
   positions[currentPlayer.getUsername()] = "main";
@@ -360,14 +362,14 @@ function onRemovePlayer(data) {
 			card2 = stage.getChildByName("lCard2");
 			action = stage.getChildByName("leftPlayerAction");
 			break;
-		  
+
 	  	case "back":
 			chip = game_menu.getChildByName("player4_chip_plate");
 			card1 = stage.getChildByName("bCard1");
 			card2 = stage.getChildByName("bCard2");
 			action = stage.getChildByName("backPlayerAction");
 			break;
-		 
+
 	  	case "right":
 			chip = game_menu.getChildByName("player2_chip_plate");
 			card1 = stage.getChildByName("rCard1");
@@ -409,6 +411,7 @@ function drawPlayerAt(playerIndex, indexAfterLocal)
 // main menu to game
 function menu() {
 
+  /*
   // Title of Game
   title = new createjs.Text("Poker Room", "50px Bembo", "#FF0000");
   title.x = width/3.1;
@@ -424,7 +427,9 @@ function menu() {
   addToMenu(subtitle);
   startButton();
   // update to show title and subtitle
-  stage.update();
+  stage.update();*/
+
+  lobby();
 }
 
 // Before all users presses ready
@@ -434,16 +439,21 @@ function lobby() {
   socket = io.connect();
 
   socket.on('welcome', function (data) {
-    
+
     // Assigns the information for the client
-    currentPlayer = new Player();
-    currentPlayer.setUsername(data.message.toString().split(" ")[0]);
-    currentPlayer.addChips((data.message.toString().split(" ")[1]));
+		var tempUsername = data.message.toString().split(" ")[0];
+		var tempChipAmount = data.message.toString().split(" ")[1];
+
+		currentPlayer = new Player();
+    currentPlayer.setUsername(tempUsername);
+    currentPlayer.addChips(tempChipAmount);
+
+
     //console.log(data.message);
     //console.log(data.message.toString().split(" ")[0]);
     //console.log(data.message.toString().split(" ")[1]);
     //console.log("my username is " + currentPlayer.getUsername() + " " + currentPlayer.getChips());
-    
+
     // Setting all Events
     socket.emit("new player", {username: currentPlayer.getUsername(), chips: currentPlayer.getChips()});
 
@@ -901,7 +911,7 @@ function newTurn() {
 	currentUserBet = 0;
 	lastUserBet = 0;
 	setAmountBet(0);
-	
+
 	var actionList = ["mainPlayerAction","leftPlayerAction","rightPlayerAction","backPlayerAction"];
 	var store;
 	for(var i = 0; i < actionList.length; i++) {
@@ -1003,7 +1013,7 @@ function nextAction() {
 					flip(card2, tempOtherCards[1], 370, 90);
 				}
 			}
-			
+
 			var display;
 
 			otherCards = [];
@@ -1119,17 +1129,17 @@ function wonPlayer(data) {
 	 if (display = game_menu.getChildByName("won player")) {
 	 	 stage.removeChild(display);
 	 }
-	 
+
 	 var amount = 0;
 	 for (var i = 0; i < currentPlayers.length; i++) {
 		 if(currentPlayers[i].getUsername() == data.player) {
 			amount = currentPlayers[i].getChips() + pot_amount;
 		 }
 	 }
-	 
+
 	 socket.emit("changed amount",{id: data.player, chips: amount});
 	 setPotToZero();
-	 
+
 	 //console.log("This is the pot amount: " + pot_amount);
 	 var player = new createjs.Text(data.player + " Wins!", "20px Bembo","#FFFF00");
  	 player.x = 350;
@@ -1142,7 +1152,7 @@ function wonPlayer(data) {
 function playerAction(data) {
 	var position = positions[data.player];
 	var storeText;
-	
+
 	if (position == "main") {
 		if (data.amount) {
 			var text = new createjs.Text("You " + data.action + ": " + data.amount, "15px Bembo", "#FFFF00");
@@ -1161,7 +1171,7 @@ function playerAction(data) {
 			var text = new createjs.Text(data.action, "15px Bembo", "#FFFF00");
 		}
 	}
-	
+
 	switch(position) {
 		case "main":
 			if (storeText = stage.getChildByName("mainPlayerAction")) {
@@ -1196,7 +1206,7 @@ function playerAction(data) {
 			text.name = "backPlayerAction";
 			break;
 	}
-	
+
 	stage.addChild(text);
 	stage.update();
 }
@@ -1209,8 +1219,8 @@ function displayWinner(data) {
 	if (display = stage.getChildByName("winner")) {
 		stage.removeChild(display);
 	}
-    
-	
+
+
 	var winner = new createjs.Text(data.username + " Won!", "20px Bembo", "#FFFF00");
 	winner.x = 350;
 	winner.y = 385;
@@ -1224,7 +1234,7 @@ function getTimeRemaining(endtime) {
   var t = Date.parse(endtime) - Date.parse(new Date());
   var seconds = Math.floor((t / 1000) % 60);
   var minutes = Math.floor((t / 1000 / 60) % 60);
-  
+
   return {
     'total': t,
     'minutes': minutes,
