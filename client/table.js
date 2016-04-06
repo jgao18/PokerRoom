@@ -207,7 +207,6 @@ function onSocketConnected() {
 // Gets called when new player joins.
 function onNewPlayer(data)
 {
-	console.log("i got called");
   // The server sends a list of players to the client
   playerList = data;
 
@@ -215,19 +214,15 @@ function onNewPlayer(data)
   {
 		// Makes a new player with current iteration information
     var existingPlayer = new Player(playerList[i].id, playerList[i].username, playerList[i].chips, playerList[i].index);
-			console.log(playerList[i].username)
+
 		// If player is a connected user
     if (existingPlayer.getUsername() != "INVALID_USER")
     {
 	  	// If the stored player is the client player
-			console.log("dsadasd " + currentPlayer.getUsername())
-			console.log("aaaaaa " + existingPlayer.getUsername())
-
       if (existingPlayer.getUsername() == currentPlayer.getUsername())
       {
 				// Then assign the current player to the stored player
         currentPlayer = existingPlayer;
-				console.log("dsadasd " + currentPlayer.getUsername())
         clientAmounts("main",currentPlayer.getUsername(), currentPlayer.getChips());
       }
 	  // If not the current client then store it an list with its tableIndex
@@ -236,8 +231,7 @@ function onNewPlayer(data)
   }
 
   var localIndex = currentPlayer.getTableIndex();
-	console.log(currentPlayer.getUsername())
-	console.log(localIndex);
+
   var nextPlayerIndex;
   var nextPlayerIterator = 0;
   positions[currentPlayer.getUsername()] = "main";
@@ -248,8 +242,6 @@ function onNewPlayer(data)
     nextPlayerIterator++;
 	// Provides the location of each connected client to the screen using
     nextPlayerIndex = (localIndex + nextPlayerIterator) % currentPlayers.length;
-		console.log(currentPlayers[0].getUsername());
-		console.log(nextPlayerIndex);
     var user = currentPlayers[nextPlayerIndex].getUsername();
 	// If player is a connected user
     if ((user != "INVALID_USER") && (user != currentPlayer.getUsername()))
@@ -455,7 +447,6 @@ function lobby() {
 		currentPlayer = new Player();
     currentPlayer.setUsername(tempUsername);
     currentPlayer.addChips(tempChipAmount);
-		console.log("my usenrame" + currentPlayer.getUsername());
 
 
     //console.log(data.message);
