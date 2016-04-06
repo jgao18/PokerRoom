@@ -33,7 +33,6 @@ if (isset($_POST['login'])) {
 <!doctype html>
 <html>
 <head>
- <li><a href="register.php">new user?</a></li>
 
 <meta charset="utf-8">
 <title>Auto Login</title>
@@ -62,7 +61,7 @@ if (isset($_POST['login'])) {
     border-radius: 3px;
     border: 1px solid #ccc;
     box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
-	
+
 }
 form {
     margin: 0 auto;
@@ -171,7 +170,7 @@ input[type=submit]:active {
             background-color: #fff;
             color: #1B1B1B;
             font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;
-            margin-left: 50px;
+            margin-left: 0px;
         }
         label {
             display: inline-block;
@@ -200,10 +199,12 @@ if (isset($error)) {
         <label for="pwd">Password:</label>
         <input type="password" name="pwd" id="pwd">
     </p>
-    <p>
+    <li><a href="register.php">Create an account</a></li>
+
+    <!--p>
         <input type="checkbox" name="remember" id="remember">
         <label for="remember">Remember me </label>
-    </p>
+    </p-->
     <p>
         <input type="submit" name="login" id="login" value="Log In">
     </p>
