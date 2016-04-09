@@ -290,7 +290,7 @@ function raiseButton() {
 
 	raise.addEventListener("click", function(event) {
 		var show;
-
+		
 		// Restarts the betting amount
 		if ((show = stage.getChildByName("bet_amount"))) {
 			setAmountBet(0);
@@ -300,8 +300,10 @@ function raiseButton() {
 		// If user wants to get out of the raise options, then press raise again
 		if ((show = game_menu.getChildByName("raise_amount"))) {
 			game_menu.removeChild(show);
+			addCallandFoldButton();
 		}
 		else {
+			removeCallandFoldButton();
 			setAmountBet(0);
 			betAmount(1);
 			raiseAmount();
