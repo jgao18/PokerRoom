@@ -28,7 +28,9 @@
        <p> You have $<?= htmlentities($stored); ?> on your account.</p>
 
    <ul>
-      <li><a href="../php/holdemRooms.php">Texas Hold'em Rooms</a></li>     
+      <li><a href="../php/holdemRooms.php">Texas Hold'em Rooms</a></li>    
+      <li><a href="../php/editPassword.php">Change Password</a></li>     
+
     </ul>
   </div>
 </div>
