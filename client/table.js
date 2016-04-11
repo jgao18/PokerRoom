@@ -1104,6 +1104,23 @@ function playerOptions() {
 	fold();
 }
 
+function removeCallandFoldButton() {
+	var buttonContainer = game_menu.getChildByName("buttons");
+	var call_button = buttonContainer.getChildByName("call_button");
+	var fold_button = buttonContainer.getChildByName("fold_button");
+	buttonContainer.removeChild(call_button,fold_button);
+}
+
+function addCallandFoldButton() {
+	var buttonContainer = game_menu.getChildByName("buttons");
+	var user_call = callButton();
+	var user_fold = foldButton();
+	user_call.name = "call_button";
+	user_fold.name = "fold_button";
+	buttonContainer.addChild(user_call,user_fold);
+	stage.update();
+}
+
 // Adds the players buttons
 function addButtonContainer() {
 	var user_buttons = new createjs.Container();
@@ -1111,6 +1128,8 @@ function addButtonContainer() {
 	var user_raise = raiseButton();
 	var user_call = callButton();
 	var user_fold = foldButton();
+	user_call.name = "call_button";
+	user_fold.name = "fold_button";
 	user_buttons.addChild(user_raise,user_call,user_fold);
 	game_menu.addChild(user_buttons);
 	stage.update();
