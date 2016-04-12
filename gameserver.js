@@ -1,3 +1,8 @@
+/* Contributors: Joey Gao & Jessie Cisneros
+   Use: Server for the poker game. Keeps track of all players that are connected and
+        transfers player's actions to all players.
+*/
+
 // required imports for socket.io
 var util = require("util");
 var app = require('express')();
@@ -7,31 +12,30 @@ var Player = require("./player").Player;
 var Deck = require("./deck").Deck;
 var Card = require("./card").Card;
 var Logic = require("./logic");
+var serverPort = process.argv[2];
 
 var socket;
-var serverPort = process.argv[2];
+// stores all sockets per user
 var userSockets;
 
-var players;
+var playingPlayers;
 var connectedPlayers;
 var currentHandPlayers;
+var usernames;
+
 var maxPlayers;
 var playerConnected;
-var raisePlayers;
 var readyPlayers = 0;
 var numTimesAccess = 0;
-var playingPlayers;
 var roundOver = false;
 var indexPlayer = 1;
 var again = 0;
 var gameStage = 0;
 var gameStages = ["preflop","flop", "turn", "river", "postriver"];
-var usernames;
 
 var deck;
 var playerCards;
 var tableCards;
-
 
 function init() {
   // initialize variables once server starts
@@ -41,9 +45,8 @@ function init() {
   playerCards = [];
   tableCards = [];
   userSockets = [];
-  raisePlayers = [];
   usernames = [];
-  maxPlayers = 4
+  maxPlayers = 4;
 
   app.get('/*', function(req, res){
     var file = req.params[0];
@@ -63,7 +66,7 @@ function init() {
 		// When socket presses ready button
 		socket.on("ready", startGame);
 
-		// When socket presses the leave button
+		// When client presses the leave button
 		socket.on("leave", playerLeft);
 
 		// Indicates the turn for the user
@@ -87,207 +90,195 @@ function init() {
 		socket.on("changed amount", amountChanged);
   });
 
-  // Thanks to the Nick/the PoP team for helping with this code
+    // Thanks to the Nick/the PoP team for helping with this code
 	// Set to listen on this ip and this port.
 	server.listen(serverPort, '0.0.0.0', function(){
 		console.log("Game server started on port " + serverPort);
 	});
 };
 
-// Called by sockets when they hit the Play button
-function onNewPlayer(data) {
+// Restarts list of players that haven't fold
+function restartPlayerList() {
+	currentHandPlayers = connectedPlayers.slice();
+}
 
-  util.log("Found a new player!" + data.username)
+// Transfers the pot amount to the winner
+function amountChanged(data) {
+	this.emit("change amount",{username: data.id, chips: data.chips});
+	this.broadcast.emit("change amount",{username: data.id, chips: data.chips});
+}
 
-  var i, existingPlayer;
-  // Stores each user's sockets by username
-  userSockets.push({username: data.username, socket: this });
-
-
-  var newPlayer = new Player(this.id, data.username, data.chips, connectedPlayers.length);
-
-  // Store new player in each list
-  playingPlayers.push(newPlayer);
-  connectedPlayers.push(newPlayer);
-  currentHandPlayers.push(newPlayer);
-  usernames.push(newPlayer.getUsername());
-
-  // Initialize a new list and push 4 players into it.
-  outputArray = [];
-  for (i = 0; i < maxPlayers; i++)
-  {
-    outputArray.push(new Player());
-  }
-
-  // Go through connectedPlayers list and provide the user info
-  for (i = 0; i < connectedPlayers.length; i++) {
-    existingPlayer = connectedPlayers[i];
-    outputArray[existingPlayer.getTableIndex()] = {id: existingPlayer.id, username: existingPlayer.getUsername(),
-												   chips: existingPlayer.getChips(), index: existingPlayer.getTableIndex()};
-  };
-
-  // Send playerArray to new player
-  this.emit("new player", outputArray);
-
-  // Send playerArray to existing players
-  this.broadcast.emit("new player", outputArray);
-
-  // Once two sockets connect, then show the Ready Button
-  if (connectedPlayers.length ==  2) {
-	  this.emit("ready");
-	  this.broadcast.emit("ready");
-  }
-
-  // Once more than two people enter, show Ready Button
-  if (connectedPlayers.length > 2) {
-	  this.emit("ready");
-  }
-
-};
-
-// Increase the pot to all players
+// Increases the pot amount and player's amount
 function potIncrease(data) {
 	this.emit("last bet", {chips: data.amount})
 	this.emit("add to pot", {chips: data.chips, amount: data.amount});
 	this.broadcast.emit("add to pot", {chips: data.chips, amount: data.amount});
 }
 
-//Restart the player list
-function restartPlayerList() {
-	currentHandPlayers = connectedPlayers.slice();
-}
+// Called by sockets when they hit the Play button
+function onNewPlayer(data) {
+	
+   var i, existingPlayer;
+   // Stores each user's sockets by username
+   userSockets.push({username: data.username, socket: this });
 
-// Provides the turn signal and buttons for players
+
+   var newPlayer = new Player(this.id, data.username, data.chips, connectedPlayers.length);
+
+   // Store new player in each list
+   playingPlayers.push(newPlayer);
+   connectedPlayers.push(newPlayer);
+   currentHandPlayers.push(newPlayer);
+   usernames.push(newPlayer.getUsername());
+
+   // Initialize a new list and push 4 players into it.
+   outputArray = [];
+   for (i = 0; i < maxPlayers; i++)
+   {
+     outputArray.push(new Player());
+   }
+
+   // Go through connectedPlayers list and provide the user info
+   for (i = 0; i < connectedPlayers.length; i++) {
+     existingPlayer = connectedPlayers[i];
+     outputArray[existingPlayer.getTableIndex()] = {id: existingPlayer.id, username: existingPlayer.getUsername(),
+												   chips: existingPlayer.getChips(), index: existingPlayer.getTableIndex()};
+   };
+
+   // Send playerArray to new player
+   this.emit("new player", outputArray);
+
+   // Send playerArray to existing players
+   this.broadcast.emit("new player", outputArray);
+
+  	// Once two sockets connect, then show the Ready Button
+   if (connectedPlayers.length ==  2) {
+	  	this.emit("ready");
+	    this.broadcast.emit("ready");
+ 	}
+
+  	// Once more than two people enter, show Ready Button
+  	if (connectedPlayers.length > 2) {
+	  	this.emit("ready");
+  	}
+
+};
+
+// Provides the turn signal and buttons
 function buttons(data) {
-
-	util.log("Ended in buttons");
-	// Precaution for out of index
-
-	// Remove the access sockets buttons
+	
+	// If the round is over
+	if (data.remove == true) {
+		this.emit("remove buttons");
+		this.broadcast.emit("remove buttons");
+		return;
+	}
+	
 	this.emit("remove buttons");
-
-	// Provide the next player in the list buttons
+	
 	for (var i = 0; i < userSockets.length; i++) {
 		if(playingPlayers[indexPlayer].getUsername() == userSockets[i].username) {
-			console.log("This is the user: " + userSockets[i].username);
-			console.log("This is the length of playingPlayers: " + playingPlayers.length);
-			console.log("This is the indexPlayer: " + indexPlayer);
-			// Access the next player's socket
 			var userSocket = userSockets[i].socket;
 			// Provide that player the turn signal and buttons
 			this.emit("signal", {username: userSockets[i].username });
 			this.broadcast.emit("signal", {username: userSockets[i].username });
+			userSocket.emit("timer");
 			userSocket.emit("add buttons");
 		}
 	}
-	// next player
-	util.log("INNNNNNNNDEXXXXX PLAYER IS INCREASING!!!!: " + indexPlayer);
+	
 	indexPlayer++;
 	
+	// Retract to the previous index
     if (data.action == "fold") {
 		if(indexPlayer > 0 && indexPlayer < playingPlayers.length) {
 			indexPlayer--;
 		}
     }
 	
+	// If the index is out of bounds then revert to 0
 	if (indexPlayer >= playingPlayers.length) {
 		indexPlayer = 0;
 	}
-
-	if (data.remove == true) {
-		this.emit("remove buttons");
-		this.broadcast.emit("remove buttons");
-		return;
-	}
 }
 
-function amountChanged(data) {
-	this.emit("change amount",{username: data.id, chips: data.chips});
-	this.broadcast.emit("change amount",{username: data.id, chips: data.chips});
-}
-
-// Enters this phase once players press the Ready Button
-function firstTurn(data) {
-	util.log("Ended in firstTurn");
-
-	gameStage = 0; // preflop
-	playingPlayers = connectedPlayers.slice();
-    currentHandPlayers = connectedPlayers.slice();
-	indexPlayer = 0;
-	numTimesAccess++;
-	util.log("numTimesAccess is " + numTimesAccess);
-	util.log("curentHandPlayers is " + currentHandPlayers.length);
-	// Until all users press the ready
-	if ( numTimesAccess == currentHandPlayers.length) {
-		
-		if (playingPlayers[indexPlayer].getUsername() == userSockets[0].username) {
-			console.log("This is the future!!!!!!!!!");
-			indexPlayer++;
-		}
-		
-		util.log("Inside the first turn");
-		numTimesAccess = 0;
-		// Accesses the first client that enters the room
-		console.log("This is the userSocket[0].socket :" + userSockets[0].username);
-		var userSocket = userSockets[0].socket;
-		userSocket.emit("add buttons");
-		userSocket.emit("signal", {username: userSockets[0].username});
-		for(var i = 1; i < userSockets.length; i++) {
-			userSocket = userSockets[i].socket;
-			userSocket.emit("signal", {username: userSockets[0].username});
-		}
-
-		// Removes the first player from the remaining round players
-		playerTurn = currentHandPlayers[0];
-		currentHandPlayers.splice(0, 1);
-	}
-}
-
-// Removes the player from the round
 function fold(data) {
-	util.log("Ended in fold");
-	// Find the player and remove him from the round
+	
+	// Find the player and remove him from the current round
 	for (var i = 0; i < playingPlayers.length; i++) {
 		if( playingPlayers[i].getUsername() == data.username ) {
-			console.log(playingPlayers[i].getUsername() + " folded!!!!!!!!!");
 			playingPlayers.splice(i, 1);
 		}
 	}
 	
+	// Check for out of bounds
 	if(indexPlayer >= playingPlayers.length) {
 		indexPlayer = 0;
 	}
 
-	// If there is only one player left in the round
+	// If there is only one player left
 	if (playingPlayers.length == 1) {
 		roundOver = true;
 		// Access the currentPlayer
 		var user = playingPlayers[0];
-		// Remove all buttons
+		
 		this.emit("remove buttons");
 		this.broadcast.emit("remove buttons");
-		// Announce the winner of the round to all sockets
 		this.emit("winning player", {player: user.getUsername()});
 		this.broadcast.emit("winning player", {player: user.getUsername()});
-		// Erase everything
 		this.emit("round over");
 		this.broadcast.emit("round over");
+		
 		// Restart the playing player list
 		playingPlayers = connectedPlayers.slice();
 	}
 }
 
-function currentTurn(data) {
-	util.log("Ended in currentTurn");
+// Enters this phase once players press the Ready Button
+function firstTurn(data) {
 	
-	// If any player raised
+	gameStage = 0;
+	indexPlayer = 0;
+	playingPlayers = connectedPlayers.slice();
+    currentHandPlayers = connectedPlayers.slice();
+	numTimesAccess++;
+	
+	// Until all users press the ready
+	if ( numTimesAccess == currentHandPlayers.length) {
+		numTimesAccess = 0;
+		var playerTurn = currentHandPlayers[0];
+		
+		// Prevents giving the current player buttons
+		if (playingPlayers[indexPlayer].getUsername() == userSockets[0].username) {
+			indexPlayer++;
+		}
+		
+		// Accesses the first client that enters the room
+		var userSocket = userSockets[0].socket;
+		userSocket.emit("timer");
+		userSocket.emit("add buttons");
+		userSocket.emit("signal", {username: userSockets[0].username});
+		
+		// Provides the turn signal to all players for first player
+		for(var i = 1; i < userSockets.length; i++) {
+			userSocket = userSockets[i].socket;
+			userSocket.emit("signal", {username: userSockets[0].username});
+		}
+
+		// Removes the first player from the remaining turn players
+		currentHandPlayers.splice(0, 1);
+	}
+}
+
+
+function currentTurn(data) {
+	
  	if (data.action == "raise") {
  		// Make a new list with all players
  		currentHandPlayers = playingPlayers.slice();
  		// Look for the user that raised and erased him from list
  		for (var i = 0; i < currentHandPlayers.length; i++) {
  			if(data.user == currentHandPlayers[i].getUsername()) {
- 				util.log("slicing user");
  				currentHandPlayers.splice(i, 1);
  			}
  		}
@@ -321,8 +312,8 @@ function currentTurn(data) {
 				// Player's Card list
 			    outputPlayerCards = [];
 				var playerHands = {};
-				var totalCards = tableCards.slice();
 				var userResults = {};
+				var totalCards = tableCards.slice();
 				var times = 0;
 				var result;
 				
@@ -333,7 +324,6 @@ function currentTurn(data) {
 				}
 				
 				times = 0;
-				console.log("This is the playerCards length: " + playerCards.length);
 				// Push a dictionary int to the card list with information of each card
 			    for (var i = 0; i < playerCards.length; i++)
 			    {
@@ -345,10 +335,7 @@ function currentTurn(data) {
 					 
 					 if (times == 2) {
 						// What hand the player has
-						result = Logic.determineWinner(totalCards);
-						console.log("\n");
-						console.log("This is the result: " + result);
-						console.log("\n");
+						result = Logic.determineHand(totalCards);
 						// Stores the results of each user
 						userResults[playerCards[i].get_owner()] = result;
 						// Restart the card list 
@@ -394,8 +381,6 @@ function currentTurn(data) {
 					}
 				}
 			 
-			 	// Makes Final Evaluations if there are same results
-				// I need to slice the list of usernames and delete the username for which there is a pair
 				var addPoints;
 				var user1Cards = tableCards.slice();
 				var user2Cards = tableCards.slice();
@@ -410,10 +395,7 @@ function currentTurn(data) {
 							user2Cards.push(playerHands[usernames[j]]["Card1"]);
 							user2Cards.push(playerHands[usernames[j]]["Card2"]);
 							// If the cards are bigger then increase the user points by 0.5
-							console.log("This is user1 " + usernames[i]);
-							console.log("This is user2 " + usernames[j]);
 							addPoints = Logic.finalEvaluation(user1Cards,user2Cards,userResults[usernames[i]],userResults[usernames[j]]);
-							console.log("This is the new Points " + addPoints);
 							userPoints[usernames[i]] += addPoints;
 							//totalCards = tableCards.slice();
 							user1Cards = tableCards.slice();
@@ -491,7 +473,8 @@ function startGame() {
       	    var card2 = deck.draw_card();
             card2.set_owner(user);
             playerCards.push(card1, card2);
-            userSocket.emit("client cards", {owner: user, value1 : card1.get_value(), suit1 : card1.get_suit(), value2 : card2.get_value(), suit2 : card2.get_suit()});
+            userSocket.emit("client cards", {owner: user, value1 : card1.get_value(), suit1 : card1.get_suit(), 
+											 value2 : card2.get_value(), suit2 : card2.get_suit()});
         }
 
         tableCards = [deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card()];

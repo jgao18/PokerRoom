@@ -23,7 +23,7 @@ module.exports = {
 		handResult += isPairs(cardList);
 		
 	    // Determine by suit/order/value
-		switch (winner) {
+		switch (handResult) {
 			case "YYN": 
 				return whichFlush(cardList);
 				break;
@@ -59,18 +59,19 @@ module.exports = {
 	    var userPoints = 0;
 		var user1Value;
 		var user2Value;
+		var i = 0;
 		
 		/* Looks for the highest pair between each player
 		   Works for pair/two pair/threeokakind/FullHouse/FourofKind */
 		if(isPairs(user1Cards) == "Y") {
-			for(var i = 0; i < values.length; i++) {
+			for(i = 0; i < values.length; i++) {
 				if(user1Result.includes(values[i])) {
 					user1Value = keyDict[values[i]];
 					break;
 				}
 			}
 		
-			for(var i = 0; i < values.length; i++) {
+			for(i = 0; i < values.length; i++) {
 				if(user2Result.includes(values[i])) {
 					user2Value = keyDict[values[i]];
 					break;
@@ -91,7 +92,7 @@ module.exports = {
 		/* Look through each cardList and find the highest value
 		   that stands apart.
 		   Works for high card/Straight/Flush/StraightFlush/RoyalFlush */
-		for(var i = 0; i < List1.length; i++) {
+		for(i = 0; i < List1.length; i++) {
 			if (List1[i] != List2[i]) {
 				if (List1[i] < List2[i]) {
 					userPoints = 0.25;
@@ -188,14 +189,15 @@ function isPairs(cards) {
 	var pairs = {};
 	var pairList = sortCards(cards);
 	var numOfCards = 1;
+	var i = 0;
 	
 	// Retrieve values
-	for (var i = 0; i < cards.length; i++) {
+	for (i = 0; i < cards.length; i++) {
 		newList.push(values[pairList[i]]);
 	}
 	
 	// Stores pairs in a dictionary
-	for (var i = 0; i < (newList.length-1); i++) {
+	for (i = 0; i < (newList.length-1); i++) {
 		if (newList[i] == newList[i+1]) {
 			numOfCards++; 
 			pairs[newList[i]] = numOfCards;
@@ -206,7 +208,7 @@ function isPairs(cards) {
 	}
 	
 	// If there is a pair, return "Y"
-	for (var i = 0; i < values.length; i++) {
+	for (i = 0; i < values.length; i++) {
 		if( pairs[values[i]] > 1) {
 			return "Y";
 		}
@@ -258,13 +260,14 @@ function whichPair(cards) {
 	var returnValue;
 	var extraValue;
 	var answer;
+	var i = 0;
 	
 	// Find the values that are associate to the points
-	for (var i = 0; i < pairList.length; i++) {
+	for (i = 0; i < pairList.length; i++) {
 		newList.push(values[pairList[i]]);
 	}
 	
-	for (var i = 0; i < newList.length; i++) {
+	for (i = 0; i < newList.length; i++) {
 		// If the next value is the current value, then skip
 		if (comp == newList[i]) {
 			continue;
@@ -284,7 +287,7 @@ function whichPair(cards) {
 	}
 
 	var keyList = Object.keys(pairs);
-	for (var i = 0; i < keyList.length; i++) {
+	for (i = 0; i < keyList.length; i++) {
 		switch(pairs[keyList[i]]) {
 			case 4:
 				fourOfaKind++;

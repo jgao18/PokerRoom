@@ -30,6 +30,7 @@ var otherCards;
 
 // Holds all items for the game
 var game_menu = new createjs.Container();
+var timeTicker;
 
 // Will incoporate this function for starting games with
 // with a random user
@@ -417,16 +418,16 @@ function drawPlayerAt(playerIndex, indexAfterLocal)
 function menu() {
 
   // Title of Game
-  title = new createjs.Text("Poker Room", "50px Bembo", "#FF0000");
+  var title = new createjs.Text("Poker Room", "50px Bembo", "#FF0000");
   title.x = width/3.1;
   title.y = height/4;
 
   // Subtitle of Game
-  subtitle = new createjs.Text("Let's Play Poker", "30px Bembo", "#FF0000");
+  var subtitle = new createjs.Text("Let's Play Poker", "30px Bembo", "#FF0000");
   subtitle.x = width/2.8;
   subtitle.y = height/2.8;
 
-  // Creating Buttons for Game
+  // Creating buttons for Game
   addToMenu(title);
   addToMenu(subtitle);
   startButton();
@@ -492,6 +493,7 @@ function lobby() {
 		 socket.on("turn card", turnCard)
 		 socket.on("river card", riverCard)
 		 socket.on("other cards", otherCardsFunction);	// Server indicates the cards of the other players
+		 socket.on("timer", timer);
 		});
 
    // Setting all Events
@@ -507,7 +509,7 @@ function lobby() {
 
 // Game is started when all players press ready
 function start_game() {
-
+	
   // Indicates to the server that the game is started
   socket.emit("first turn");
   // Passes the cards to the current client
@@ -994,8 +996,6 @@ function nextAction() {
 				}
 			}
 			
-			var display;
-
 			otherCards = [];
 			againButton();
 			socket.emit("buttons",{remove: true});
@@ -1025,7 +1025,7 @@ function nextAction() {
 				var shape = stage.getChildByName("tableCards");
 				stage.removeChild(shape);
 			}
-
+			
 			otherCards = [];
 			againButton();
 			socket.emit("buttons",{remove: true});
@@ -1117,6 +1117,9 @@ function addButtonContainer() {
 
 // Removes the client's buttons
 function removeButtonContainer() {
+	createjs.Ticker.off("tick",timeTicker);
+	var timer = stage.getChildByName("time");
+	stage.removeChild(timer);
 	var user_buttons = game_menu.getChildByName("buttons");
 	game_menu.removeChild(user_buttons);
 	stage.update();
@@ -1208,4 +1211,39 @@ function playerAction(data) {
 	
 	stage.addChild(text);
 	stage.update();
+}
+
+function timer(data){
+	var past = new Date();
+	var i = 30;
+	var timeText = new createjs.Text(i, "20px Bembo", "red");
+ 	timeText.x = 360;
+	timeText.y = 590;
+	timeText.name = "time";
+	stage.addChild(timeText);
+    stage.update();
+	
+	console.log("HELLLO");
+	timeTicker = createjs.Ticker.addEventListener("tick", handleTick);
+    function handleTick(event) {
+		 var d = new Date();
+		 var dSeconds = d.getSeconds();
+		 var pastSeconds = past.getSeconds();
+    	 if (dSeconds > pastSeconds || (dSeconds == 0) && (pastSeconds == 59)) {
+			 past = d;
+			 i--;
+			 timeText.text = i;
+			 stage.update();
+			 if (i < 1) {
+			 	createjs.Ticker.off("tick",timeTicker);
+				var player = getCurrentPlayer();
+				socket.emit("buttons", {remove: false, action: "fold"});
+				socket.emit("fold",{username: player});
+				socket.emit("current turn",{action: "fold", user: player});
+			 }
+         }
+    }
+	
+	
+	
 }
