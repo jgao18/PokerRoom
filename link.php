@@ -11,10 +11,8 @@ require __DIR__ . '/autoload.php';
 $username = $_COOKIE["user_cookie"];
 $chipAmount = $_COOKIE["chip_cookie"];
 $server = $_COOKIE["server_cookie"];
-$turingIP = 'http://192.168.1.97:3000';
-$turingIP2 = 'http://192.168.1.97:3999';
 
-// Checking if it's a turing server
+// If it IS a Turing server
 if (strpos($server, 'http://192.168.1.97:') !== FALSE) {
   $client = new Client(new Version1X($server)); // This does not like it if you include the backslash at the end of the address!
   
