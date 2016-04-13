@@ -19,7 +19,7 @@ var Player = function(id, username, chips, tableIndex, position)
 
   var getChips = function()
   {
-    return chips;
+    return chips*1;
   }
 
   var getTableIndex = function()
@@ -39,11 +39,11 @@ var Player = function(id, username, chips, tableIndex, position)
 
   var addChips = function(numChips)
   {
-    chips += numChips;
+    chips = chips*1 + numChips;
   }
   
   var deleteChips = function(numChips) {
-	chips -= numChips;
+	chips = chips *1 - numChips;
   }
 
   var setTableIndex = function(index)

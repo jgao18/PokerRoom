@@ -127,19 +127,19 @@ function retrieveUsername(data)
 
 function retrieveChipAmount(data)
 {
+  util.log("RETRIEVING CHIP AMOUNT!" + data[0]);
   latestPlayerChipAmount = data[0];
-  util.log(latestPlayerChipAmount);
 }
 
 // Called by sockets when they hit the Play button
 function onNewPlayer(data) {
 
   util.log("Found a new player!" + data.username)
-
+  
+  
   var i, existingPlayer;
   // Stores each user's sockets by username
   userSockets.push({username: latestPlayerUsername, socket: this });
-
 
   var newPlayer = new Player(this.id, latestPlayerUsername, latestPlayerChipAmount, connectedPlayers.length);
 
@@ -242,45 +242,48 @@ function buttons(data) {
 }
 
 function amountChanged(data) {
-	this.emit("change amount",{username: data.id, chips: data.chips});
-	this.broadcast.emit("change amount",{username: data.id, chips: data.chips});
+  util.log("amount changed " + data.id + " // " + data.chips);
+  this.emit("change amount",{username: data.id, chips: data.chips});
+  this.broadcast.emit("change amount",{username: data.id, chips: data.chips});
 }
 
 // Enters this phase once players press the Ready Button
 function firstTurn(data) {
-	util.log("Ended in firstTurn");
+  util.log("Ended in firstTurn");
 
-	gameStage = 0; // preflop
-	playingPlayers = connectedPlayers.slice();
-    currentHandPlayers = connectedPlayers.slice();
-	indexPlayer = 0;
-	numTimesAccess++;
-	util.log("numTimesAccess is " + numTimesAccess);
-	util.log("curentHandPlayers is " + currentHandPlayers.length);
-	// Until all users press the ready
-	if ( numTimesAccess == currentHandPlayers.length) {
+  gameStage = 0; // preflop
+  playingPlayers = connectedPlayers.slice();
+  currentHandPlayers = connectedPlayers.slice();
+  indexPlayer = 0;
+  numTimesAccess++;
+  
+  util.log("numTimesAccess is " + numTimesAccess);
+  util.log("curentHandPlayers is " + currentHandPlayers.length);
+  
+  // Until all users press the ready
+  if ( numTimesAccess == currentHandPlayers.length) {
 
-		if (playingPlayers[indexPlayer].getUsername() == userSockets[0].username) {
-			console.log("This is the future!!!!!!!!!");
-			indexPlayer++;
-		}
+    if (playingPlayers[indexPlayer].getUsername() == userSockets[0].username) {
+      indexPlayer++;
+    }
 
-		util.log("Inside the first turn");
-		numTimesAccess = 0;
-		// Accesses the first client that enters the room
-		console.log("This is the userSocket[0].socket :" + userSockets[0].username);
-		var userSocket = userSockets[0].socket;
-		userSocket.emit("add buttons");
-		userSocket.emit("signal", {username: userSockets[0].username});
-		for(var i = 1; i < userSockets.length; i++) {
-			userSocket = userSockets[i].socket;
-			userSocket.emit("signal", {username: userSockets[0].username});
-		}
+    util.log("Inside the first turn");
+    numTimesAccess = 0;
+    // Accesses the first client that enters the room
+    console.log("This is the userSocket[0].socket :" + userSockets[0].username);
+    var userSocket = userSockets[0].socket;
+    userSocket.emit("add buttons");
+    
+    userSocket.emit("signal", {username: userSockets[0].username});
+    for(var i = 1; i < userSockets.length; i++) {
+      userSocket = userSockets[i].socket;
+      userSocket.emit("signal", {username: userSockets[0].username});
+    }
 
-		// Removes the first player from the remaining round players
-		playerTurn = currentHandPlayers[0];
-		currentHandPlayers.splice(0, 1);
-	}
+    // Removes the first player from the remaining round players
+    playerTurn = currentHandPlayers[0];
+    currentHandPlayers.splice(0, 1);
+  }
 }
 
 // Removes the player from the round
@@ -516,34 +519,34 @@ function currentTurn(data) {
 
 function startGame() {
 
-	readyPlayers++;
+  readyPlayers++;
 
-	util.log("ready # " + readyPlayers);
-	util.log("connected # " + connectedPlayers.length);
+  util.log("ready # " + readyPlayers);
+  util.log("connected # " + connectedPlayers.length);
 
-	deck = new Deck();
-	deck.get_new_deck();
+  deck = new Deck();
+  deck.get_new_deck();
 
-	if (readyPlayers == connectedPlayers.length) {
-		roundOver = false;
-		readyPlayers = 0;
-        for (i = 0; i < connectedPlayers.length; i++)
-        {
-        	var userSocket = userSockets[i].socket;
-        	var card1 = deck.draw_card();
-        	var user = connectedPlayers[i].getUsername();
-        	card1.set_owner(user);
-      	    var card2 = deck.draw_card();
-            card2.set_owner(user);
-            playerCards.push(card1, card2);
-            userSocket.emit("client cards", {owner: user, value1 : card1.get_value(), suit1 : card1.get_suit(), value2 : card2.get_value(), suit2 : card2.get_suit()});
-        }
+  if (readyPlayers == connectedPlayers.length) {
+    roundOver = false;
+    readyPlayers = 0;
+    for (i = 0; i < connectedPlayers.length; i++)
+    {
+      var userSocket = userSockets[i].socket;
+      var card1 = deck.draw_card();
+      var user = connectedPlayers[i].getUsername();
+      card1.set_owner(user);
+      var card2 = deck.draw_card();
+      card2.set_owner(user);
+      playerCards.push(card1, card2);
+      userSocket.emit("client cards", {owner: user, value1 : card1.get_value(), suit1 : card1.get_suit(), value2 : card2.get_value(), suit2 : card2.get_suit()});
+    }
 
-        tableCards = [deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card()];
+  tableCards = [deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card()];
 
-		this.emit("start game");
-		this.broadcast.emit("start game");
-	}
+  this.emit("start game");
+  this.broadcast.emit("start game");
+  }
 };
 
 function playerLeft(data) {

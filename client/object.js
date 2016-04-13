@@ -393,29 +393,33 @@ function raiseAmount() {
 	// Once the user presses the button, then bet amount will go into the pot
 	var bet_button = new button(460,445,35,18,"bet", "yellow",10);
 	bet_button.addEventListener("click", function(event) {
-		
-		var done_raising = game_menu.getChildByName("raise_amount");
-		game_menu.removeChild(done_raising);
-		var store = getAmountBet();
-        var lastBet = getLastUserBet();
-		var diffAmount = store - lastBet;
-		var highBet = getAmountBet();
-		console.log("This is the high bet right now: " + highBet);
-       
-		//removePlayerChips(diffAmount);
+	  
+	  var done_raising = game_menu.getChildByName("raise_amount");
+	  game_menu.removeChild(done_raising);
+	  var store = getAmountBet();
+	  var lastBet = getLastUserBet();
+	  var diffAmount = store - lastBet;
+	  var highBet = getAmountBet();
+	  console.log("This is the high bet right now: " + highBet);
 
-		var currentChips = getPlayerChips() - diffAmount;
-		var player = getCurrentPlayer();
-		
-		var bet;
-		if (bet = stage.getChildByName("bet_amount")) {
-			stage.removeChild(bet);
-		}
+	  //removePlayerChips(diffAmount);
 
-		socket.emit("changed amount", {id: player, chips: currentChips});
-		socket.emit("increase pot", {chips: diffAmount, amount: store});
-		socket.emit("current turn", {action: "raise", user: player, amount: highBet});
-		socket.emit("buttons", {remove: false});
+	  var currentChips = getPlayerChips() - diffAmount;
+	  var player = getCurrentPlayer();
+	  
+	  var bet;
+	  if (bet = stage.getChildByName("bet_amount")) {
+		  stage.removeChild(bet);
+	  }
+	  
+	  console.log("changed amount current chips " + currentChips);
+	  console.log("diff amount chips (pot) " + diffAmount);
+	  console.log("high bet " + highBet);
+
+	  socket.emit("changed amount", {id: player, chips: currentChips});
+	  socket.emit("increase pot", {chips: diffAmount, amount: store});
+	  socket.emit("current turn", {action: "raise", user: player, amount: highBet});
+	  socket.emit("buttons", {remove: false});
 	})
 
 	raise_amount.addChild(one,five,ten,twenty,hundred,bet_button);

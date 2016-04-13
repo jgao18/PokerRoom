@@ -139,8 +139,9 @@ function sortCards(cards) {
 	var valueList = [];
 	var pointList = [];
 	
+	console.log("THIS IS THE CARDS LENGTH" + cards.length);
 	for (var i = 0; i < cards.length; i++) {
-		//console.log(cards[i]);
+		console.log("CARDS OF I" + cards[i]);
 		valueList.push(cards[i].get_value());
 	}
 	
