@@ -21,6 +21,10 @@ var Player = function(id, username, chips, tableIndex, position)
   {
     return chips;
   }
+  
+  var getId = function() {
+	return id;
+  }
 
   var getTableIndex = function()
   {
@@ -71,6 +75,7 @@ var Player = function(id, username, chips, tableIndex, position)
 		getUsername: getUsername,
 		getPassword: getPassword,
     	getChips: getChips,
+	    getId: getId,
     	getTableIndex: getTableIndex,
 		setUsername: setUsername,
 		setPassword: setPassword,

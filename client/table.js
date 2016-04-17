@@ -18,6 +18,7 @@ var lastUserBet = 0;
 var lastBetAmount = 0;
 var pot_amount = 0;
 var positions = {};
+// good
 var card1;
 var card2;
 var tableCard1;
@@ -59,10 +60,6 @@ function setLastUserBet(data) {
 function getLastUserBet() {
 	return lastUserBet;
 }
-
-/*function setCurrentUserBet(data) {
-	currentUserBet = data.chips;
-}*/
 
 function getPotAmount() {
 	return pot_amount;
@@ -140,7 +137,7 @@ function game_init() {
 	{
 		currentPlayers.push(new Player());
 	}
-
+	console.log("This is the lenght of currentPlayers: " + currentPlayers.length);
 	// Changes the pace of the Tickers
 	createjs.Ticker.timingMode = createjs.Ticker.RAF;
 	createjs.Ticker.setFPS(40);
@@ -165,9 +162,12 @@ function otherCardsFunction(data) {
 	// Inserts new card objects by using the server information
 	for (i = 0; i < inputPlayerCards.length; i++)
 	{
+		console.log("This is the value: " + inputPlayerCards[i].value + " suit: "+ inputPlayerCards[i].suit + " owner: "+ inputPlayerCards[i].owner);
 		temp.push(new Card(inputPlayerCards[i].value, inputPlayerCards[i].suit, inputPlayerCards[i].owner))
 	}
 
+	console.log("This is card1 value: " + card1.get_value());
+	console.log("This is card2 value: " + card2.get_value());
 	// Pushes all other cards from the temp list into a global list
 	for (i = 0; i < temp.length; i++)
 	{
@@ -175,6 +175,7 @@ function otherCardsFunction(data) {
 		{
 			if ( (temp[i].get_suit() != card2.get_suit()) || (temp[i].get_value() != card2.get_value()) )
 			{
+				console.log("WEEEEEEEEEEEEEE");
 				otherCards.push(temp[i]);
 			}
 		}
@@ -184,6 +185,9 @@ function otherCardsFunction(data) {
 // produces the player cards
 function assignCards(data)
 {
+	console.log("This is the assign value: " + data.value1);
+	console.log("This is the assign suit: " + data.suit1);
+	console.log("This is the data.owner: " + data.owner);
 	card1 = new Card(data.value1, data.suit1, data.owner);
 	card2 = new Card(data.value2, data.suit2, data.owner);
 }
@@ -215,14 +219,14 @@ function onSocketConnected() {
 function onNewPlayer(data)
 {
   // The server sends a list of players to the client
-  playerList = data;
-
+  var playerList = data;
+  console.log(playerList);
   for (i = 0; i < playerList.length; i++)
   {
 	// Makes a new player with current iteration information
     var existingPlayer = new Player(playerList[i].id, playerList[i].username, playerList[i].chips, playerList[i].index);
 	// If player is a connected user
-    if (existingPlayer.getUsername() != "INVALID_USER")
+    if (existingPlayer.getId() != undefined)
     {
 	  // If the stored player is the client player
       if (existingPlayer.getUsername() == currentPlayer.getUsername())
@@ -232,11 +236,14 @@ function onNewPlayer(data)
         clientAmounts("main",currentPlayer.getUsername(), currentPlayer.getChips());
       }
 	  // If not the current client then store it an list with its tableIndex
+	  console.log(existingPlayer);
       currentPlayers[existingPlayer.getTableIndex()] = existingPlayer;
     }
   }
 
+  console.log(currentPlayers);
   var localIndex = currentPlayer.getTableIndex();
+  console.log(localIndex);
   var nextPlayerIndex;
   var nextPlayerIterator = 0;
   positions[currentPlayer.getUsername()] = "main";
@@ -247,18 +254,20 @@ function onNewPlayer(data)
     nextPlayerIterator++;
 	// Provides the location of each connected client to the screen using
     nextPlayerIndex = (localIndex + nextPlayerIterator) % currentPlayers.length;
-    var user = currentPlayers[nextPlayerIndex].getUsername();
-	console.log(user);
+    var user = currentPlayers[nextPlayerIndex];
+	//console.log(user);
 	// If player is a connected user
-    if ((user != "INVALID_USER") && (user != currentPlayer.getUsername()))
+    if ((user.getId() != undefined) && (user.getUsername() != currentPlayer.getUsername()))
     {
+	  console.log("This is nextPlayerIndex: " + nextPlayerIndex);
+	  console.log("This is i: " + i);
 	  // Draw that player location
 	  console.log("This is the user: " + currentPlayers[nextPlayerIndex].getUsername());
       drawPlayerAt(nextPlayerIndex, i);
     }
   }
 
-  // When called, number of players is increased
+  // How many players are in the game
   numPlayers++;
 
 }
@@ -342,7 +351,7 @@ function passingCards() {
 }
 
 
-// Removes the left player from the current list of players
+// Removes a player from the current list of players
 function onRemovePlayer(data) {
   var i;
   for (i = 0; i < currentPlayers.length; i++ )
@@ -352,14 +361,7 @@ function onRemovePlayer(data) {
 	  console.log("Someone left");
 	  var username = currentPlayers[i].getUsername();
 	  console.log("This user is: " + username);
-	  /*if(username = game_menu.getChildByName(username)) {
-	  	  game_menu.removeChild(username);
-	  }*/
-	  // get the position of the player and erase him from the stage
-      //currentPlayers.splice(i, 1);
 	  var position = positions[username];
-	  console.log("This user is: " + username);
-	  console.log("The position is: " + position);
 	  var chip, card1, card2, action;
 	  switch (position) {
 	  	case "left":
@@ -387,6 +389,8 @@ function onRemovePlayer(data) {
 	  stage.removeChild(card1, card2, action);
 	  stage.update();
 	  currentPlayers.splice(i, 1);
+	  currentPlayers.push(new Player());
+	  console.log(positions);
 	  delete positions[username];
     }
   }
@@ -404,6 +408,7 @@ function drawPlayerAt(playerIndex, indexAfterLocal)
   }
   else if (indexAfterLocal == 1)
   {
+	  console.log("SOMEONE IS BACK PLAYER WTF");
     clientAmounts("back", currentPlayers[playerIndex].getUsername(), currentPlayers[playerIndex].getChips());
 	positions[currentPlayers[playerIndex].getUsername()] = "back";
   }
@@ -941,29 +946,37 @@ function nextAction() {
 			newTurn();
 			var cardList = ["rCard1","rCard2","lCard1","lCard2","bCard1","bCard2"];
 			var placement = [20,300,80,300,615,300,675,300,310,90,370,90];
+			var i = 0;
 			var j = 0;
 
 			for (var username in positions)
 			{
 				var card1, card2;
+				console.log(positions);
 				if (positions[username] == "right")
 				{
+					console.log("These are the username: " + username);
 					card1 = stage.getChildByName("rCard1");
 					card2 = stage.getChildByName("rCard2");
 
 					var tempOtherCards = [];
 					for (i = 0; i < otherCards.length; i++)
 					{
+						console.log("This is the owner of otherCards: " + otherCards[i].get_owner());
 						if (otherCards[i].get_owner() == username)
 						{
+							console.log("This is otherCards: " + otherCards[i]);
 							tempOtherCards.push(otherCards[i]);
 						}
 					}
+					console.log("This is first card: " + tempOtherCards[0]);
+					console.log("This is second card: " + tempOtherCards[1]);
 					flip(card1, tempOtherCards[0], 20, 300);
 					flip(card2, tempOtherCards[1], 80, 300);
 				}
 				if (positions[username] == "left")
 				{
+					console.log("These are the username: " + username);
 					card1 = stage.getChildByName("lCard1");
 					card2 = stage.getChildByName("lCard2");
 
@@ -980,6 +993,7 @@ function nextAction() {
 				}
 				if (positions[username] == "back")
 				{
+					console.log("These are the username: " + username);
 					card1 = stage.getChildByName("bCard1");
 					card2 = stage.getChildByName("bCard2");
 
