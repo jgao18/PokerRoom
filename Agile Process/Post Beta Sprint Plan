@@ -1,0 +1,25 @@
+- Implement proper client disconnects (Joey, Jessie) [40]
+
+- UI Design 
+  - Buttons more button-y (Jessie) [3]
+  - Bigger buttons (Jessie) [3]
+  - Betting system, e.g. slider, 1/2 pot, full pot (Joey) [20]
+  - Screen size, e.g. fullscreen (Joey) [3]
+  
+- Update database on client disconnects (Joey, Bikram) [20]
+
+- Turn timer (Jessie) [13]
+
+- Don't let people join if server is full (Joey) [8]
+
+- Instructions (Jake) [3]
+
+- Daily reward for logging in (Bikram) [13]
+
+- Sound, Mute (Jake) [13]
+
+- Kick people out at $0 (Jessie) [13]
+
+- Bugfixes
+  - Proper turn order (Jessie) [8]
+  - Dollar amounts getting set to $null (Joey) [?]

@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS `holdemRooms`;
+ CREATE TABLE `holdemRooms` (   `id` int(11) NOT NULL AUTO_INCREMENT,   `roomName` varchar(255) NOT NULL,   `roomIP` varchar(255) NOT NULL,   PRIMARY KEY (`id`) ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;                                                                                                                       

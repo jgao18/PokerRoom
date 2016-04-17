@@ -32,6 +32,17 @@ var roundOver = false;
 var indexPlayer = 1;
 var gameStage = 0;
 var game_in_progress = false;
+var usernames;
+
+var localUserNames = ["res_Homer", "res_Bart", "res_Marge", "res_Lisa"]
+var localUserCount = 0;
+
+var latestPlayerUsername = localUserNames[localUserCount];
+var latestPlayerChipAmount = 1000;
+
+var deck;
+var playerCards;
+var tableCards;
 
 function init() {
   // initialize variables once server starts
@@ -46,36 +57,55 @@ function init() {
 
   app.get('/*', function(req, res){
     var file = req.params[0];
+        util.log(file);
+
       //Send the requesting client the file.
      res.sendFile( __dirname + '/client/' + file );
+
    });
 
+  app.get('/*', function(req, res){
+    var file = req.params[0];
+    util.log(file);
+    if (file == "link.php")
+      res.sendFile( __dirname + file );
+
+   });
+
+
   io.on('connection', function (socket) {
-    socket.emit('welcome', { message: 'Welcome to the poker room, client!' });
 
-		socket.on("new player", onNewPlayer);
+  socket.on("new player", onNewPlayer);
 
-		socket.on("disconnect", onsocketDisconnect);
+  socket.on("disconnect", onsocketDisconnect);
+  socket.emit('welcome', { message: latestPlayerUsername + " " + latestPlayerChipAmount });
 
-		// When socket presses ready button
-		socket.on("ready", startGame);
+  socket.on('linkUsername', retrieveUsername);
+  socket.on('linkChipAmount', retrieveChipAmount);
+  socket.on('disconnectLink', function (data) { util.log(this.id) ; io.sockets.connected[this.id].disconnect(); });
+	
+    // When socket presses ready button
+    socket.on("ready", startGame);
 
-		// Indicates the turn for the user
-		socket.on("current turn", currentTurn);
+    // When socket presses the leave button
+    socket.on("leave", playerLeft);
 
-		// Once players press the Ready Button
-		socket.on("first turn", firstTurn);
+    // Indicates the turn for the user
+    socket.on("current turn", currentTurn);
 
-		socket.on("buttons", buttons);
+	socket.on("buttons", buttons);
 
-		socket.on("fold", fold);
+	socket.on("fold", fold);
 
-		socket.on("call", currentTurn);
+	socket.on("call", currentTurn);
+		
+    // Once players press the Ready Button
+    socket.on("first turn", firstTurn);
 
-		// Once players bet
-		socket.on("increase pot", potIncrease);
+    // Once players bet
+    socket.on("increase pot", potIncrease);
 
-		socket.on("changed amount", amountChanged);
+    socket.on("changed amount", amountChanged);
   });
 
     // Thanks to the Nick/the PoP team for helping with this code
@@ -94,6 +124,18 @@ function restartPlayerList() {
 function amountChanged(data) {
 	this.emit("change amount",{username: data.id, chips: data.chips});
 	this.broadcast.emit("change amount",{username: data.id, chips: data.chips});
+}
+
+function retrieveUsername(data)
+{
+  latestPlayerUsername = data[0];
+  util.log(latestPlayerUsername);
+}
+
+function retrieveChipAmount(data)
+{
+  util.log("RETRIEVING CHIP AMOUNT!" + data[0]);
+  latestPlayerChipAmount = data[0];
 }
 
 // Increases the pot amount and player's amount
@@ -196,11 +238,11 @@ function buttons(data) {
 	
 	// Retract to the previous index
     if (data.action == "fold") {
-		if(indexPlayer > 0 && indexPlayer < playingPlayers.length) {
-			indexPlayer--;
-		}
+    	if(indexPlayer > 0 && indexPlayer < playingPlayers.length) {
+    		indexPlayer--;
+    	}
     }
-	
+
 	// If the index is out of bounds then revert to 0
 	if (indexPlayer >= playingPlayers.length) {
 		indexPlayer = 0;
@@ -283,7 +325,7 @@ function firstTurn(data) {
 function currentTurn(data) {
 	
 	var gameStages = ["preflop","flop", "turn", "river", "postriver"];
-	
+
  	if (data.action == "raise") {
  		// Make a new list with all players
  		currentHandPlayers = playingPlayers.slice();
@@ -294,7 +336,7 @@ function currentTurn(data) {
  			}
  		}
  	}
-	
+
 	// If all player decided their action for the turn
 	if (currentHandPlayers.length == 0) {
 		currentHandPlayers = playingPlayers.slice();
@@ -327,14 +369,15 @@ function currentTurn(data) {
 				var totalCards = tableCards.slice();
 				var times = 0;
 				var result;
-				
+
 				// Puts each user cards inside a dictionary {user: {Card1: Card2:}}
 				for (var i = 0; i < usernames.length; i++) {
 					playerHands[usernames[i]] = {"Card1": playerCards[times], "Card2": playerCards[times+1]};
 					times += 2;
 				}
-				
+
 				times = 0;
+
 				// Push a dictionary int to the card list with information of each card
 			    for (var i = 0; i < playerCards.length; i++)
 			    {
@@ -344,55 +387,56 @@ function currentTurn(data) {
 			         // Pushing the card value into the logic list
 					 totalCards.push(playerCards[i]);
 					 times++;
-					 
+
 					 if (times == 2) {
-						// What hand the player has
-						result = Logic.determineHand(totalCards);
+						result = Logic.determineWinner(totalCards);
 						// Stores the results of each user
 						userResults[playerCards[i].get_owner()] = result;
-						// Restart the card list 
+						// Restart the card list
 						totalCards = tableCards.slice();
 						times = 0;
 					 }
 			    }
-				
+
 				// Iterate through the dictionary and see which is the higher result
 				var userPoints = {};
 				for (var i = 0; i < usernames.length; i++) {
+					util.log("len: " + usernames.length);
+					util.log("i: " + usernames[i]);
+
 					var str = userResults[usernames[i]];
-					
-					if (str.includes("Royal Flush")) {
+					if (str.indexOf("Royal Flush") >= 0) {
 						userPoints[usernames[i]] = 10;
 					}
-					else if(str.includes("Straight Flush")) {
+					else if(str.indexOf("Straight Flush") >= 0) {
 						userPoints[usernames[i]] = 9;
 					}
-					else if(str.includes("four of a kind")) {
+					else if(str.indexOf("four of a kind") >= 0) {
 						userPoints[usernames[i]] = 8;
 					}
-					else if(str.includes("Full House")) {
+					else if(str.indexOf("Full House") >= 0) {
 						userPoints[usernames[i]] = 7;
 					}
-					else if(str.includes("Flush")) {
+					else if(str.indexOf("Flush") >= 0) {
 						userPoints[usernames[i]] = 6;
 					}
-					else if(str.includes("Straight")) {
+					else if(str.indexOf("Straight") >= 0) {
 						userPoints[usernames[i]] = 5;
 					}
-					else if(str.includes("three of a kind")) {
+					else if(str.indexOf("three of a kind") >= 0) {
 						userPoints[usernames[i]] = 4;
 					}
-					else if(str.includes("two pair")) {
+					else if(str.indexOf("two pair") >= 0) {
 						userPoints[usernames[i]] = 3;
 					}
-					else if(str.includes("pair")) {
+					else if(str.indexOf("pair") >= 0) {
 						userPoints[usernames[i]] = 2;
 					}
-					else if(str.includes("High Card")) {
+					else if(str.indexOf("High Card") >= 0) {
 						userPoints[usernames[i]] = 1;
 					}
 				}
-			 
+
 				var addPoints;
 				var user1Cards = tableCards.slice();
 				var user2Cards = tableCards.slice();
@@ -415,7 +459,7 @@ function currentTurn(data) {
 						}
 					}
 				}
-				
+
 				// Decides the winner
 				var winner;
 				var high = 0;
@@ -437,7 +481,7 @@ function currentTurn(data) {
 			         var userSocket = userSockets[i].socket;
 			         userSocket.emit("other cards", outputPlayerCards);
 			    }
-				
+
 				// Restart the list
 			    playerCards = [];
 			 }
@@ -445,14 +489,14 @@ function currentTurn(data) {
 			 this.broadcast.emit("next action", gameStages[gameStage]);
 		 }
 	 }
-	
+
  	if (data.action == "raise") {
  		this.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
  		this.broadcast.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
 	}
 	else if (data.action == "call") {
- 		this.emit("player's action", {player: data.user, action: "called", amount: data.amount});
- 		this.broadcast.emit("player's action", {player: data.user, action: "called", amount: data.amount});
+ 		this.emit("player's action", {player: data.user, action: "checked/called", amount: data.amount});
+ 		this.broadcast.emit("player's action", {player: data.user, action: "checked/called", amount: data.amount});
  	}
 	else if (data.action == "fold") {
  		this.emit("player's action", {player: data.user, action: "folded", amount: 0});
@@ -469,6 +513,8 @@ function currentTurn(data) {
 function startGame() {
 
 	readyPlayers++;
+    util.log("ready # " + readyPlayers);
+    util.log("connected # " + connectedPlayers.length);
     
 	if (readyPlayers >= connectedPlayers.length) {
 		roundOver = false;

@@ -1,23 +1,33 @@
 <!DOCTYPE html>
+
 <html>
-	<script src="http://code.jquery.com/jquery-1.12.0.min.js"></script>
-	<!--<script type="text/javascript" src="/i.js"></script><script type="text/javascript">if(typeof(urchinTracker)=='function'){_uacct="UA-230305-2";_udn="none";_uff=false;urchinTracker();}</script>-->
-	<script type="text/javascript" src="http://edge.quantserve.com/quant.js"></script> 
-	<script type="text/javascript">_qacct="p-44naSaXtNJt26";quantserve();</script>
-	<head>
-			<title>Poker Room</title>
-			<link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
-			<script src="http://code.createjs.com/easeljs-0.8.1.min.js"></script>
-			<script src="https://code.createjs.com/soundjs-0.6.2.min.js"></script>
-			<script type="text/javascript" src="/socket.io/socket.io.js"></script>
-			<script src="table.js"></script>
-			<script src="Card.js"></script>
-			<script src="Deck.js"></script>
-			<script src="object.js"></script>
-			<script src="Player.js"></script>
-            <li><a href="../php/logout.php">Logout</a></li>	         		
-	</head>
-	<body onload="game_init()">
-		<canvas id="demoCanvas" width="750" height="650" style="background-color: green;"></canvas>
-	</body>
+  <script src="http://code.jquery.com/jquery-1.12.0.min.js"></script>
+  <!--<script type="text/javascript" src="/i.js"></script><script type="text/javascript">if(typeof(urchinTracker)=='function'){_uacct="UA-230305-2";_udn="none";_uff=false;urchinTracker();}</script>-->
+  <script type="text/javascript" src="http://edge.quantserve.com/quant.js"></script> 
+  <script type="text/javascript">_qacct="p-44naSaXtNJt26";quantserve();</script>
+  <head>
+
+    <title>Poker Room</title>
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
+    <script src="http://code.createjs.com/easeljs-0.8.1.min.js"></script>
+    <script src="https://code.createjs.com/soundjs-0.6.2.min.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script src="table.js"></script>
+    <script src="Card.js"></script>
+    <script src="Deck.js"></script>
+    <script src="object.js"></script>
+    <script src="Player.js"></script>
+        
+    <!--li><a href="../php/logout_button.php">Logout</a></li-->	
+  
+  </head>
+  
+  <body onload="game_init()">
+  
+  <canvas id="demoCanvas" width="750" height="650" style="background-color: green;"></canvas>
+  <li><a href="https://docs.google.com/forms/d/1uKd5YC1RJAhlTceCG7b_zu10_UXw53i_sJT50zh_tIE/viewform" target="_blank">Report bugs and leave feedback here!</li>
+
+  <!--?php include ("../php/logout_button.php"); ?-->
+  
+  </body>
 </html>

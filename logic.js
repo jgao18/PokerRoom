@@ -61,18 +61,18 @@ module.exports = {
 		var user2Value;
 		var i = 0;
 		
-		/* Looks for the highest pair between each player
-		   Works for pair/two pair/threeokakind/FullHouse/FourofKind */
-		if(isPairs(user1Cards) == "Y") {
-			for(i = 0; i < values.length; i++) {
-				if(user1Result.includes(values[i])) {
+		//What if we looked into the result string and find the values
+		//Need something for pair/two pair/threeokakind/FullHouse/FourofKind
+		if(isPairs(user1List) == "Y") {
+			for(var i = 0; i < values.length; i++) {
+				if(user1Results.indexOf(values[i]) >= 0) {
 					user1Value = keyDict[values[i]];
 					break;
 				}
 			}
 		
-			for(i = 0; i < values.length; i++) {
-				if(user2Result.includes(values[i])) {
+			for(var i = 0; i < values.length; i++) {
+				if(user2Results.indexOf(values[i]) >= 0) {
 					user2Value = keyDict[values[i]];
 					break;
 				}
@@ -114,6 +114,7 @@ function sortCards(cards) {
 
 	var pointList = [];
 	
+	console.log("THIS IS THE CARDS LENGTH" + cards.length);
 	for (var i = 0; i < cards.length; i++) {
 		pointList.push(keyDict[cards[i].get_value()]);
 	}
@@ -239,7 +240,8 @@ function whichFlush(cards) {
 
 // Finds the value that correspond to times
 function findValue(dict,keyList,times,extra) {
-	for(var i = keyList.length - 1; i => 0; i--) {
+	var lastIndex = keyList.length - 1;
+	for(var i = lastIndex; i >= 0; i--) {
 		if(dict[keyList[i]] == times && keyList[i] != extra) {
 			return keyList[i];
 		}

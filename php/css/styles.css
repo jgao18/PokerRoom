@@ -1,0 +1,28 @@
+body {
+    background-color: #fff;
+    color: #1B1B1B;
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;
+    margin-left: 50px;
+}
+label {
+    display: inline-block;
+    width: 5em;
+    text-align: right;
+}
+#create label {
+    width: 10em;
+}
+label[for=remember] {
+    width: auto;
+}
+label[for=color] {
+    display: inline;
+    width: auto;
+    text-align: left;
+}
+#register {
+    margin-left: 12.5em;
+}
+#revalidate {
+    margin-left: 6.5em;
+}

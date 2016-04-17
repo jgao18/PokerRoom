@@ -3,10 +3,10 @@
 
 <html lang="en">
 	<head>
-		<title>Poker Header</title>
+		<title>Poker Room</title>
 		<link href="public.css" media="all" rel="stylesheet" type="text/css" />
 	</head>
 	<body>
     <div id="header">
-      <h1>Poker Games</h1>
+      <h1>Poker Room</h1>
     </div>
