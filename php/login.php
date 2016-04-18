@@ -1,11 +1,6 @@
 <?php
 include ("init.php");
-//require_once ("db_connect.php");
-include ("AutoLogin.php");
 include ("header.php");
-
-
-//use Foundationphp\Sessions\AutoLogin;
 
 if (isset($_POST['login'])) {
     $username = trim($_POST['username']);
@@ -23,6 +18,25 @@ if (isset($_POST['login'])) {
             $autologin = new AutoLogin($db);
             $autologin->persistentLogin();
         }
+         //find the difference between current Date and last_login date
+        $stmt=$db->prepare('SELECT DATEDIFF(NOW(),last_login) FROM users WHERE username=:username');
+        $stmt->bindParam(':username', $username);
+        $stmt->execute();
+        $stored = $stmt->fetchColumn();
+         //check the number of days    
+            if($stored>0){
+            $sql= 'UPDATE users SET chipamount=chipamount+100 WHERE username=:username';
+            $stmt = $db->prepare($sql);
+            $stmt->bindParam(':username', $username);
+            $stmt->execute();}
+                    
+          //update users current date 
+        $sql= 'UPDATE users SET last_login=NOW() WHERE username=:username';
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':username', $username);
+        $stmt->execute();
+        
+       
         header('Location: lobby.php');
         exit;
     } else {
