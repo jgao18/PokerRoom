@@ -87,9 +87,6 @@ function init() {
     // When socket presses ready button
     socket.on("ready", startGame);
 
-    // When socket presses the leave button
-    socket.on("leave", playerLeft);
-
     // Indicates the turn for the user
     socket.on("current turn", currentTurn);
 
@@ -148,6 +145,10 @@ function potIncrease(data) {
 // Called by sockets when they hit the Play button
 function onNewPlayer(data) {
 	
+  if(connectedPlayers.length == maxPlayers) {
+	  return;
+  }
+	
    var i, existingPlayer;
    var j;
    var newPlayer;
@@ -155,7 +156,7 @@ function onNewPlayer(data) {
    var sortTablePlayers = [];
    
    // Stores each user's sockets by username in a list
-   userSockets.push({username: data.username, socket: this });
+   userSockets.push({username: latestPlayerUsername, socket: this });
 
    for(i = 0; i < connectedPlayers.length; i++) {
      if(connectedPlayers[i].getTableIndex() != i){
@@ -165,7 +166,7 @@ function onNewPlayer(data) {
 	 tableIndex += 1;
    }
    
-   newPlayer = new Player(this.id, data.username, data.chips, tableIndex);
+   newPlayer = new Player(this.id, latestPlayerUsername, latestPlayerChipAmount, tableIndex);
    if(game_in_progress){
      waitList.push(newPlayer);
 	 return;
@@ -208,7 +209,10 @@ function onNewPlayer(data) {
    this.broadcast.emit("new player", outputArray);
    this.emit("ready");
    playersReady++;
-
+   
+   localUserCount+=1;
+   latestPlayerUsername = localUserNames[localUserCount];
+   
 };
 
 // Provides the turn signal and buttons
@@ -389,7 +393,7 @@ function currentTurn(data) {
 					 times++;
 
 					 if (times == 2) {
-						result = Logic.determineWinner(totalCards);
+						result = Logic.determineHand(totalCards);
 						// Stores the results of each user
 						userResults[playerCards[i].get_owner()] = result;
 						// Restart the card list
