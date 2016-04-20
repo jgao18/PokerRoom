@@ -29,8 +29,8 @@ if (isset($_POST['register'])) {
                     // Generate a random 8-character user key and insert values into the database
                     $chipamount = 1000;
                     $user_key = hash('crc32', microtime(true) . mt_rand() . $username);
-                    $sql = 'INSERT INTO users (user_key, username, pwd,chipamount)
-                            VALUES (:key, :username, :pwd, :chipamount)';
+                    $sql = 'INSERT INTO users (user_key, username, pwd,chipamount,last_login)
+                            VALUES (:key, :username, :pwd, :chipamount,NOW())';
                     $stmt = $db->prepare($sql);
                     $stmt->bindParam(':key', $user_key);
                     $stmt->bindParam(':username', $username);
