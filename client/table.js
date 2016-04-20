@@ -328,21 +328,22 @@ function passingCards() {
 	localIndex = currentPlayer.getTableIndex();
 	var nextPlayerIndex;
 	var nextPlayerIterator = 0;
+	console.log(currentPlayers);
 
 	// Extracts each player's position and passes the cards to them
-	for(var i = 0; i < maxPlayers - 1; i++) {
+	for(var i = 0; i < maxPlayers; i++) {
 		nextPlayerIterator++;
 		nextPlayerIndex = (localIndex + nextPlayerIterator) % currentPlayers.length;
-	    if (currentPlayers[nextPlayerIndex].getUsername() != "INVALID_USER")
+	    if (currentPlayers[i].getUsername() != "INVALID_USER" && currentPlayers[i].getUsername() != currentPlayer)
 	    {
-			switch(i) {
-				case 0:
+			switch(positions[currentPlayers[i].getUsername()]) {
+				case "right":
 					cardsToRight();
 					break;
-				case 1:
+				case "back":
 					cardsToBack();
 					break;
-				case 2:
+				case "left":
 					cardsToLeft();
 					break;
 			}
@@ -407,7 +408,7 @@ function drawPlayerAt(playerIndex, indexAfterLocal)
   }
   else if (indexAfterLocal == 1)
   {
-	  console.log("SOMEONE IS BACK PLAYER WTF");
+	console.log("SOMEONE IS BACK PLAYER WTF");
     clientAmounts("back", currentPlayers[playerIndex].getUsername(), currentPlayers[playerIndex].getChips());
 	positions[currentPlayers[playerIndex].getUsername()] = "back";
   }
