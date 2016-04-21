@@ -28,16 +28,15 @@ var gameStage = 0;
 var gameStages = ["preflop","flop", "turn", "river", "postriver"];
 var usernames;
 
-var localUserNames = ["res_Homer", "res_Bart", "res_Marge", "res_Lisa"]
+var localUserName = "Player_"; //s = ["Player1", "Player2", "Player3", "Player4"]
 var localUserCount = 0;
 
-var latestPlayerUsername = localUserNames[localUserCount];
+var latestPlayerUsername = localUserName + localUserCount; //localUserNames[localUserCount];
 var latestPlayerChipAmount = 1000;
 
 var deck;
 var playerCards;
 var tableCards;
-
 
 function init() {
   // initialize variables once server starts
@@ -135,8 +134,8 @@ function retrieveChipAmount(data)
 function onNewPlayer(data) {
 
   util.log("Found a new player!" + data.username)
-  
-  
+
+
   var i, existingPlayer;
   // Stores each user's sockets by username
   userSockets.push({username: latestPlayerUsername, socket: this });
@@ -181,7 +180,7 @@ function onNewPlayer(data) {
   }
 
   localUserCount+=1;
-  latestPlayerUsername = localUserNames[localUserCount];
+  latestPlayerUsername = localUserName + localUserCount;// localUserNames[localUserCount];
 
 };
 
@@ -256,10 +255,10 @@ function firstTurn(data) {
   currentHandPlayers = connectedPlayers.slice();
   indexPlayer = 0;
   numTimesAccess++;
-  
+
   util.log("numTimesAccess is " + numTimesAccess);
   util.log("curentHandPlayers is " + currentHandPlayers.length);
-  
+
   // Until all users press the ready
   if ( numTimesAccess == currentHandPlayers.length) {
 
@@ -273,7 +272,7 @@ function firstTurn(data) {
     console.log("This is the userSocket[0].socket :" + userSockets[0].username);
     var userSocket = userSockets[0].socket;
     userSocket.emit("add buttons");
-    
+
     userSocket.emit("signal", {username: userSockets[0].username});
     for(var i = 1; i < userSockets.length; i++) {
       userSocket = userSockets[i].socket;

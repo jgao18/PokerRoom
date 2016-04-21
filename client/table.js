@@ -741,12 +741,8 @@ function serverPot(data) {
 // This function will be called to accumulate the amount
 // of money the player is betting.
 function betAmount(amount) {
-  
-  console.log("AMOUNT!!!" + amount);
-  console.log("AMOUNTBET!!!" + amountBet);
-
   // Will not go over current player amount
-  if ((amount + amountBet) <= currentPlayer.getChips()) {
+  //if ((amount + amountBet) <= currentPlayer.getChips()) {
 
     // Erase the current bet amount
     var bet;
@@ -755,14 +751,15 @@ function betAmount(amount) {
     }
 
     // Creates the new amount
-    amountBet += amount;
+    //amountBet += amount;
     var bet_amount = new createjs.Text("Bet: $" + amountBet, "16px Bembo", "#FFFF00");
+		console.log("GOT HERE!")
     bet_amount.name = "bet_amount";
-    bet_amount.x = 180;
+    bet_amount.x = 220;
     bet_amount.y = 445;
     stage.addChild(bet_amount);
     stage.update();
-  }
+  //}
 }
 
 // Provides the username and the user amount for each player
@@ -1135,7 +1132,7 @@ function addCallandFoldButton() {
 function addButtonContainer() {
 	var user_buttons = new createjs.Container();
 	user_buttons.name = "buttons";
-	var user_raise = raiseButton();
+	var user_raise = raiseButton(currentPlayer.getChips());
 	var user_call = callButton();
 	var user_fold = foldButton();
 	user_call.name = "call_button";
