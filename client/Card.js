@@ -1,5 +1,4 @@
 // Card Class - used by Deck
-// This is a test comment
 function Card(value, suit, owner, sm, font, width, height, strokeColor, strokeThickness, backFillColor, frontFillColor)
 {
   this.value = value;
