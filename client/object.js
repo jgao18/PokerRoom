@@ -296,14 +296,6 @@ function raiseButton(maxChips) {
     raise_button = new button(345,475,50,18,"raise", "yellow",10);
 
     raise_button.addEventListener("click", function(event) {
-  		var show;
-
-  		// Restarts the betting amount
-  		//if ((show = stage.getChildByName("bet_amount"))) {
-  			//setHighBet(0);
-  			//stage.removeChild(show);
-  		//}
-
   		// If user wants to get out of the raise options, then press raise again
   		if ((show = game_menu.getChildByName("raise_container"))) {
   			game_menu.removeChild(show);
@@ -311,10 +303,7 @@ function raiseButton(maxChips) {
   		}
   		else {
   			removeCallandFoldButton();
-  			//setHighBet(0);
-  			//betAmount(1);
   			showRaiseContainer(maxChips);
-  			//betAmount(getTotalBet());
   		}
 	})
 	return raise_button;
@@ -375,17 +364,16 @@ function showRaiseContainer(maxChips) {
   raise_container.name = "raise_container";
 
   // Bet amount text
-  console.log("the current total bet is: " + getTotalBet())
-  var totalBetIncremented = getTotalBet() + 1;
+  var amountBetIncremented = getTotalBet() + 1;
 
-  bet_amount = new createjs.Text("$" + totalBetIncremented, "16px Bembo", "#FFFF00");
+  bet_amount = new createjs.Text("$" + amountBetIncremented, "16px Bembo", "#FFFF00"); // global variable
   bet_amount.name = "bet_amount";
   bet_amount.x = 238;
   bet_amount.y = 445;
   raise_container.addChild(bet_amount);
 
   // Slider
-  var raise_slider = new Slider(totalBetIncremented*1, maxChips*1, 150,15).set({x: 290, y: 445, value: 1});
+  var raise_slider = new Slider(amountBetIncremented*1, maxChips*1, 150,15).set({x: 290, y: 445, value: 1});
   raise_slider.trackColor = "purple";
   raise_slider.thumbColor = "#FFFF00";
   raise_slider.on("change", handleSliderChange, this);
@@ -395,102 +383,24 @@ function showRaiseContainer(maxChips) {
   var bet_button = new button(460,445,35,18,"bet", "yellow",10);
   bet_button.addEventListener("click", function(event) {
 
-    //var done_raising = game_menu.getChildByName("raise_amount");
-    //game_menu.removeChild(done_raising);
     game_menu.removeChild(game_menu.getChildByName("raise_container"));
+
     var currentBetAmount = parseInt(bet_amount.text.substr(1));
     var lastBet = getLastUserBet();
     var diffAmount = currentBetAmount - lastBet;
     setAmountBet(getAmountBet() + currentBetAmount);
-    console.log("Setting the bet amount now: " + getAmountBet());
 
     var currentChips = getPlayerChips() - diffAmount;
     var player = getCurrentPlayer();
-
-    //var bet;
-    //if (bet = stage.getChildByName("bet_amount")) {
-    //  stage.removeChild(bet);
-    //}
-
-    console.log("changed amount current chips " + currentChips);
-    console.log("diff amount chips (pot) " + diffAmount);
-    console.log("the total bet is " + getTotalBet());
-
     socket.emit("changed amount", {id: player, chips: currentChips});
     socket.emit("increase pot", {chips: diffAmount, amount: currentBetAmount});
-    socket.emit("current turn", {action: "raise", user: player, amount: getTotalBet()});
+    socket.emit("current turn", {action: "raise", user: player, amount: currentBetAmount});
     socket.emit("buttons", {remove: false});
   })
   raise_container.addChild(bet_button);
 
   addToGame(raise_container);
   stage.update();
-  /*
-	var raise_amount = new createjs.Container();
-
-	/* Different button options
-
-	var one = new button(260,445,35,18,"1", "yellow",10);
-	one.addEventListener("click", function(event) {
-		betAmount(1);
-	})
-
-	var five = new button(300,445,35,18,"5", "yellow",10);
-	five.addEventListener("click", function(event) {
-    	betAmount(5);
-	})
-
-	var ten = new button(340,445,35,18,"10", "yellow",10);
-	ten.addEventListener("click", function(event) {
-  	    betAmount(10);
-	})
-
-	var twenty = new button(380,445,35,18,"20", "yellow",10);
-	twenty.addEventListener("click", function(event) {
-        betAmount(20);
-	})
-
-	var hundred = new button(420,445,35,18,"100", "yellow",10);
-	hundred.addEventListener("click", function(event) {
-        betAmount(100);
-	})
-
-	// Once the user presses the button, then bet amount will go into the pot
-	var bet_button = new button(460,445,35,18,"bet", "yellow",10);
-	bet_button.addEventListener("click", function(event) {
-
-	  var done_raising = game_menu.getChildByName("raise_amount");
-	  game_menu.removeChild(done_raising);
-	  var store = getAmountBet();
-	  var lastBet = getLastUserBet();
-	  var diffAmount = store - lastBet;
-	  var highBet = getAmountBet();
-	  console.log("This is the high bet right now: " + highBet);
-
-	  //removePlayerChips(diffAmount);
-
-	  var currentChips = getPlayerChips() - diffAmount;
-	  var player = getCurrentPlayer();
-
-	  var bet;
-	  if (bet = stage.getChildByName("bet_amount")) {
-		  stage.removeChild(bet);
-	  }
-
-	  console.log("changed amount current chips " + currentChips);
-	  console.log("diff amount chips (pot) " + diffAmount);
-	  console.log("high bet " + highBet);
-
-	  socket.emit("changed amount", {id: player, chips: currentChips});
-	  socket.emit("increase pot", {chips: diffAmount, amount: store});
-	  socket.emit("current turn", {action: "raise", user: player, amount: highBet});
-	  socket.emit("buttons", {remove: false});
-	})
-
-	raise_amount.addChild(one,five,ten,twenty,hundred,bet_button);
-	raise_amount.name = "raise_amount";
-	addToGame(raise_amount);
-	stage.update();*/
 }
 
 // Once the finishes, all players must press this button to play again

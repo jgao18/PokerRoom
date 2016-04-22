@@ -738,30 +738,6 @@ function serverPot(data) {
 	pot(data.chips);
 }
 
-// This function will be called to accumulate the amount
-// of money the player is betting.
-function betAmount(amount) {
-  // Will not go over current player amount
-  //if ((amount + amountBet) <= currentPlayer.getChips()) {
-
-    // Erase the current bet amount
-    var bet;
-    if (bet = stage.getChildByName("bet_amount")) {
-      stage.removeChild(bet);
-    }
-
-    // Creates the new amount
-    //amountBet += amount;
-    var bet_amount = new createjs.Text("Bet: $" + amountBet, "16px Bembo", "#FFFF00");
-		console.log("GOT HERE!")
-    bet_amount.name = "bet_amount";
-    bet_amount.x = 220;
-    bet_amount.y = 445;
-    stage.addChild(bet_amount);
-    stage.update();
-  //}
-}
-
 // Provides the username and the user amount for each player
 function clientAmounts(player, username, amount) {
 
