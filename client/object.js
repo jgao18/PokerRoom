@@ -313,7 +313,7 @@ function raiseButton() {
 			setAmountBet(0);
 			betAmount(1);
 			raiseAmount();
-			betAmount(getTotalBet());
+			//betAmount(getTotalBet());
 		}
 	})
 	return raise;
