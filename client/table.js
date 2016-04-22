@@ -299,6 +299,7 @@ function assignSignal(data) {
 
 	var userSignal;
 	var index;
+	var localIndex = currentPlayer.getTableIndex();
 	// Takes in the current client's position
 	switch(localIndex) {
 		case 0:
@@ -334,7 +335,7 @@ function passingCards() {
 	for(var i = 0; i < maxPlayers; i++) {
 		nextPlayerIterator++;
 		nextPlayerIndex = (localIndex + nextPlayerIterator) % currentPlayers.length;
-	    if (currentPlayers[i].getUsername() != "INVALID_USER" && currentPlayers[i].getUsername() != currentPlayer)
+	    if ((currentPlayers[i].getId() != undefined) && (currentPlayers[i].getUsername() != currentPlayer))
 	    {
 			switch(positions[currentPlayers[i].getUsername()]) {
 				case "right":
@@ -484,6 +485,8 @@ function lobby() {
     socket.on("last bet", setLastUserBet);
 
     socket.on("player's action", playerAction);
+	
+	socket.on("again button", againButton);
 
     // Assigns cards to the table
     socket.on("flop cards", flopCards)
@@ -500,6 +503,10 @@ function lobby() {
    optionsButton();
    helpButton();
    leaveButton(currentPlayer);
+}
+
+function showAgain(){
+	againButton();
 }
 
 // Game is started when all players press ready
@@ -868,6 +875,7 @@ function changeAmount(data) {
   }
 
   var index;
+  var localIndex = currentPlayer.getTableIndex();
   switch(localIndex) {
     case 0:
       index = userTableIndex;
@@ -917,6 +925,7 @@ function newTurn() {
 
 // Once all user have finish their turn, go to the next action
 function nextAction() {
+	console.log("hellllllllllllllllllo2");
 
 	switch(action) {
 		// Flips the first three cards on the table
@@ -956,13 +965,15 @@ function nextAction() {
 			var i = 0;
 			var j = 0;
 
+            console.log("hellllllllllllllllllo1");
 			for (var username in positions)
 			{
 				var card1, card2;
 				console.log(positions);
+				
 				if (positions[username] == "right")
 				{
-					console.log("These are the username: " + username);
+					console.log("These are the right username: " + username);
 					card1 = stage.getChildByName("rCard1");
 					card2 = stage.getChildByName("rCard2");
 
@@ -978,12 +989,14 @@ function nextAction() {
 					}
 					console.log("This is first card: " + tempOtherCards[0]);
 					console.log("This is second card: " + tempOtherCards[1]);
-					flip(card1, tempOtherCards[0], 20, 300);
-					flip(card2, tempOtherCards[1], 80, 300);
+					if (tempOtherCards[0] != null){
+						flip(card1, tempOtherCards[0], 20, 300);
+						flip(card2, tempOtherCards[1], 80, 300);
+				    }
 				}
 				if (positions[username] == "left")
 				{
-					console.log("These are the username: " + username);
+					console.log("These are the left username: " + username);
 					card1 = stage.getChildByName("lCard1");
 					card2 = stage.getChildByName("lCard2");
 
@@ -995,12 +1008,14 @@ function nextAction() {
 							tempOtherCards.push(otherCards[i]);
 						}
 					}
-					flip(card1, tempOtherCards[0], 615, 300);
-					flip(card2, tempOtherCards[1], 675, 300);
+					if (tempOtherCards[0] != null){
+					  flip(card1, tempOtherCards[0], 615, 300);
+					  flip(card2, tempOtherCards[1], 675, 300);
+				    }
 				}
 				if (positions[username] == "back")
 				{
-					console.log("These are the username: " + username);
+					console.log("These are the back username: " + username);
 					card1 = stage.getChildByName("bCard1");
 					card2 = stage.getChildByName("bCard2");
 
@@ -1012,8 +1027,10 @@ function nextAction() {
 							tempOtherCards.push(otherCards[i]);
 						}
 					}
-					flip(card1, tempOtherCards[0], 310, 90);
-					flip(card2, tempOtherCards[1], 370, 90);
+					if (tempOtherCards[0] != null){
+						flip(card1, tempOtherCards[0], 310, 90);
+						flip(card2, tempOtherCards[1], 370, 90);
+				    }
 				}
 			}
 			

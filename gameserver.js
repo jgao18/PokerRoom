@@ -20,6 +20,8 @@ var currentHandPlayers;
 // players that need to wait until round is over
 var waitList;
 
+var waitSockets;
+
 var socket;
 var usernames;
 var playerCards;
@@ -34,7 +36,7 @@ var gameStage = 0;
 var game_in_progress = false;
 var usernames;
 
-var localUserNames = ["res_Homer", "res_Bart", "res_Marge", "res_Lisa"]
+var localUserNames = ["res_Homer", "res_Bart", "res_Marge", "res_Lisa", "res_Burns"];
 var localUserCount = 0;
 
 var latestPlayerUsername = localUserNames[localUserCount];
@@ -54,6 +56,7 @@ function init() {
   userSockets = [];
   usernames = [];
   waitList = [];
+  waitSockets = [];
 
   app.get('/*', function(req, res){
     var file = req.params[0];
@@ -73,16 +76,16 @@ function init() {
    });
 
 
-  io.on('connection', function (socket) {
+    io.on('connection', function (socket) {
 
-  socket.on("new player", onNewPlayer);
+    socket.on("new player", onNewPlayer);
 
-  socket.on("disconnect", onsocketDisconnect);
-  socket.emit('welcome', { message: latestPlayerUsername + " " + latestPlayerChipAmount });
+    socket.on("disconnect", onsocketDisconnect);
+    socket.emit('welcome', { message: latestPlayerUsername + " " + latestPlayerChipAmount });
 
-  socket.on('linkUsername', retrieveUsername);
-  socket.on('linkChipAmount', retrieveChipAmount);
-  socket.on('disconnectLink', function (data) { util.log(this.id) ; io.sockets.connected[this.id].disconnect(); });
+    socket.on('linkUsername', retrieveUsername);
+    socket.on('linkChipAmount', retrieveChipAmount);
+    socket.on('disconnectLink', function (data) { util.log(this.id) ; io.sockets.connected[this.id].disconnect(); });
 	
     // When socket presses ready button
     socket.on("ready", startGame);
@@ -145,18 +148,26 @@ function potIncrease(data) {
 // Called by sockets when they hit the Play button
 function onNewPlayer(data) {
 	
-  if(connectedPlayers.length == maxPlayers) {
+   if(connectedPlayers.length > maxPlayers) {
+	  console.log("Rejected!!!!");
 	  return;
-  }
+   }
 	
    var i, existingPlayer;
    var j;
    var newPlayer;
    var tableIndex = 0;
+   var pStatus;
    var sortTablePlayers = [];
    
-   // Stores each user's sockets by username in a list
-   userSockets.push({username: latestPlayerUsername, socket: this });
+   // Stores each user's sockets by username in a list 
+   if (game_in_progress == false) {
+   	 userSockets.push({username: latestPlayerUsername, socket: this });
+	 pStatus = true;
+   }else{
+	 waitSockets.push({username: latestPlayerUsername, socket: this });
+	 pStatus = false
+   }
 
    for(i = 0; i < connectedPlayers.length; i++) {
      if(connectedPlayers[i].getTableIndex() != i){
@@ -166,14 +177,16 @@ function onNewPlayer(data) {
 	 tableIndex += 1;
    }
    
-   newPlayer = new Player(this.id, latestPlayerUsername, latestPlayerChipAmount, tableIndex);
-   if(game_in_progress){
+   newPlayer = new Player(this.id, latestPlayerUsername, latestPlayerChipAmount, tableIndex, pStatus);
+   
+   if(game_in_progress == true){
      waitList.push(newPlayer);
-	 return;
+   }
+   else{
+   	 usernames.push(newPlayer.getUsername());
    }
    
    connectedPlayers.push(newPlayer);
-   usernames.push(newPlayer.getUsername());
    
    // Sorts a new list of players by Table Index
    for(i = 0; i < connectedPlayers.length; i++){
@@ -183,10 +196,17 @@ function onNewPlayer(data) {
 	   }
 	 }
    }
-  
-   playingPlayers = sortTablePlayers.slice()
+   
    connectedPlayers = sortTablePlayers.slice();
-   currentHandPlayers = sortTablePlayers.slice();
+   
+   
+   if(game_in_progress == false){
+	 playingPlayers = sortTablePlayers.slice()
+	 currentHandPlayers = sortTablePlayers.slice();
+   }
+   
+   console.log("This is the length of playingPlayers: " + playingPlayers.length);
+   console.log("This is the length of currentHandPlayers: " + currentHandPlayers.length);
    
    util.log("This is the length of the connected players: " + connectedPlayers.length);
 
@@ -207,13 +227,76 @@ function onNewPlayer(data) {
    // Send all connected player list to all players
    this.emit("new player", outputArray);
    this.broadcast.emit("new player", outputArray);
-   this.emit("ready");
-   playersReady++;
    
-   localUserCount+=1;
-   latestPlayerUsername = localUserNames[localUserCount];
+   if(!game_in_progress){
+     this.emit("ready");
+	 playersReady++;
+   }
    
+   /*localUserCount+=1;
+   if(localUserCount > maxPlayers){
+     localUserCount = 0;
+   }*/
+   latestPlayerUsername = localUserNames[0];
+   var haveUserName = false;
+   var i = 0;
+   var j = 0;
+   while(!haveUserName){
+	  console.log("This is connectedPlayers username: " + connectedPlayers[i].getUsername());
+	  console.log("This is the latestPlayerUsername: " + latestPlayerUsername);
+      console.log("This is j: " + j);
+      console.log("This is i: " + j);
+	  if(connectedPlayers[i].getUsername() == latestPlayerUsername){
+		 i = 0;
+		 j++;
+		 latestPlayerUsername = localUserNames[j];
+	   }
+	   else{
+	     i++;
+	   }
+	   
+	   if(i == connectedPlayers.length){
+		 console.log("This is the user: " + latestPlayerUsername);
+		 haveUserName = true;
+	   }
+   }
+	 
 };
+
+function waitToPlay() {
+	var i;
+	var sortTablePlayers = [];
+	
+	console.log("Adding Players");
+	 
+	for(i = 0; i < waitList.length; i++){
+		playersReady++;
+	}
+	
+	console.log("This is the length of waitSockets: " + waitSockets.length);
+	for(i = 0; i < waitSockets.length; i++){
+		console.log("Pushing sockets");
+		userSocket = waitSockets[i].socket;
+		userSocket.emit("again button");
+		userSockets.push(waitSockets[i]);
+		usernames.push(waitSockets[i].username);
+	}
+	
+    for(i = 0; i < connectedPlayers.length; i++){
+ 	  for(j = 0; j < connectedPlayers.length; j++){
+ 	    if(connectedPlayers[j].getTableIndex() == i){
+ 	      sortTablePlayers.push(connectedPlayers[j]);
+ 	    }
+      }
+    }
+	
+    playingPlayers = sortTablePlayers.slice()
+    connectedPlayers = sortTablePlayers.slice();
+    currentHandPlayers = sortTablePlayers.slice();
+	game_in_progress = false;
+	waitList = [];
+	waitSockets = [];
+}
 
 // Provides the turn signal and buttons
 function buttons(data) {
@@ -226,11 +309,16 @@ function buttons(data) {
 	}
 	
 	this.emit("remove buttons");
-	
+	console.log("In buttons");
+	console.log("index player is " + indexPlayer);
+	console.log("This is userSockets length: " + userSockets.length);
 	for (var i = 0; i < userSockets.length; i++) {
+		console.log("This is playingPlayers: " + playingPlayers[indexPlayer].getUsername());
+		console.log("This is userSockets: " + userSockets[i].username);
 		if(playingPlayers[indexPlayer].getUsername() == userSockets[i].username) {
 			var userSocket = userSockets[i].socket;
 			// Provide that player the turn signal and buttons
+			util.log("Sending buttons to :" + userSockets[i].username);
 			this.emit("signal", {username: userSockets[i].username });
 			this.broadcast.emit("signal", {username: userSockets[i].username });
 			userSocket.emit("timer");
@@ -294,6 +382,16 @@ function firstTurn(data) {
 	indexPlayer = 0;
 	playingPlayers = connectedPlayers.slice();
     currentHandPlayers = connectedPlayers.slice();
+	
+    for(i = 0; i < waitList.length; i++){
+      for(j = 0; j < playingPlayers.length; j++){
+ 	   if(playingPlayers[j].getUsername() == waitList[i].getUsername()){
+ 	     playingPlayers.splice(j, 1);
+		 currentHandPlayers.splice(j,1);
+ 	   } 
+      } 
+    }
+	
 	numTimesAccess++;
 	
 	// Until all users press the ready
@@ -328,6 +426,9 @@ function firstTurn(data) {
 
 function currentTurn(data) {
 	
+	var i;
+	var userSocket;
+	var round_over = false;
 	var gameStages = ["preflop","flop", "turn", "river", "postriver"];
 
  	if (data.action == "raise") {
@@ -341,6 +442,10 @@ function currentTurn(data) {
  		}
  	}
 
+	console.log("This is the currentHandPlayers length: " + currentHandPlayers.length);
+	for(i = 0; i < currentHandPlayers.length; i++){
+		console.log("This is the currentPlayer " + i + ": " + currentHandPlayers[i].getUsername());
+	}
 	// If all player decided their action for the turn
 	if (currentHandPlayers.length == 0) {
 		currentHandPlayers = playingPlayers.slice();
@@ -351,18 +456,28 @@ function currentTurn(data) {
 
 		    if (stage == "flop")
 			{
-			    this.emit("flop cards", {value1 : tableCards[0].get_value(), suit1 : tableCards[0].get_suit(), value2 : tableCards[1].get_value(), suit2 : tableCards[1].get_suit(),value3 : tableCards[2].get_value(), suit3 : tableCards[2].get_suit()});
-			    this.broadcast.emit("flop cards", {value1 : tableCards[0].get_value(), suit1 : tableCards[0].get_suit(), value2 : tableCards[1].get_value(), suit2 : tableCards[1].get_suit(),value3 : tableCards[2].get_value(), suit3 : tableCards[2].get_suit()});
+				console.log("This is the length of userSockets: " + userSockets.length);
+				for(i = 0; i < userSockets.length; i++){
+				  userSocket = userSockets[i].socket;
+			      userSocket.emit("flop cards", {value1 : tableCards[0].get_value(), suit1 : tableCards[0].get_suit(), value2 : tableCards[1].get_value(), suit2 : tableCards[1].get_suit(),value3 : tableCards[2].get_value(), suit3 : tableCards[2].get_suit()});
+			      //userSocket.broadcast.emit("flop cards", {value1 : tableCards[0].get_value(), suit1 : tableCards[0].get_suit(), value2 : tableCards[1].get_value(), suit2 : tableCards[1].get_suit(),value3 : tableCards[2].get_value(), suit3 : tableCards[2].get_suit()});
+			    }
 			}
 			else if (stage == "turn")
 			{
-			    this.emit("turn card", {value : tableCards[3].get_value(), suit : tableCards[3].get_suit()});
-			    this.broadcast.emit("turn card", {value : tableCards[3].get_value(), suit : tableCards[3].get_suit()});
+				for(i = 0; i < userSockets.length; i++){
+				  userSocket = userSockets[i].socket;
+			      userSocket.emit("turn card", {value : tableCards[3].get_value(), suit : tableCards[3].get_suit()});
+			      //userSocket.broadcast.emit("turn card", {value : tableCards[3].get_value(), suit : tableCards[3].get_suit()});
+			    }
 			}
 			else if (stage == "river")
 			{
-			    this.emit("river card", {value : tableCards[4].get_value(), suit : tableCards[4].get_suit()});
-			    this.broadcast.emit("river card", {value : tableCards[4].get_value(), suit : tableCards[4].get_suit()});
+				for(i = 0; i < userSockets.length; i++){
+				  userSocket = userSockets[i].socket;
+			      userSocket.emit("river card", {value : tableCards[4].get_value(), suit : tableCards[4].get_suit()});
+			      //this.broadcast.emit("river card", {value : tableCards[4].get_value(), suit : tableCards[4].get_suit()});
+			    }
 			}
 			else if (stage == "postriver")
 			{
@@ -480,7 +595,7 @@ function currentTurn(data) {
 				this.broadcast.emit("winning player",{player: winner});
 
 				// Inform every player which cards are who's
-			    for (var i = 0; i < connectedPlayers.length; i++)
+			    for (var i = 0; i < userSockets.length; i++)
 			    {
 			         var userSocket = userSockets[i].socket;
 			         userSocket.emit("other cards", outputPlayerCards);
@@ -488,9 +603,18 @@ function currentTurn(data) {
 
 				// Restart the list
 			    playerCards = [];
+				round_over = true;
 			 }
-		     this.emit("next action", gameStages[gameStage]);
-			 this.broadcast.emit("next action", gameStages[gameStage]);
+			 
+			 console.log("This is the length of userSockets: " + userSockets.length);
+			 for(i = 0; i < userSockets.length; i++){
+				 userSocket = userSockets[i].socket;
+			     userSocket.emit("next action", gameStages[gameStage]);
+			 }
+			 
+			 if(round_over == true){
+			   waitToPlay();
+			 }
 		 }
 	 }
 
@@ -591,6 +715,41 @@ function onsocketDisconnect() {
 			usernames.splice(i,1);
 		}
 	}
+	
+	for(i = 0; i < waitList.length; i++){
+		if(waitList[i].id == this.id){
+			waitList.splice(i,1);
+		}
+	}
+	
+	for(i = 0; i < waitSockets.length; i++) {
+		storeDict = waitSockets[i];
+		storeSocket = storeDict["socket"];
+		if(storeSocket.id == this.id) {
+			waitSockets.splice(i,1);
+		}
+	}
+	
+	if (indexPlayer >= playingPlayers.length) {
+		indexPlayer = 0;
+	}
+	
+	if (playingPlayers.length == 1) {
+		roundOver = true;
+		// Access the currentPlayer
+		var user = playingPlayers[0];
+		
+		this.emit("remove buttons");
+		this.broadcast.emit("remove buttons");
+		this.emit("winning player", {player: user.getUsername()});
+		this.broadcast.emit("winning player", {player: user.getUsername()});
+		this.emit("round over");
+		this.broadcast.emit("round over");
+		
+		// Restart the playing player list
+		playingPlayers = connectedPlayers.slice();
+	}
+	
 
 	if (connectedPlayers.length == 0) {
 		waitList = [];
