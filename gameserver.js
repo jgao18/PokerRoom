@@ -39,7 +39,7 @@ var usernames;
 var localUserNames = ["res_Homer", "res_Bart", "res_Marge", "res_Lisa", "res_Burns"];
 var localUserCount = 0;
 
-var latestPlayerUsername = localUserName + localUserCount; //localUserNames[localUserCount];
+var latestPlayerUsername = localUserNames[localUserCount];
 var latestPlayerChipAmount = 1000;
 
 var deck;
