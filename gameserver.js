@@ -368,6 +368,8 @@ function currentTurn(data) {
 				var times = 0;
 				var result;
 
+        console.log("created userResults: " + userResults);
+
 				// Puts each user cards inside a dictionary {user: {Card1: Card2:}}
 				for (var i = 0; i < usernames.length; i++) {
 					playerHands[usernames[i]] = {"Card1": playerCards[times], "Card2": playerCards[times+1]};
@@ -389,7 +391,7 @@ function currentTurn(data) {
 						// What hand the player has
 						result = Logic.determineWinner(totalCards);
 						//console.log("\n");
-						//console.log("This is the result: " + result);
+						console.log("This is the result: " + result);
 						//console.log("\n");
 						// Stores the results of each user
 						userResults[playerCards[i].get_owner()] = result;
@@ -402,10 +404,15 @@ function currentTurn(data) {
 				// Iterate through the dictionary and see which is the higher result
 				var userPoints = {};
 				for (var i = 0; i < usernames.length; i++) {
-					util.log("len: " + usernames.length);
-					util.log("i: " + usernames[i]);
+					/*util.log("len: " + usernames.length);
+          for (j = 0; j < usernames.length; j++)
+          {
+            util.log(usernames[j]);
+          }
+					util.log("i: " + usernames[i]);*/
 
 					var str = userResults[usernames[i]];
+          util.log("userResults length: " + userResults.length);
 					if (str.indexOf("Royal Flush") >= 0) {
 						userPoints[usernames[i]] = 10;
 					}

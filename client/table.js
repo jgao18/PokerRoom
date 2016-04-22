@@ -755,7 +755,7 @@ function clientAmounts(player, username, amount) {
       if (chip = game_menu.getChildByName("player1_chip_plate")) {
 	    game_menu.removeChild(chip);
       }
-      chip_plate_background.graphics.beginFill("black").drawRect(330,601,100,17);
+      chip_plate_background.graphics.beginFill("black").drawRect(330,601,120,17);
 
       chip_background.graphics.beginFill("red").drawCircle(320,610,15);
       chip_background.graphics.beginFill("white").drawCircle(320,610,12);
@@ -774,7 +774,7 @@ function clientAmounts(player, username, amount) {
       if (chip = game_menu.getChildByName("player2_chip_plate")) {
 	    game_menu.removeChild(chip);
       }
-	  chip_plate_background.graphics.beginFill("black").drawRect(30,380,100,17);
+	  chip_plate_background.graphics.beginFill("black").drawRect(30,380,120,17);
 
       chip_background.graphics.beginFill("blue").drawCircle(20,390,15);
       chip_background.graphics.beginFill("white").drawCircle(20,390,12);
@@ -793,7 +793,7 @@ function clientAmounts(player, username, amount) {
       if (chip = game_menu.getChildByName("player3_chip_plate")) {
 	    game_menu.removeChild(chip);
       }
-	  chip_plate_background.graphics.beginFill("black").drawRect(625,380,100,17);
+	  chip_plate_background.graphics.beginFill("black").drawRect(625,380,120,17);
 
       chip_background.graphics.beginFill("blue").drawCircle(615,390,15);
       chip_background.graphics.beginFill("white").drawCircle(615,390,12);
