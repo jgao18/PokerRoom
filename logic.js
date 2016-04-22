@@ -1,124 +1,99 @@
-// How do I pass in the table cards? 
-// I will pass in the table cards and the a player's cards
+/* Created by Jessie Cisneros
+   Use: logic.js determines the highest value the hand contains
+*/
+
 var suits = ["heart", "spade", "diamond", "club"];
 var values = ["A", "K", "Q", "J", "10", "9", "8", "7", "6", "5", "4", "3", "2"];
 var keyDict = {"A": 0, "K": 1, "Q": 2, "J": 3, "10": 4, "9": 5, "8": 6, "7": 7, "6": 8, "5": 9, "4": 10, "3": 11, "2": 12};
-//dictonary with values and points
-// sort then reverse
-//var deck;
 
 function sortNumber(a,b) {
     return a - b;
 }
 
 module.exports = {
-	determineWinner: function(cardList) {
-		//var deck = new Deck();
-		//deck.get_new_deck();
-		//var cardList = [];
-		var testList = [];
-
-		for (var i = 0; i < 7; i++) {
-			testList.push(cardList[i].get_value());
-		}
-
-		var winner = isSuit(cardList);
-		winner += isOrder(cardList);
-		winner += isPairs(cardList);
-		//console.log(winner);
-
-		testList.sort();
 	
-		/*for (var i =0; i < testList.length; i++) {
-			console.log(testList[i]);
-		}*/
-	
-		var hand;
-		switch (winner) {
-			// suit/order/value
+	// Determines the value of the hand
+	// Takes in table cards and two cards of player
+	determineHand: function(cardList) {
+		
+		// Retrieving all variables to determine hand
+		var handResult;
+		handResult = isSuit(cardList);
+		handResult += isOrder(cardList);
+		handResult += isPairs(cardList);
+		
+	    // Determine by suit/order/value
+		switch (handResult) {
 			case "YYN": 
-				//console.log("Royal or Straight Flush");
 				return whichFlush(cardList);
 				break;
 			case "YNY":
-				//console.log("Flush");
 				return "Flush";
 				break;
 			case "YNN":
-				//console.log("Flush");
 				return "Flush";
 				break;
 			case "NYY":
-				//console.log("Straight");
 				return "Straight";
 				break;
 			case "NYN":
-				//console.log("Straight");
 				return "Straight";
 				break;
 			case "NNY":
-				//console.log("4/3/2 of kind or 2 Pair or Full House");
 				return whichPair(cardList);
 				break;
 			case "NNN":
-				//console.log("High Card");
 				return "High Card";
+				break;
+			default:
+				console.log("Something went wrong");
 				break;
 		}
 	},
 	
-	finalEvaluation: function(user1List, user2List, user1Results, user2Results) {
+	// If two players have the same result, then determine the winner between them
+	finalEvaluation: function(user1Cards, user2Cards, user1Result, user2Result) {
+		
+		var List1 = sortCards(user1Cards);
+		var List2 = sortCards(user2Cards);
 	    var userPoints = 0;
 		var user1Value;
 		var user2Value;
+		var i = 0;
 		
-		console.log("This is the user1Results: " + user1Results);
-		console.log("This is the user2Results: " + user2Results);
 		//What if we looked into the result string and find the values
 		//Need something for pair/two pair/threeokakind/FullHouse/FourofKind
-		if(isPairs(user1List) == "Y") {
+		if(isPairs(user1Cards) == "Y") {
 			for(var i = 0; i < values.length; i++) {
-				if(user1Results.indexOf(values[i]) >= 0) {
+				if(user1Result.indexOf(values[i]) >= 0) {
 					user1Value = keyDict[values[i]];
 					break;
 				}
 			}
 		
 			for(var i = 0; i < values.length; i++) {
-				if(user2Results.indexOf(values[i]) >= 0) {
+				if(user2Result.indexOf(values[i]) >= 0) {
 					user2Value = keyDict[values[i]];
 					break;
 				}
 			}
 		
-			console.log("The user1Value is " + user1Value);
-			console.log("The user2Value is " + user2Value);
+			// If the first user's value is more than the second
 			if(user1Value < user2Value) {
 				userPoints = 0.25;
-				console.log("The pair is larger than");
 				return userPoints;
 			}
 			else if(user1Value > user2Value) {
 				userPoints = 0;
-				console.log("The pair is smaller than")
 				return userPoints;
 			}
 		}
 		
-		
-		var List1 = sortCards(user1List);
-		console.log("\n");
-		console.log(user1List);
-		var List2 = sortCards(user2List);
-		console.log("\n");
-		console.log(user2List);
-		// Only works for high card/Straight/Flush/StraightFlush/RoyalFlush
-		for(var i = 0; i < List1.length; i++) {
-			console.log("This is List1: " + List1[i]);
-			console.log("This is List2: " + List2[i]);
+		/* Look through each cardList and find the highest value
+		   that stands apart.
+		   Works for high card/Straight/Flush/StraightFlush/RoyalFlush */
+		for(i = 0; i < List1.length; i++) {
 			if (List1[i] != List2[i]) {
-				console.log("This is List1: " + List1[i]);
-				console.log("This is List2: " + List2[i]);
 				if (List1[i] < List2[i]) {
 					userPoints = 0.25;
 					break;
@@ -134,35 +109,30 @@ module.exports = {
 	}
 }
 
+// Sorts a card list by highest value
 function sortCards(cards) {
-	
-	var valueList = [];
+
 	var pointList = [];
 	
 	console.log("THIS IS THE CARDS LENGTH" + cards.length);
 	for (var i = 0; i < cards.length; i++) {
-		console.log("CARDS OF I" + cards[i]);
-		valueList.push(cards[i].get_value());
+		pointList.push(keyDict[cards[i].get_value()]);
 	}
 	
-	for (var i = 0; i < cards.length; i++) {
-		pointList.push(keyDict[valueList[i]]);
-	}
 	pointList.sort(sortNumber);
 	
 	return pointList;
 }
 
 function isSuit(cards) {
-	// Will I need to sort the list
-	var points = 0;
 	var testList = [];
-	//sortCards(testList);
-	
+	var points = 0;
 	var heart = 0;
 	var spade = 0;
 	var diamond = 0;
 	var club = 0;
+	
+	// Determines if there are multiple suits
 	for(var i = 0; i < cards.length; i++) {
 		switch(cards[i].get_suit()) {
 			case "heart":
@@ -180,21 +150,22 @@ function isSuit(cards) {
 		}
 	}
 	
+	// Determines if there are 5 cards of the same suit or more
 	if((heart>4) || (spade>4) || (diamond>4) || (club>4)) {
 		points = "Y";
-		return points;
 	}
 	else {
 		points = "N";
 	}
+	
 	return points;
 }
 
 function isOrder(cards) {
-	
 	var orderList = sortCards(cards);
-	
 	var order = 0;
+	
+	// Determines if the list has five values in order
 	for (var i = 0; i < (orderList.length-1); i++) {
 		if ((orderList[i] + 1) == orderList[i+1] ) {
 			order++;
@@ -202,6 +173,7 @@ function isOrder(cards) {
 				return "Y";
 			}
 		}
+		// If the next value the same value as current
 		else if (orderList[i+1] == orderList[i]){
 			continue;
 		}
@@ -215,16 +187,18 @@ function isOrder(cards) {
 
 function isPairs(cards) {
 	var newList = [];
+	var pairs = {};
 	var pairList = sortCards(cards);
+	var numOfCards = 1;
+	var i = 0;
 	
-	for (var i = 0; i < cards.length; i++) {
-		//console.log(pairList[i]);
+	// Retrieve values
+	for (i = 0; i < cards.length; i++) {
 		newList.push(values[pairList[i]]);
 	}
 	
-	var pairs = {};
-	var numOfCards = 1;
-	for (var i = 0; i < (newList.length-1); i++) {
+	// Stores pairs in a dictionary
+	for (i = 0; i < (newList.length-1); i++) {
 		if (newList[i] == newList[i+1]) {
 			numOfCards++; 
 			pairs[newList[i]] = numOfCards;
@@ -234,7 +208,8 @@ function isPairs(cards) {
 		}
 	}
 	
-	for (var i = 0; i < values.length; i++) {
+	// If there is a pair, return "Y"
+	for (i = 0; i < values.length; i++) {
 		if( pairs[values[i]] > 1) {
 			return "Y";
 		}
@@ -243,10 +218,12 @@ function isPairs(cards) {
 	return "N";
 }
 
+// Determines Royal or Straight Flush
 function whichFlush(cards) {
 	var flushList = sortCards(cards);
-
 	var isRoyal = 0;
+	
+	// If values match the beginning values
 	for (var i = 0; i < 5; i++) {
 		if (flushList[i] == i) {
 			isRoyal++;
@@ -261,35 +238,43 @@ function whichFlush(cards) {
 	}
 }
 
+// Finds the value that correspond to times
 function findValue(dict,keyList,times,extra) {
 	var lastIndex = keyList.length - 1;
 	for(var i = lastIndex; i >= 0; i--) {
-		//console.log("This is keyList[i] " + keyList[i]);
-		//console.log(times);
 		if(dict[keyList[i]] == times && keyList[i] != extra) {
 			return keyList[i];
 		}
 	}
 }
 
-
+// Determines the highest pair values
 function whichPair(cards) {
 	var newList = [];
+	var pairs = {};
+	var finalDict = {};
+	var numOfCards = 1;
+	var fourOfaKind = 0;
+	var threeOfaKind = 0;
+	var pair = 0;
 	var pairList = sortCards(cards);
+	var comp;
+	var returnValue;
+	var extraValue;
+	var answer;
+	var i = 0;
 	
 	// Find the values that are associate to the points
-	for (var i = 0; i < pairList.length; i++) {
+	for (i = 0; i < pairList.length; i++) {
 		newList.push(values[pairList[i]]);
 	}
 	
-	var pairs = {};
-	var numOfCards = 1;
-	for (var i = 0; i < newList.length; i++) {
+	for (i = 0; i < newList.length; i++) {
 		// If the next value is the current value, then skip
 		if (comp == newList[i]) {
 			continue;
 		}
-		var comp = newList[i];
+		comp = newList[i];
 		// Look through the list and see if the value appears again
 		for (var j = i; j < (newList.length-1); j++) {
 			if (comp == newList[j+1]) {
@@ -304,11 +289,7 @@ function whichPair(cards) {
 	}
 
 	var keyList = Object.keys(pairs);
-	var finalDict = {};
-	var fourOfaKind = 0;
-	var threeOfaKind = 0;
-	var pair = 0;
-	for (var i = 0; i < keyList.length; i++) {
+	for (i = 0; i < keyList.length; i++) {
 		switch(pairs[keyList[i]]) {
 			case 4:
 				fourOfaKind++;
@@ -322,85 +303,32 @@ function whichPair(cards) {
 		}
 	}
 	
-	var returnValue;
-	var extraValue;
-	var answer;
 	if(fourOfaKind == 1) {
 		returnValue = findValue(pairs,keyList,4);
-		console.log("It is a four of a Kind of " + returnValue);
 		answer = "four of a kind of " + returnValue;
 		return answer;
 	}
 	else if(threeOfaKind == 1 && pair == 1) {
 		returnValue = findValue(pairs,keyList,3);
 		extraValue = findValue(pairs,keyList,2);
-		console.log("It is a Full House with " + returnValue + " and " + extraValue);
 		answer = "Full House with " + returnValue + " and " + extraValue;
 		return answer;
 	}
 	else if(threeOfaKind == 1) {
 		returnValue = findValue(pairs,keyList,3);
-		console.log("It is a three of a kind of " + returnValue);
 		answer = "three of a kind of " + returnValue;
 		return answer;
 	}
 	else if(pair > 1) {
 		returnValue = findValue(pairs,keyList,2);
 		extraValue = findValue(pairs,keyList,2,returnValue);
-		console.log("It is a pair of " + returnValue + " and " + extraValue);
 		answer = "two pair with " + returnValue + " and " + extraValue;
 		return answer;
 	}
 	else if(pair == 1) {
 		returnValue = findValue(pairs,keyList,2);
-		console.log("It is a pair of " + returnValue);
 		answer = "It is a pair of " + returnValue;
 		return answer;
 	}
 	
 }
-
-/*
-function orderTesting() {
-	var list = [1,2,2,3,4,5,7];
-	var order = 0;
-	
-	for (var i = 0; i < (list.length-1); i++) {
-		if ((list[i] + 1) == list[i+1] ) {
-			order++;
-			if (order > 3) {
-				console.log("Its in order");
-				break;
-			}
-		}
-		else if (list[i+1] == list[i]){
-			continue;
-		}
-		else {
-			order = 0;
-		}
-	}
-}
-
-function pairTesting() {
-	var list = ["A","A","K","5","3","3","2"];
-	
-	var pairs = {};
-	var numOfCards = 1;
-	for (var i = 0; i < list.length; i++) {
-		if (list[i] == list[i+1]) {
-			numOfCards++;
-			pairs[list[i]] = numOfCards;
-		}
-		else {
-			numOfCards = 1;
-		}
-	}
-	
-	var store;
-	for (var i = 0; i < values.length; i++) {
-		if(store = pairs[values[i]]) {
-		}
-	}
-}
-*/
