@@ -242,10 +242,6 @@ function onNewPlayer(data) {
    var i = 0;
    var j = 0;
    while(!haveUserName){
-	  console.log("This is connectedPlayers username: " + connectedPlayers[i].getUsername());
-	  console.log("This is the latestPlayerUsername: " + latestPlayerUsername);
-      console.log("This is j: " + j);
-      console.log("This is i: " + j);
 	  if(connectedPlayers[i].getUsername() == latestPlayerUsername){
 		 i = 0;
 		 j++;
@@ -256,7 +252,6 @@ function onNewPlayer(data) {
 	   }
 	   
 	   if(i == connectedPlayers.length){
-		 console.log("This is the user: " + latestPlayerUsername);
 		 haveUserName = true;
 	   }
    }
@@ -282,7 +277,8 @@ function waitToPlay() {
 		usernames.push(waitSockets[i].username);
 	}
 	
-    for(i = 0; i < connectedPlayers.length; i++){
+	console.log("This is the old length: " + connectedPlayers.length); 
+    for(i = 0; i < maxPlayers; i++){
  	  for(j = 0; j < connectedPlayers.length; j++){
  	    if(connectedPlayers[j].getTableIndex() == i){
  	      sortTablePlayers.push(connectedPlayers[j]);
@@ -290,9 +286,11 @@ function waitToPlay() {
       }
     }
 	
-    playingPlayers = sortTablePlayers.slice()
+    playingPlayers = sortTablePlayers.slice();
     connectedPlayers = sortTablePlayers.slice();
     currentHandPlayers = sortTablePlayers.slice();
+	
+	console.log("This is the new length: " + connectedPlayers.length); 
 	game_in_progress = false;
 	waitList = [];
 	waitSockets = [];
@@ -306,6 +304,10 @@ function buttons(data) {
 		this.emit("remove buttons");
 		this.broadcast.emit("remove buttons");
 		return;
+	}
+	
+	if (indexPlayer >= playingPlayers.length) {
+		indexPlayer = 0;
 	}
 	
 	this.emit("remove buttons");
@@ -383,6 +385,8 @@ function firstTurn(data) {
 	playingPlayers = connectedPlayers.slice();
     currentHandPlayers = connectedPlayers.slice();
 	
+	console.log("This is the length of waitlist: " + waitList.length);
+	
     for(i = 0; i < waitList.length; i++){
       for(j = 0; j < playingPlayers.length; j++){
  	   if(playingPlayers[j].getUsername() == waitList[i].getUsername()){
@@ -407,6 +411,7 @@ function firstTurn(data) {
 		}
 		
 		// Accesses the first client that enters the room
+		console.log("This is the user getting the buttons: " + userSockets[0].username);
 		var userSocket = userSockets[0].socket;
 		userSocket.emit("timer");
 		userSocket.emit("add buttons");
@@ -652,15 +657,11 @@ function startGame() {
         for (i = 0; i < userSockets.length; i++)
         {
         	var userSocket = userSockets[i].socket;
-			console.log("This is userSockets[i].username: " + userSockets[i].username);
         	var card1 = deck.draw_card();
         	var user = userSockets[i].username;
         	card1.set_owner(user);
       	    var card2 = deck.draw_card();
             card2.set_owner(user);
-			console.log("This is card1: " + card1.get_value());
-			console.log("This is card2: " + card2.get_value());
-			console.log("user: " + user); 
             playerCards.push(card1, card2);
             userSocket.emit("client cards", {owner: user, value1 : card1.get_value(), suit1 : card1.get_suit(), 
 											 value2 : card2.get_value(), suit2 : card2.get_suit()});
@@ -677,6 +678,31 @@ function startGame() {
 function onsocketDisconnect() {
 	util.log("Ended in onSocketDisconnect");
     util.log("Player has disconnected: " + this.id);
+	
+	var index;
+	if(indexPlayer == 0){
+	   index = playingPlayers.length - 1;
+	}
+	else{
+		index = indexPlayer - 1;
+	}
+	
+	if(playingPlayers[index].getId() == this.id){
+		// move the buttons to next player
+		for (var i = 0; i < userSockets.length; i++) {
+	        util.log("Sending buttons to next player");
+			if(playingPlayers[indexPlayer].getUsername() == userSockets[i].username) {
+				var userSocket = userSockets[i].socket;
+				// Provide that player the turn signal and buttons
+				util.log("Sending buttons to :" + userSockets[i].username);
+				this.emit("signal", {username: userSockets[i].username });
+				this.broadcast.emit("signal", {username: userSockets[i].username });
+				userSocket.emit("timer");
+				userSocket.emit("add buttons");
+				break;
+			}
+		}
+	}
 
     var i;
 	var storeDict;
@@ -730,10 +756,11 @@ function onsocketDisconnect() {
 		}
 	}
 	
+	//indexPlayer++;
 	if (indexPlayer >= playingPlayers.length) {
 		indexPlayer = 0;
 	}
-	
+
 	if (playingPlayers.length == 1) {
 		roundOver = true;
 		// Access the currentPlayer
