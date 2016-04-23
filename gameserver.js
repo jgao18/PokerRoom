@@ -374,6 +374,7 @@ function fold(data) {
 		this.broadcast.emit("winning player", {player: user.getUsername()});
 		this.emit("round over", {status: "more than two players"});
 		this.broadcast.emit("round over", {status: "more than two players"});
+		game_in_progress = false;
 		
 		// Restart the playing player list
 		playingPlayers = connectedPlayers.slice();
@@ -698,19 +699,21 @@ function onsocketDisconnect() {
 		index = indexPlayer - 1;
 	}
 	
-	if((playingPlayers[index].getId() == this.id) && game_in_progress){
-		// move the buttons to next player
-		for (var i = 0; i < userSockets.length; i++) {
-	        util.log("Sending buttons to next player");
-			if(playingPlayers[indexPlayer].getUsername() == userSockets[i].username) {
-				var userSocket = userSockets[i].socket;
-				// Provide that player the turn signal and buttons
-				util.log("Sending buttons to :" + userSockets[i].username);
-				this.emit("signal", {username: userSockets[i].username });
-				this.broadcast.emit("signal", {username: userSockets[i].username });
-				userSocket.emit("timer");
-				userSocket.emit("add buttons");
-				break;
+	if(connectedPlayers.length > 1){
+		if((playingPlayers[index].getId() == this.id) && game_in_progress){
+			// move the buttons to next player
+			for (var i = 0; i < userSockets.length; i++) {
+		        util.log("Sending buttons to next player");
+				if(playingPlayers[indexPlayer].getUsername() == userSockets[i].username) {
+					var userSocket = userSockets[i].socket;
+					// Provide that player the turn signal and buttons
+					util.log("Sending buttons to :" + userSockets[i].username);
+					this.emit("signal", {username: userSockets[i].username });
+					this.broadcast.emit("signal", {username: userSockets[i].username });
+					userSocket.emit("timer");
+					userSocket.emit("add buttons");
+					break;
+				}
 			}
 		}
 	}
