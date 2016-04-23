@@ -313,7 +313,7 @@ function raiseButton() {
 			setAmountBet(0);
 			betAmount(1);
 			raiseAmount();
-			//betAmount(getTotalBet());
+			betAmount(getTotalBet());
 		}
 	})
 	return raise;
@@ -349,12 +349,16 @@ function startButton() {
 // Once everyone presses ready, start the game
 function readyButton() {
 	var ready = new button(315,300,100,45,"Ready", "#F00",20);
+	ready.name = "readyButton";
 	addToGame(ready);
 	stage.update();
 
 	ready.addEventListener("click", function(event) {
         deleteItemFromGame(ready);
         socket.emit("ready");
+		
+		var userStore = game_menu.getChildByName("won player");
+		game_menu.removeChild(userStore);
 	})
 }
 
@@ -431,6 +435,7 @@ function raiseAmount() {
 // Once the finishes, all players must press this button to play again
 function againButton() {
 	var again = new button(315,245,100,45,"Again?", "#F00",20);
+	again.name = "againButton";
 	addToGame(again);
 	stage.update();
 

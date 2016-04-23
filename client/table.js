@@ -273,9 +273,15 @@ function onNewPlayer(data)
 }
 
 // Occurs when all users except one folds
-function lastAction() {
-	action = 4;
-	nextAction();
+function lastAction(data) {
+	
+	if(data.status == "only one player"){
+		action = 5;
+	}
+	else{
+	    action = 4;
+	}
+    nextAction();
 }
 
 // Assigns the signal for which player's turn it is.
@@ -1070,6 +1076,41 @@ function nextAction() {
 			socket.emit("restart");
 			action = 0;
 			break;
+			
+		case 5:
+			
+			newTurn();
+			var store;
+			// Erases all unfolded cards
+			var cardList = ["rCard1","rCard2","lCard1","lCard2","bCard1","bCard2",
+							"tCard1","tCard2","tCard3","tCard4","tCard5"];
+			for (var j = 0; j < cardList.length; j++) {
+				if(store = stage.getChildByName(cardList[j])) {
+					stage.removeChild(store);
+				}
+			}
+
+			// Signal doesn't delete properly
+			var signal = stage.getChildByName("signal");
+			game_menu.removeChild(signal);
+			
+			var again = game_menu.getChildByName("againButton");
+			game_menu.removeChild(again);
+			
+			var ready = game_menu.getChildByName("readyButton");
+			game_menu.removeChild(ready);
+
+			// Erases all flip cards
+			for (var i = 0; i < 13; i ++) {
+				var shape = stage.getChildByName("tableCards");
+				stage.removeChild(shape);
+			}
+			
+			otherCards = [];
+			socket.emit("buttons",{remove: true});
+			//socket.emit("restart");
+			action = 0;
+			break;
 	}
 }
 
@@ -1155,9 +1196,11 @@ function addButtonContainer() {
 
 // Removes the client's buttons
 function removeButtonContainer() {
+	// remove timer
 	createjs.Ticker.off("tick",timeTicker);
 	var timer = stage.getChildByName("time");
 	stage.removeChild(timer);
+	// remove buttons
 	var user_buttons = game_menu.getChildByName("buttons");
 	game_menu.removeChild(user_buttons);
 	stage.update();

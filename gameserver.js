@@ -228,11 +228,15 @@ function onNewPlayer(data) {
    this.emit("new player", outputArray);
    this.broadcast.emit("new player", outputArray);
    
-   if(!game_in_progress){
+   if((!game_in_progress) && connectedPlayers.length == 2){
      this.emit("ready");
-	 playersReady++;
+	 this.broadcast.emit("ready");
    }
-   
+   else if((!game_in_progress) && connectedPlayers.length > 2){
+	 this.emit("ready");
+   }
+ 
+    playersReady++;
    /*localUserCount+=1;
    if(localUserCount > maxPlayers){
      localUserCount = 0;
@@ -359,6 +363,7 @@ function fold(data) {
 
 	// If there is only one player left
 	if (playingPlayers.length == 1) {
+		console.log("User folded");
 		roundOver = true;
 		// Access the currentPlayer
 		var user = playingPlayers[0];
@@ -367,11 +372,12 @@ function fold(data) {
 		this.broadcast.emit("remove buttons");
 		this.emit("winning player", {player: user.getUsername()});
 		this.broadcast.emit("winning player", {player: user.getUsername()});
-		this.emit("round over");
-		this.broadcast.emit("round over");
+		this.emit("round over", {status: "more than two players"});
+		this.broadcast.emit("round over", {status: "more than two players"});
 		
 		// Restart the playing player list
 		playingPlayers = connectedPlayers.slice();
+		playerCards = [];
 	}
 }
 
@@ -397,7 +403,9 @@ function firstTurn(data) {
     }
 	
 	numTimesAccess++;
-	
+	console.log("This is players ready: " + playersReady);
+	console.log("This is numTimesAccess: " + numTimesAccess);
+	console.log("This is the currentHandPlayerslength: " + currentHandPlayers.length);
 	// Until all users press the ready
 	if ((numTimesAccess == currentHandPlayers.length) && (playersReady > 1)) {
 		console.log("ITSSSS INNNNNN");
@@ -425,6 +433,9 @@ function firstTurn(data) {
 
 		// Removes the first player from the remaining turn players
 		currentHandPlayers.splice(0, 1);
+	}
+	else{
+		console.log("THIS IS NOT WORKING ");
 	}
 }
 
@@ -687,7 +698,7 @@ function onsocketDisconnect() {
 		index = indexPlayer - 1;
 	}
 	
-	if(playingPlayers[index].getId() == this.id){
+	if((playingPlayers[index].getId() == this.id) && game_in_progress){
 		// move the buttons to next player
 		for (var i = 0; i < userSockets.length; i++) {
 	        util.log("Sending buttons to next player");
@@ -761,7 +772,7 @@ function onsocketDisconnect() {
 		indexPlayer = 0;
 	}
 
-	if (playingPlayers.length == 1) {
+	if (playingPlayers.length == 1 && game_in_progress) {
 		roundOver = true;
 		// Access the currentPlayer
 		var user = playingPlayers[0];
@@ -770,11 +781,19 @@ function onsocketDisconnect() {
 		this.broadcast.emit("remove buttons");
 		this.emit("winning player", {player: user.getUsername()});
 		this.broadcast.emit("winning player", {player: user.getUsername()});
-		this.emit("round over");
-		this.broadcast.emit("round over");
+		this.emit("round over",{status: "only one player"});
+		this.broadcast.emit("round over",{status: "only one player"});
 		
 		// Restart the playing player list
 		playingPlayers = connectedPlayers.slice();
+		game_in_progress = false;
+		playerCards = [];
+	}
+	
+	if(playingPlayers.length == 1){
+		this.emit("round over",{status: "only one player"});
+		this.broadcast.emit("round over",{status: "only one player"});
+		readyPlayers = 0;
 	}
 	
 
