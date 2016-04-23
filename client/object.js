@@ -314,7 +314,6 @@ function callButton() {
 
 // Allows the user to raise
 function raiseButton(maxChips) {
-  console.log("MAX: " + maxChips);
   var raise_button = new button(345,475,50,18,"raise", "yellow",10);
 
   raise_button.addEventListener("click", function(event) {
@@ -347,7 +346,7 @@ function showRaiseContainer(maxChips) {
   var raise_container = new createjs.Container(); // Holds the bet amount text, slider, and bet button
   raise_container.name = "raise_container";
 
-  if (maxChips < getTotalBet() || maxChips == 0) { // User doesn't have enough chips to raise
+  if (maxChips <= getTotalBet() || maxChips == 0) { // User doesn't have enough chips to raise
     not_enough = new createjs.Text("Insufficient chips!", "16px Bembo", "#FFFF00");
     not_enough.x = 312;
     not_enough.y = 455;
