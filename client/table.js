@@ -18,7 +18,7 @@ var lastUserBet = 0;
 var lastBetAmount = 0;
 var pot_amount = 0;
 var positions = {};
-// good
+
 var card1;
 var card2;
 var tableCard1;
@@ -746,7 +746,7 @@ function clientAmounts(player, username, amount) {
       if (chip = game_menu.getChildByName("player1_chip_plate")) {
 	    game_menu.removeChild(chip);
       }
-      chip_plate_background.graphics.beginFill("black").drawRect(330,601,120,17);
+      chip_plate_background.graphics.beginFill("black").drawRect(330,601,130,17);
 
       chip_background.graphics.beginFill("red").drawCircle(320,610,15);
       chip_background.graphics.beginFill("white").drawCircle(320,610,12);
@@ -765,7 +765,7 @@ function clientAmounts(player, username, amount) {
       if (chip = game_menu.getChildByName("player2_chip_plate")) {
 	    game_menu.removeChild(chip);
       }
-	  chip_plate_background.graphics.beginFill("black").drawRect(30,380,120,17);
+	  chip_plate_background.graphics.beginFill("black").drawRect(30,380,130,17);
 
       chip_background.graphics.beginFill("blue").drawCircle(20,390,15);
       chip_background.graphics.beginFill("white").drawCircle(20,390,12);
@@ -784,26 +784,26 @@ function clientAmounts(player, username, amount) {
       if (chip = game_menu.getChildByName("player3_chip_plate")) {
 	    game_menu.removeChild(chip);
       }
-	  chip_plate_background.graphics.beginFill("black").drawRect(625,380,120,17);
+		  chip_plate_background.graphics.beginFill("black").drawRect(617,380,130,17);
 
-      chip_background.graphics.beginFill("blue").drawCircle(615,390,15);
-      chip_background.graphics.beginFill("white").drawCircle(615,390,12);
-      chip_background.graphics.beginFill("blue").drawCircle(615,390,9);
-      chip_background.graphics.beginFill("blue").drawPolyStar(615,390,15,8,0.5,90);
-      chip_background.graphics.beginFill("white").drawCircle(615,390,2);
+      chip_background.graphics.beginFill("blue").drawCircle(605,390,15);
+      chip_background.graphics.beginFill("white").drawCircle(605,390,12);
+      chip_background.graphics.beginFill("blue").drawCircle(605,390,9);
+      chip_background.graphics.beginFill("blue").drawPolyStar(605,390,15,8,0.5,90);
+      chip_background.graphics.beginFill("white").drawCircle(605,390,2);
 
-      user_amount.x = 635;
+      user_amount.x = 622;
       user_amount.y = 380;
-	  chip_plate.addChild(chip_plate_background,chip_background,user_amount);
-	  chip_plate.name = "player3_chip_plate";
-	  break;
+		  chip_plate.addChild(chip_plate_background,chip_background,user_amount);
+		  chip_plate.name = "player3_chip_plate";
+		  break;
 
   // back user details
   case "back":
       if (chip = game_menu.getChildByName("player4_chip_plate")) {
 	    game_menu.removeChild(chip);
       }
-	  chip_plate_background.graphics.beginFill("black").drawRect(326,175,100,17);
+	  	chip_plate_background.graphics.beginFill("black").drawRect(326,178,130,17);
 
       chip_background.graphics.beginFill("blue").drawCircle(316,187,15);
       chip_background.graphics.beginFill("white").drawCircle(316,187,12);
@@ -812,7 +812,7 @@ function clientAmounts(player, username, amount) {
       chip_background.graphics.beginFill("white").drawCircle(316,187,2);
 
       user_amount.x = 335;
-      user_amount.y = 175;
+      user_amount.y = 178;
       chip_plate.addChild(chip_plate_background,chip_background,user_amount);
       chip_plate.name = "player4_chip_plate";
       break;

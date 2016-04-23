@@ -36,7 +36,7 @@ var gameStage = 0;
 var game_in_progress = false;
 var usernames;
 
-var localUserNames = ["res_Homer", "res_Bart", "res_Marge", "res_Lisa", "res_Burns"];
+var localUserNames = ["~Antonio", "~Sam", "~Daniel", "~Philip"];
 var localUserCount = 0;
 
 var latestPlayerUsername = localUserNames[localUserCount];
@@ -383,16 +383,16 @@ function firstTurn(data) {
 	gameStage = 0;
 	indexPlayer = 0;
 	playingPlayers = connectedPlayers.slice();
-    currentHandPlayers = connectedPlayers.slice();
+  currentHandPlayers = connectedPlayers.slice();
 
 	console.log("This is the length of waitlist: " + waitList.length);
 
     for(i = 0; i < waitList.length; i++){
       for(j = 0; j < playingPlayers.length; j++){
- 	   if(playingPlayers[j].getUsername() == waitList[i].getUsername()){
- 	     playingPlayers.splice(j, 1);
-		 currentHandPlayers.splice(j,1);
- 	   }
+ 	      if(playingPlayers[j].getUsername() == waitList[i].getUsername()){
+ 	        playingPlayers.splice(j, 1);
+		      currentHandPlayers.splice(j,1);
+ 	      }
       }
     }
 
@@ -661,20 +661,21 @@ function startGame() {
 		readyPlayers = 0;
 		var deck = new Deck();
 		deck.get_new_deck();
-        for (i = 0; i < userSockets.length; i++)
-        {
-        	var userSocket = userSockets[i].socket;
-        	var card1 = deck.draw_card();
-        	var user = userSockets[i].username;
-        	card1.set_owner(user);
-      	    var card2 = deck.draw_card();
-            card2.set_owner(user);
-            playerCards.push(card1, card2);
-            userSocket.emit("client cards", {owner: user, value1 : card1.get_value(), suit1 : card1.get_suit(),
-											 value2 : card2.get_value(), suit2 : card2.get_suit()});
-        }
 
-        tableCards = [deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card()];
+    for (i = 0; i < userSockets.length; i++)
+    {
+    	var userSocket = userSockets[i].socket;
+    	var card1 = deck.draw_card();
+    	var user = userSockets[i].username;
+    	card1.set_owner(user);
+	    var card2 = deck.draw_card();
+      card2.set_owner(user);
+      playerCards.push(card1, card2);
+      userSocket.emit("client cards", {owner: user, value1 : card1.get_value(), suit1 : card1.get_suit(),
+								 value2 : card2.get_value(), suit2 : card2.get_suit()});
+    }
+
+    tableCards = [deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card()];
 
 		this.emit("start game");
 		this.broadcast.emit("start game");

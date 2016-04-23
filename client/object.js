@@ -221,7 +221,8 @@ function button(x,y,width,height,label,color,textSize) {
     background.graphics.beginFill(color).drawRoundRect(x,y,width,height,10);
 
 	// Adding the button shape and text to container
-    user_button.addChild(background, text)
+    user_button.addChild(background);
+    user_button.addChild(text);
     return user_button;
 }
 
@@ -270,18 +271,38 @@ function leaveButton(currentPlayer) {
 	})*/
 }
 
-
 // Allows the user to call
 function callButton() {
+  var playerChips = getPlayerChips()
+
 	var call = new button(290,475,50,18,"check/call","yellow",10);
 
-	call.addEventListener("click", function(event) {
-		var amount = getTotalBet() - getAmountBet();
-		var totalBet = getTotalBet();
-		removePlayerChips(amount);
+  var totalBet = getTotalBet();
+  var amount = totalBet - getAmountBet();
+  var currentChips;
+  var player = getCurrentPlayer();
 
-		var currentChips = getPlayerChips();
-		var player = getCurrentPlayer();
+  console.log(totalBet);
+  console.log(amount);
+  console.log((playerChips - amount) < 0);
+
+	call.addEventListener("click", function(event) {
+    if (currentChips == 0) {  // User has 0 chips left
+      amount = 0;
+      currentChips = 0
+    }
+    else if ((playerChips - amount) < 0) // Calling would make chips negative
+    {
+      console.log("got'em")
+      amount = playerChips*1;
+      removePlayerChips(playerChips*1)
+      currentChips = 0;
+    }
+    else {  // User has enough chips
+      amount = getTotalBet() - getAmountBet();
+      removePlayerChips(amount)
+      currentChips = getPlayerChips();
+    }
 
 		socket.emit("increase pot", {chips: amount, amount: amount});
 		socket.emit("changed amount", {id: player, chips: currentChips});
@@ -293,20 +314,84 @@ function callButton() {
 
 // Allows the user to raise
 function raiseButton(maxChips) {
-    raise_button = new button(345,475,50,18,"raise", "yellow",10);
+  console.log("MAX: " + maxChips);
+  var raise_button = new button(345,475,50,18,"raise", "yellow",10);
 
-    raise_button.addEventListener("click", function(event) {
-  		// If user wants to get out of the raise options, then press raise again
-  		if ((show = game_menu.getChildByName("raise_container"))) {
-  			game_menu.removeChild(show);
-  			addCallandFoldButton();
-  		}
-  		else {
-  			removeCallandFoldButton();
-  			showRaiseContainer(maxChips);
-  		}
-	})
+  raise_button.addEventListener("click", function(event) {
+		// If user wants to get out of the raise options, then press raise again
+		if ((show = game_menu.getChildByName("raise_container"))) {
+      raise_button.children[1].text = "raise";
+			game_menu.removeChild(show);
+			addCallandFoldButton();
+		}
+		else {
+      raise_button.children[1].text = "return";
+			removeCallandFoldButton();
+			showRaiseContainer(maxChips);
+		}
+})
 	return raise_button;
+}
+
+function handleSliderChange(evt) {
+  console.log(evt.target.value);
+
+  bet_amount.text = "$" + Math.round(evt.target.value);
+  stage.update();
+
+  //betAmount(Math.round(evt.target.value));
+}
+
+// Allows the different options for raising
+function showRaiseContainer(maxChips) {
+  var raise_container = new createjs.Container(); // Holds the bet amount text, slider, and bet button
+  raise_container.name = "raise_container";
+
+  if (maxChips < getTotalBet() || maxChips == 0) { // User doesn't have enough chips to raise
+    not_enough = new createjs.Text("Insufficient chips!", "16px Bembo", "#FFFF00");
+    not_enough.x = 312;
+    not_enough.y = 455;
+    raise_container.addChild(not_enough);
+  }
+  else {
+    // Bet amount text
+    var amountBetIncremented = getTotalBet() + 1;
+
+    bet_amount = new createjs.Text("$" + amountBetIncremented, "16px Bembo", "#FFFF00"); // global variable
+    bet_amount.name = "bet_amount";
+    bet_amount.x = 238;
+    bet_amount.y = 445;
+    raise_container.addChild(bet_amount);
+
+    // Slider
+    var raise_slider = new Slider(amountBetIncremented*1, maxChips*1, 150,15).set({x: 290, y: 445, value: 1});
+    raise_slider.trackColor = "purple";
+    raise_slider.thumbColor = "#FFFF00";
+    raise_slider.on("change", handleSliderChange, this);
+    raise_container.addChild(raise_slider);
+
+    // Bet Button
+    var bet_button = new button(460,445,35,18,"bet", "yellow",10);
+    bet_button.addEventListener("click", function(event) {
+      game_menu.removeChild(game_menu.getChildByName("raise_container"));
+
+      var currentBetAmount = parseInt(bet_amount.text.substr(1));
+      var lastBet = getLastUserBet();
+      var diffAmount = currentBetAmount - lastBet;
+      setAmountBet(getAmountBet() + currentBetAmount);
+
+      var currentChips = getPlayerChips() - diffAmount;
+      var player = getCurrentPlayer();
+      socket.emit("changed amount", {id: player, chips: currentChips});
+      socket.emit("increase pot", {chips: diffAmount, amount: currentBetAmount});
+      socket.emit("current turn", {action: "raise", user: player, amount: currentBetAmount});
+      socket.emit("buttons", {remove: false});
+    });
+    raise_container.addChild(bet_button);
+  }
+
+  addToGame(raise_container);
+  stage.update();
 }
 
 // Allows the user to fold
@@ -346,61 +431,6 @@ function readyButton() {
         deleteItemFromGame(ready);
         socket.emit("ready");
 	})
-}
-
-function handleSliderChange(evt) {
-  console.log(evt.target.value);
-
-  bet_amount.text = "$" + Math.round(evt.target.value);
-  stage.update();
-
-  //betAmount(Math.round(evt.target.value));
-}
-
-// Allows the different options for raising
-function showRaiseContainer(maxChips) {
-  // Raise container that holds the bet amount text, slider, and bet button
-  var raise_container = new createjs.Container();
-  raise_container.name = "raise_container";
-
-  // Bet amount text
-  var amountBetIncremented = getTotalBet() + 1;
-
-  bet_amount = new createjs.Text("$" + amountBetIncremented, "16px Bembo", "#FFFF00"); // global variable
-  bet_amount.name = "bet_amount";
-  bet_amount.x = 238;
-  bet_amount.y = 445;
-  raise_container.addChild(bet_amount);
-
-  // Slider
-  var raise_slider = new Slider(amountBetIncremented*1, maxChips*1, 150,15).set({x: 290, y: 445, value: 1});
-  raise_slider.trackColor = "purple";
-  raise_slider.thumbColor = "#FFFF00";
-  raise_slider.on("change", handleSliderChange, this);
-  raise_container.addChild(raise_slider);
-
-  // Bet Button
-  var bet_button = new button(460,445,35,18,"bet", "yellow",10);
-  bet_button.addEventListener("click", function(event) {
-
-    game_menu.removeChild(game_menu.getChildByName("raise_container"));
-
-    var currentBetAmount = parseInt(bet_amount.text.substr(1));
-    var lastBet = getLastUserBet();
-    var diffAmount = currentBetAmount - lastBet;
-    setAmountBet(getAmountBet() + currentBetAmount);
-
-    var currentChips = getPlayerChips() - diffAmount;
-    var player = getCurrentPlayer();
-    socket.emit("changed amount", {id: player, chips: currentChips});
-    socket.emit("increase pot", {chips: diffAmount, amount: currentBetAmount});
-    socket.emit("current turn", {action: "raise", user: player, amount: currentBetAmount});
-    socket.emit("buttons", {remove: false});
-  })
-  raise_container.addChild(bet_button);
-
-  addToGame(raise_container);
-  stage.update();
 }
 
 // Once the finishes, all players must press this button to play again

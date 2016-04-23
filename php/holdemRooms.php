@@ -1,12 +1,15 @@
-<?php 
+<?php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+use ElephantIO\Client, ElephantIO\Engine\SocketIO\Version1X;
+
+
 require_once ("db_connect.php");
 require_once ("authenticate.php");
 
-$roomList = array(); 
+$roomList = array();
 $sql = 'SELECT roomName, roomIP FROM holdemRooms';
 $stmt = $db->prepare($sql);
 $stmt->execute();
@@ -75,7 +78,7 @@ if (isset($_POST['removeRoom'])) // This needs to update the database
   //validations
   $field_required = "removeRoomName";
   $value = trim($_POST[$field_required]);
-  
+
   if (empty($value)) {
     $errors[$field_required] = 'This field requires a value.';
   } else if ($password != "adminpwd") {
@@ -101,13 +104,31 @@ if (isset($_POST['refresh'])) // This needs to pull from the database
   header("Refresh:0");
 }
 
-if (isset($_POST['join_server'])) 
+if (isset($_POST['join_server']))
 {
-  header('Location: ../link.php/');
-  
+  //header('Location: ../link.php/');
+
   $ip = $_POST['servers'];
 
   setcookie('server_cookie', $ip , time() + (86400*30), '/');
+
+  $username = $_COOKIE["user_cookie"];
+  $chipAmount = $_COOKIE["chip_cookie"];
+
+  // If it IS a Turing server
+  if (strpos($ip, 'http://192.168.1.101:') !== FALSE) {
+    $client = new Client(new Version1X($ip)); // This does not like it if you include the backslash at the end of the address!
+
+    $client->initialize();
+    $client->emit('linkUsername', [$username, $chipAmount]);
+    $client->emit('linkChipAmount', [$chipAmount]);
+    $client->emit('disconnectLink', []);
+    $client->close();
+  }?>
+  <script>
+    window.open("<?php echo $ip ?>", '_blank','width=780,height=670');
+  </script>
+  <?php
 }
 
 
@@ -133,7 +154,7 @@ if (isset($_POST['join_server']))
     border-radius: 3px;
     border: 1px solid #ccc;
     box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
-  
+
 }
 form {
     margin: 0 auto;
@@ -252,7 +273,7 @@ input[type=submit]:active {
         }
         ?>
 	</p>
-	
+
 	<p>
 	<label for="roomIP"> IP Address: </label>
 	<input type="text" name="roomIP" id="roomIP"/>
@@ -262,13 +283,13 @@ input[type=submit]:active {
         }
         ?>
 	</p>
-	
+
 	<input type="submit" name="addRoom" id="addRoom" value="Add">
       </form>
     </div>
-    
+
     <h2> <br> </h2>
-    
+
     <div id="page2">
       <p>Remove Rooms (Admins only)</h2>
       <form  method="post">
@@ -284,14 +305,12 @@ input[type=submit]:active {
 	    echo $errors['notadmin'];
 	}
         ?>
-  
+
 	</p>
-	
+
 	<input type="submit" name="removeRoom" id="removeRoom" value="Remove">
       </form>
     </div>
-    
+
   </div>
 </div>
-
-

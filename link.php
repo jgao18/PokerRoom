@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -15,7 +15,7 @@ $server = $_COOKIE["server_cookie"];
 // If it IS a Turing server
 if (strpos($server, 'http://192.168.1.101:') !== FALSE) {
   $client = new Client(new Version1X($server)); // This does not like it if you include the backslash at the end of the address!
-  
+
   $client->initialize();
   $client->emit('linkUsername', [$username, $chipAmount]);
   $client->emit('linkChipAmount', [$chipAmount]);
@@ -25,18 +25,6 @@ if (strpos($server, 'http://192.168.1.101:') !== FALSE) {
 }
 ?>
 
-<html>
-  <head>
-    <title>Poker Room Redirect</title>
-    <META http-equiv="refresh" content="0; url=<?php echo $_COOKIE["server_cookie"] ?>">
-  </head>
-  <body bgcolor="#ffffff">
-    <center>Hi, <?php echo $_COOKIE["user_cookie"] ?>, you will be redirected to your game server (<?php echo $_COOKIE["server_cookie"] ?>) shortly...</a>
-    </center>
-  </body>
-</html>
-
-
-
-
- 
+<script>
+    window.open("<?php echo $_COOKIE["server_cookie"] ?>", '_blank','width=680,height=680');
+</script>
