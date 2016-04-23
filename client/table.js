@@ -491,7 +491,7 @@ function lobby() {
     socket.on("last bet", setLastUserBet);
 
     socket.on("player's action", playerAction);
-	
+
 	socket.on("again button", againButton);
 
     // Assigns cards to the table
@@ -517,7 +517,7 @@ function showAgain(){
 
 // Game is started when all players press ready
 function start_game() {
-	
+
   // Indicates to the server that the game is started
   socket.emit("first turn");
   // Passes the cards to the current client
@@ -735,33 +735,6 @@ function serverPot(data) {
 	pot(data.chips);
 }
 
-// This function will be called to accumulate the amount
-// of money the player is betting.
-function betAmount(amount) {
-  
-  console.log("AMOUNT!!!" + amount);
-  console.log("AMOUNTBET!!!" + amountBet);
-
-  // Will not go over current player amount
-  if ((amount + amountBet) <= currentPlayer.getChips()) {
-
-    // Erase the current bet amount
-    var bet;
-    if (bet = stage.getChildByName("bet_amount")) {
-      stage.removeChild(bet);
-    }
-
-    // Creates the new amount
-    amountBet += amount;
-    var bet_amount = new createjs.Text("Bet: $" + amountBet, "16px Bembo", "#FFFF00");
-    bet_amount.name = "bet_amount";
-    bet_amount.x = 180;
-    bet_amount.y = 445;
-    stage.addChild(bet_amount);
-    stage.update();
-  }
-}
-
 // Provides the username and the user amount for each player
 function clientAmounts(player, username, amount) {
 
@@ -779,7 +752,7 @@ function clientAmounts(player, username, amount) {
       if (chip = game_menu.getChildByName("player1_chip_plate")) {
 	    game_menu.removeChild(chip);
       }
-      chip_plate_background.graphics.beginFill("black").drawRect(330,601,100,17);
+      chip_plate_background.graphics.beginFill("black").drawRect(330,601,120,17);
 
       chip_background.graphics.beginFill("red").drawCircle(320,610,15);
       chip_background.graphics.beginFill("white").drawCircle(320,610,12);
@@ -798,7 +771,7 @@ function clientAmounts(player, username, amount) {
       if (chip = game_menu.getChildByName("player2_chip_plate")) {
 	    game_menu.removeChild(chip);
       }
-	  chip_plate_background.graphics.beginFill("black").drawRect(30,380,100,17);
+	  chip_plate_background.graphics.beginFill("black").drawRect(30,380,120,17);
 
       chip_background.graphics.beginFill("blue").drawCircle(20,390,15);
       chip_background.graphics.beginFill("white").drawCircle(20,390,12);
@@ -817,7 +790,7 @@ function clientAmounts(player, username, amount) {
       if (chip = game_menu.getChildByName("player3_chip_plate")) {
 	    game_menu.removeChild(chip);
       }
-	  chip_plate_background.graphics.beginFill("black").drawRect(625,380,100,17);
+	  chip_plate_background.graphics.beginFill("black").drawRect(625,380,120,17);
 
       chip_background.graphics.beginFill("blue").drawCircle(615,390,15);
       chip_background.graphics.beginFill("white").drawCircle(615,390,12);
@@ -976,7 +949,7 @@ function nextAction() {
 			{
 				var card1, card2;
 				console.log(positions);
-				
+
 				if (positions[username] == "right")
 				{
 					console.log("These are the right username: " + username);
@@ -1039,7 +1012,7 @@ function nextAction() {
 				    }
 				}
 			}
-			
+
 			otherCards = [];
 			againButton();
 			socket.emit("buttons",{remove: true});
@@ -1069,7 +1042,7 @@ function nextAction() {
 				var shape = stage.getChildByName("tableCards");
 				stage.removeChild(shape);
 			}
-			
+
 			otherCards = [];
 			againButton();
 			socket.emit("buttons",{remove: true});
@@ -1184,7 +1157,7 @@ function addCallandFoldButton() {
 function addButtonContainer() {
 	var user_buttons = new createjs.Container();
 	user_buttons.name = "buttons";
-	var user_raise = raiseButton();
+	var user_raise = raiseButton(currentPlayer.getChips());
 	var user_call = callButton();
 	var user_fold = foldButton();
 	user_call.name = "call_button";
@@ -1303,7 +1276,7 @@ function timer(data){
 	timeText.name = "time";
 	stage.addChild(timeText);
     stage.update();
-	
+
 	console.log("HELLLO");
 	timeTicker = createjs.Ticker.addEventListener("tick", handleTick);
     function handleTick(event) {
@@ -1324,7 +1297,4 @@ function timer(data){
 			 }
          }
     }
-	
-	
-	
 }

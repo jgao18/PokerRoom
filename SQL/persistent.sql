@@ -27,3 +27,7 @@ CREATE TABLE IF NOT EXISTS `autologin` (
 
 -- Change the value of ENGINE to MyISAM
 -- if your server doesn't support InnoDB
+
+ALTER TABLE users ADD chipamount Int(250) DEFAULT NULL;
+
+ALTER TABLE users ADD last_login DATE DEFAULT NULL;

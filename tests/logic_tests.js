@@ -1,4 +1,6 @@
-// How do I pass in the table cards? 
+// These tests print to the console
+
+// How do I pass in the table cards?
 // I will pass in the table cards and the a player's cards
 var suits = ["heart", "spade", "diamond", "club"];
 var values = ["A", "K", "Q", "J", "10", "9", "8", "7", "6", "5", "4", "3", "2"];
@@ -28,15 +30,15 @@ function determineWinner(cardList) {
 	console.log(winner);
 
 	testList.sort();
-	
+
 	for (var i =0; i < testList.length; i++) {
 		console.log(testList[i]);
 	}
-	
+
 	var hand;
 	switch (winner) {
 		// suit/order/value
-		case "YYN": 
+		case "YYN":
 			console.log("Royal or Straight Flush");
 			return whichFlush(cardList);
 			break;
@@ -71,16 +73,16 @@ function sortCards(cards) {
 	//console.log("In sort cards");
 	var valueList = [];
 	var pointList = [];
-	
+
 	for (var i = 0; i < cards.length; i++) {
 		valueList.push(cards[i].get_value());
 	}
-	
+
 	for (var i = 0; i < cards.length; i++) {
 		pointList.push(keyDict[valueList[i]]);
 	}
 	pointList.sort(sortNumber);
-	
+
 	return pointList;
 }
 
@@ -89,7 +91,7 @@ function isSuit(cards) {
 	var points = 0;
 	var testList = [];
 	//sortCards(testList);
-	
+
 	var heart = 0;
 	var spade = 0;
 	var diamond = 0;
@@ -110,7 +112,7 @@ function isSuit(cards) {
 				break;
 		}
 	}
-	
+
 	console.log("Heart is " + heart);
 	console.log("Spade is " + spade);
 	console.log("Diamond is " + diamond);
@@ -126,9 +128,9 @@ function isSuit(cards) {
 }
 
 function isOrder(cards) {
-	
+
 	var orderList = sortCards(cards);
-	
+
 	var order = 0;
 	for (var i = 0; i < (orderList.length-1); i++) {
 		if ((orderList[i] + 1) == orderList[i+1] ) {
@@ -144,36 +146,36 @@ function isOrder(cards) {
 			order = 0;
 		}
 	}
-	
+
 	return "N";
 }
 
 function isPairs(cards) {
 	var newList = [];
 	var pairList = cards;
-	
+
 	for (var i = 0; i < cards.length; i++) {
 		newList.push(values[pairList[i]]);
 	}
-	
+
 	var pairs = {};
 	var numOfCards = 1;
 	for (var i = 0; i < (newList.length-1); i++) {
 		if (newList[i] == newList[i+1]) {
-			numOfCards++; 
+			numOfCards++;
 			pairs[newList[i]] = numOfCards;
 		}
 		else {
 			numOfCards = 1;
 		}
 	}
-	
+
 	for (var i = 0; i < values.length; i++) {
 		if( pairs[values[i]] > 1) {
 			return "Y";
 		}
 	}
-	
+
 	return "N";
 }
 
@@ -186,7 +188,7 @@ function whichFlush(cards) {
 			isRoyal++;
 		}
 	}
-	
+
 	if (isRoyal > 4) {
 		return "Royal Flush";
 	}
@@ -209,12 +211,12 @@ function findValue(dict,keyList,times,extra) {
 function whichPair(cards) {
 	var newList = [];
 	var pairList = sortCards(cards);
-	
+
 	// Find the values that are associate to the points
 	for (var i = 0; i < pairList.length; i++) {
 		newList.push(values[pairList[i]]);
 	}
-	
+
 	var pairs = {};
 	var numOfCards = 1;
 	for (var i = 0; i < newList.length; i++) {
@@ -256,7 +258,7 @@ function whichPair(cards) {
 				break;
 		}
 	}
-	
+
 	var returnValue;
 	var extraValue;
 	if(fourOfaKind == 1) {
@@ -284,7 +286,7 @@ function whichPair(cards) {
 		returnValue = findValue(pairs,keyList,2);
 		console.log("It is a pair of " + returnValue);
 	}
-	
+
 }
 
 function finalEvaluation(user1List, user2List, user1Results,user2Results) {
@@ -305,14 +307,14 @@ function finalEvaluation(user1List, user2List, user1Results,user2Results) {
 				break;
 			}
 		}
-		
+
 		for(var i = 0; i < values.length; i++) {
 			if(user2Results.includes(values[i])) {
 				user2Value = keyDict[values[i]];
 				break;
 			}
 		}
-		
+
 		console.log("The user1Value is " + user1Value);
 		console.log("The user2Value is " + user2Value);
 		if(user1Value < user2Value) {
@@ -340,7 +342,7 @@ function finalEvaluation(user1List, user2List, user1Results,user2Results) {
 				}
 			}
 		}
-	
+
 		if (userValueList[0] < userValueList[1]) {
 			console.log("user1Value is less than user2Value");
 			userPoints = 0.5;
@@ -349,7 +351,7 @@ function finalEvaluation(user1List, user2List, user1Results,user2Results) {
 			console.log("It is not less");
 			userPoints = 0;
 		}
-	
+
 	}*/
 	// This is good
 	var List1 = user1List;
@@ -369,7 +371,7 @@ function finalEvaluation(user1List, user2List, user1Results,user2Results) {
 			}
 		}
 	}
-	
+
     console.log("The value at the end " + userPoints);
 }
 
@@ -384,7 +386,7 @@ finalEvaluation([0,1,2,4,5,5,6],[0,1,3,4,5,5,6],"It is a pair of 9", "It is a pa
 function orderTesting() {
 	var list = [1,2,2,3,4,5,7];
 	var order = 0;
-	
+
 	for (var i = 0; i < (list.length-1); i++) {
 		if ((list[i] + 1) == list[i+1] ) {
 			order++;
@@ -404,7 +406,7 @@ function orderTesting() {
 
 function pairTesting() {
 	var list = ["A","A","K","5","3","3","2"];
-	
+
 	var pairs = {};
 	var numOfCards = 1;
 	for (var i = 0; i < list.length; i++) {
@@ -416,7 +418,7 @@ function pairTesting() {
 			numOfCards = 1;
 		}
 	}
-	
+
 	var store;
 	for (var i = 0; i < values.length; i++) {
 		if(store = pairs[values[i]]) {
