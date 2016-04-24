@@ -507,7 +507,7 @@ function currentTurn(data) {
 				// Push a dictionary int to the card list with information of each card
 			    for (var i = 0; i < playerCards.length; i++)
 			    {
-					 console.log("This is playerCards: " + playerCards[i]);
+					 //console.log("This is playerCards: " + playerCards[i]);
 					 // inserting the info of the card
 			         outputPlayerCards.push({value: playerCards[i].get_value(), suit: playerCards[i].get_suit(), owner: playerCards[i].get_owner()});
 			         // Pushing the card value into the logic list
@@ -517,6 +517,8 @@ function currentTurn(data) {
 					 if (times == 2) {
 						result = Logic.determineHand(totalCards);
 						// Stores the results of each user
+            console.log("520: " + playerCards[i].get_owner());
+            console.log("521: " + result)
 						userResults[playerCards[i].get_owner()] = result;
 						// Restart the card list
 						totalCards = tableCards.slice();
@@ -524,15 +526,17 @@ function currentTurn(data) {
 					 }
 			    }
 
+      console.log("USERRESULTS LENGTHHHH" + userResults.length);
+
 				// Iterate through the dictionary and see which is the higher result
 				var userPoints = {};
 				for (var i = 0; i < usernames.length; i++) {
-					/*util.log("len: " + usernames.length);
+					util.log("len: " + usernames.length);
           for (j = 0; j < usernames.length; j++)
           {
             util.log(usernames[j]);
           }
-					util.log("i: " + usernames[i]);*/
+					util.log("i: " + usernames[i]);
 
 					var str = userResults[usernames[i]];
           util.log("userResults length: " + userResults.length);
@@ -661,6 +665,12 @@ function startGame() {
 		readyPlayers = 0;
 		var deck = new Deck();
 		deck.get_new_deck();
+
+    for (var i = 0; i < connectedPlayers.length; i++) {
+      util.log("USERNAME AND CHIPS");
+      util.log(connectedPlayers[i].getUsername());
+      util.log(connectedPlayers[i].getChips());
+    }
 
     for (i = 0; i < userSockets.length; i++)
     {

@@ -18,6 +18,7 @@ var lastUserBet = 0;
 var lastBetAmount = 0;
 var pot_amount = 0;
 var positions = {};
+var zeroChipsList = [];
 
 var card1;
 var card2;
@@ -1121,7 +1122,10 @@ function addButtonContainer() {
 	var user_fold = foldButton();
 	user_call.name = "call_button";
 	user_fold.name = "fold_button";
-	user_buttons.addChild(user_raise,user_call,user_fold);
+	user_buttons.addChild(user_fold);
+	if (zeroChipsList.indexOf(currentPlayer.getUsername()) < 0) {
+		user_buttons.addChild(user_raise,user_call)
+	}
 	game_menu.addChild(user_buttons);
 	stage.update();
 }
@@ -1148,12 +1152,14 @@ function wonPlayer(data) {
 		 if(currentPlayers[i].getUsername() == data.player) {
 			amount = currentPlayers[i].getChips() + pot_amount;
 		 }
+		 else if (currentPlayers[i].getChips()*1 == 0 && currentPlayers[i].getUsername() != "INVALID_USER") {
+			 console.log("FLAGGING FLAGGING FLAGGING FLAGGING " + currentPlayers[i].getUsername());
+			 zeroChipsList.push(currentPlayers[i].getUsername());
+		 }
 	 }
-
 	 socket.emit("changed amount",{id: data.player, chips: amount});
 	 setPotToZero();
 
-	 //console.log("This is the pot amount: " + pot_amount);
 	 var player = new createjs.Text(data.player + " Wins!", "20px Bembo","#FFFF00");
  	 player.x = 350;
  	 player.y = 385;

@@ -22,14 +22,19 @@ var Player = function(id, username, chips, tableIndex, position, pStatus)
   {
     return chips;
   }
-  
+
+  var setChips = function(numChips)
+  {
+    chips = numChips;
+  }
+
   var getId = function() {
 	return id;
   }
-  
+
   var getIsPlaying = function() {
     return isPlaying;
-  } 
+  }
 
   var setIsPlaying = function(pStatus) {
 	isPlaying = pStatus;
@@ -54,7 +59,7 @@ var Player = function(id, username, chips, tableIndex, position, pStatus)
   {
     chips += numChips;
   }
-  
+
   var deleteChips = function(numChips) {
 	chips -= numChips;
   }
@@ -63,11 +68,11 @@ var Player = function(id, username, chips, tableIndex, position, pStatus)
   {
     tableIndex = index;
   }
-  
+
   var setPosition = function(num) {
 	 position = num;
   }
-  
+
   var getPosition = function() {
      return position;
   }
