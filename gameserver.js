@@ -36,7 +36,7 @@ var gameStage = 0;
 var game_in_progress = false;
 var usernames;
 
-var localUserNames = ["res_Homer", "res_Bart", "res_Marge", "res_Lisa", "res_Burns"];
+var localUserNames = ["~Antonio", "~Sam", "~Daniel", "~Philip"];
 var localUserCount = 0;
 
 var latestPlayerUsername = localUserNames[localUserCount];
@@ -391,16 +391,16 @@ function firstTurn(data) {
 	gameStage = 0;
 	indexPlayer = 0;
 	playingPlayers = connectedPlayers.slice();
-    currentHandPlayers = connectedPlayers.slice();
+  currentHandPlayers = connectedPlayers.slice();
 
 	console.log("This is the length of waitlist: " + waitList.length);
 
     for(i = 0; i < waitList.length; i++){
       for(j = 0; j < playingPlayers.length; j++){
- 	   if(playingPlayers[j].getUsername() == waitList[i].getUsername()){
- 	     playingPlayers.splice(j, 1);
-		 currentHandPlayers.splice(j,1);
- 	   }
+ 	      if(playingPlayers[j].getUsername() == waitList[i].getUsername()){
+ 	        playingPlayers.splice(j, 1);
+		      currentHandPlayers.splice(j,1);
+ 	      }
       }
     }
 
@@ -522,7 +522,7 @@ function currentTurn(data) {
 				// Push a dictionary int to the card list with information of each card
 			    for (var i = 0; i < playerCards.length; i++)
 			    {
-					 console.log("This is playerCards: " + playerCards[i]);
+					 //console.log("This is playerCards: " + playerCards[i]);
 					 // inserting the info of the card
 			         outputPlayerCards.push({value: playerCards[i].get_value(), suit: playerCards[i].get_suit(), owner: playerCards[i].get_owner()});
 			         // Pushing the card value into the logic list
@@ -532,6 +532,8 @@ function currentTurn(data) {
 					 if (times == 2) {
 						result = Logic.determineHand(totalCards);
 						// Stores the results of each user
+            console.log("520: " + playerCards[i].get_owner());
+            console.log("521: " + result)
 						userResults[playerCards[i].get_owner()] = result;
 						// Restart the card list
 						totalCards = tableCards.slice();
@@ -539,15 +541,17 @@ function currentTurn(data) {
 					 }
 			    }
 
+      console.log("USERRESULTS LENGTHHHH" + userResults.length);
+
 				// Iterate through the dictionary and see which is the higher result
 				var userPoints = {};
 				for (var i = 0; i < usernames.length; i++) {
-					/*util.log("len: " + usernames.length);
+					util.log("len: " + usernames.length);
           for (j = 0; j < usernames.length; j++)
           {
             util.log(usernames[j]);
           }
-					util.log("i: " + usernames[i]);*/
+					util.log("i: " + usernames[i]);
 
 					var str = userResults[usernames[i]];
           util.log("userResults length: " + userResults.length);
@@ -676,20 +680,27 @@ function startGame() {
 		readyPlayers = 0;
 		var deck = new Deck();
 		deck.get_new_deck();
-        for (i = 0; i < userSockets.length; i++)
-        {
-        	var userSocket = userSockets[i].socket;
-        	var card1 = deck.draw_card();
-        	var user = userSockets[i].username;
-        	card1.set_owner(user);
-      	    var card2 = deck.draw_card();
-            card2.set_owner(user);
-            playerCards.push(card1, card2);
-            userSocket.emit("client cards", {owner: user, value1 : card1.get_value(), suit1 : card1.get_suit(),
-											 value2 : card2.get_value(), suit2 : card2.get_suit()});
-        }
 
-        tableCards = [deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card()];
+    for (var i = 0; i < connectedPlayers.length; i++) {
+      util.log("USERNAME AND CHIPS");
+      util.log(connectedPlayers[i].getUsername());
+      util.log(connectedPlayers[i].getChips());
+    }
+
+    for (i = 0; i < userSockets.length; i++)
+    {
+    	var userSocket = userSockets[i].socket;
+    	var card1 = deck.draw_card();
+    	var user = userSockets[i].username;
+    	card1.set_owner(user);
+	    var card2 = deck.draw_card();
+      card2.set_owner(user);
+      playerCards.push(card1, card2);
+      userSocket.emit("client cards", {owner: user, value1 : card1.get_value(), suit1 : card1.get_suit(),
+								 value2 : card2.get_value(), suit2 : card2.get_suit()});
+    }
+
+    tableCards = [deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card()];
 
 		this.emit("start game");
 		this.broadcast.emit("start game");
