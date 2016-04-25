@@ -61,7 +61,7 @@ var Player = function(id, username, chips, tableIndex, position, pStatus)
   }
 
   var deleteChips = function(numChips) {
-	chips = chips *1 - numChips;
+	chips = chips*1 - numChips;
   }
 
   var setTableIndex = function(index)
