@@ -3,8 +3,8 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+require __DIR__ . '/autoload.php';
 use ElephantIO\Client, ElephantIO\Engine\SocketIO\Version1X;
-
 
 require_once ("db_connect.php");
 require_once ("authenticate.php");
@@ -23,6 +23,12 @@ if ($stmt->rowCount() > 0){
   }else{
      "";
   }
+  
+if(isset($_GET['updateDatabase']))
+{
+  echo "FSDFASDFDAFASDFFDSAFSDAFSDAFSAFSDFSDFSAFSDAFSADFSDAFSDFSAF";
+}
+  
 $errors =[];
 if (isset($_POST['addRoom'])) // This needs to update the database
 {
