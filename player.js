@@ -20,7 +20,7 @@ var Player = function(id, username, chips, tableIndex, position, pStatus)
 
   var getChips = function()
   {
-    return chips;
+    return chips*1;
   }
 
   var setChips = function(numChips)
@@ -57,11 +57,11 @@ var Player = function(id, username, chips, tableIndex, position, pStatus)
 
   var addChips = function(numChips)
   {
-    chips += numChips;
+    chips = chips*1 + numChips;
   }
 
   var deleteChips = function(numChips) {
-	chips -= numChips;
+	chips = chips*1 - numChips;
   }
 
   var setTableIndex = function(index)
@@ -81,6 +81,7 @@ var Player = function(id, username, chips, tableIndex, position, pStatus)
 		getUsername: getUsername,
 		getPassword: getPassword,
         getChips: getChips,
+	    setChips: setChips,
 	    getId: getId,
 	    getIsPlaying: getIsPlaying,
 	    setIsPlaying: setIsPlaying,

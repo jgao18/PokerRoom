@@ -115,6 +115,25 @@ function init() {
 	});
 };
 
+function changePlayerAmount(user,amount,extra){
+	var i;
+	var playerAmount;
+	var newAmount;
+	for(i = 0; i < connectedPlayers.length; i++){
+		if(connectedPlayers[i].getUsername() == user){
+			if(extra == "pot"){
+				newAmount = amount + connectedPlayers[i].getChips();
+				connectedPlayers[i].setChips(newAmount);
+			}
+			else{
+				playerAmount = parseInt(connectedPlayers[i].getChips());
+				newAmount = playerAmount - parseInt(amount);
+				connectedPlayers[i].setChips(amount);
+			}
+		}
+	}
+}
+
 // Restarts list of players that haven't fold
 function restartPlayerList() {
 	currentHandPlayers = connectedPlayers.slice();
@@ -122,6 +141,8 @@ function restartPlayerList() {
 
 // Transfers the pot amount to the winner
 function amountChanged(data) {
+	console.log("This is the id: " + data.id);
+	changePlayerAmount(data.id, data.chips,"raise");
 	this.emit("change amount",{username: data.id, chips: data.chips});
 	this.broadcast.emit("change amount",{username: data.id, chips: data.chips});
 }
@@ -140,6 +161,9 @@ function retrieveChipAmount(data)
 
 // Increases the pot amount and player's amount
 function potIncrease(data) {
+	//changePlayerAmount(data.id, data.chips);
+	console.log("This is the last bet amount: " + data.amount);
+	console.log("This is the data.chips: " + data.chips);
 	this.emit("last bet", {chips: data.amount})
 	this.emit("add to pot", {chips: data.chips, amount: data.amount});
 	this.broadcast.emit("add to pot", {chips: data.chips, amount: data.amount});
@@ -147,6 +171,10 @@ function potIncrease(data) {
 
 // Called by sockets when they hit the Play button
 function onNewPlayer(data) {
+	
+   for(i=0; i < connectedPlayers.length; i++){
+	   console.log("This is start of onNewPlayer: " + connectedPlayers[i].getChips());
+   }
 
    if(connectedPlayers.length > maxPlayers) {
 	  console.log("Rejected!!!!");
@@ -178,6 +206,12 @@ function onNewPlayer(data) {
    }
 
    newPlayer = new Player(this.id, latestPlayerUsername, latestPlayerChipAmount, tableIndex, pStatus);
+   
+   if(connectedPlayers.length > 0){
+	   for(i=0; i < connectedPlayers.length; i++){
+		   console.log("This is after newPlayer: " + connectedPlayers[i].getChips());
+	   }
+   }
 
    if(game_in_progress == true){
      waitList.push(newPlayer);
@@ -220,6 +254,7 @@ function onNewPlayer(data) {
    // Go through connectedPlayers list and provide the user info
    for (i = 0; i < connectedPlayers.length; i++) {
      existingPlayer = connectedPlayers[i];
+	 console.log("This is the player amount: " + existingPlayer.getChips());
      outputArray[existingPlayer.getTableIndex()] = {id: existingPlayer.id, username: existingPlayer.getUsername(),
 												    chips: existingPlayer.getChips(), index: existingPlayer.getTableIndex()};
    };
@@ -391,7 +426,7 @@ function firstTurn(data) {
 	gameStage = 0;
 	indexPlayer = 0;
 	playingPlayers = connectedPlayers.slice();
-  currentHandPlayers = connectedPlayers.slice();
+    currentHandPlayers = connectedPlayers.slice();
 
 	console.log("This is the length of waitlist: " + waitList.length);
 
@@ -642,13 +677,24 @@ function currentTurn(data) {
 				 userSocket = userSockets[i].socket;
 			     userSocket.emit("next action", gameStages[gameStage]);
 			 }
+			 
+	  	   for(i=0; i < connectedPlayers.length; i++){
+	  		   console.log("This is before waitToPlay: " + connectedPlayers[i].getChips());
+	  	   }
 
 			 if(round_over == true){
 			   waitToPlay();
 			 }
+			 
+	  	   for(i=0; i < connectedPlayers.length; i++){
+	  		   console.log("This is after waitToPlay: " + connectedPlayers[i].getChips());
+	  	   }
 		 }
 	 }
 
+	 console.log("\n");
+	 console.log("This is the data.amount" + data.amount);
+	 console.log("\n");
  	if (data.action == "raise") {
  		this.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
  		this.broadcast.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
@@ -686,6 +732,7 @@ function startGame() {
       util.log(connectedPlayers[i].getUsername());
       util.log(connectedPlayers[i].getChips());
     }
+	
 
     for (i = 0; i < userSockets.length; i++)
     {
