@@ -13,7 +13,7 @@ function sortNumber(a,b) {
     return a - b;
 }
 
-function determineWinner(cardList) {
+/*function determineWinner(cardList) {
 	//var deck = new Deck();
 	//deck.get_new_deck();
 	//var cardList = [];
@@ -352,7 +352,7 @@ function finalEvaluation(user1List, user2List, user1Results,user2Results) {
 			userPoints = 0;
 		}
 
-	}*/
+	}
 	// This is good
 	var List1 = user1List;
 	var List2 = user2List;
@@ -380,8 +380,190 @@ finalEvaluation([0,2,2,2,2,3,6],[1,2,4,4,4,4,7],"It is a four of a kind of Q", "
 finalEvaluation([3,4,6,7,7,9,10],[2,3,5,5,6,8,9],"It is a pair of 7", "It is a pair of 9");
 finalEvaluation([0,1,3,5,6,8,9],[1,3,4,4,9,10,11],"High Card");
 finalEvaluation([3,4,6,7,8,9,10],[0,1,3,5,6,8,9], "High card");
-finalEvaluation([0,1,2,4,5,5,6],[0,1,3,4,5,5,6],"It is a pair of 9", "It is a pair of 9");
+finalEvaluation([0,1,2,4,5,5,6],[0,1,3,4,5,5,6],"It is a pair of 9", "It is a pair of 9");*/
+// Finds the value that correspond to times
+function findValue(dict,keyList,times,extra) {
+	var lastIndex = keyList.length - 1;
+	for(var i = lastIndex; i >= 0; i--) {
+		if(dict[keyList[i]] == times && keyList[i] != extra) {
+			return keyList[i];
+		}
+	}
+}
 
+function whichPair(cards) {
+	var newList = [];
+	var pairs = {};
+	var finalDict = {};
+	var numOfCards = 1;
+	var fourOfaKind = 0;
+	var threeOfaKind = 0;
+	var pair = 0;
+	var pairList = [3,3,3,4,4,4,7];
+	var comp;
+	var returnValue;
+	var extraValue;
+	var answer;
+	var i = 0;
+
+	// Find the values that are associate to the points
+	for (i = 0; i < pairList.length; i++) {
+		newList.push(values[pairList[i]]);
+	}
+
+	for (i = 0; i < newList.length; i++) {
+		// If the next value is the current value, then skip
+		if (comp == newList[i]) {
+			continue;
+		}
+		comp = newList[i];
+		// Look through the list and see if the value appears again
+		for (var j = i; j < (newList.length-1); j++) {
+			if (comp == newList[j+1]) {
+				numOfCards++;
+			}
+		}
+		// If there are multiple card values, then store it inside the dictionary
+		if (numOfCards > 1) {
+			pairs[comp] = numOfCards;
+		}
+		numOfCards = 1;
+	}
+
+	var keyList = Object.keys(pairs);
+	for (i = 0; i < keyList.length; i++) {
+		switch(pairs[keyList[i]]) {
+			case 4:
+				fourOfaKind++;
+				break;
+			case 3:
+				threeOfaKind++;
+				break;
+			case 2:
+				pair++;
+				break;
+		}
+	}
+
+	if(fourOfaKind == 1) {
+		returnValue = findValue(pairs,keyList,4);
+		answer = "four of a kind of " + returnValue;
+		return answer;
+	}
+	else if(threeOfaKind == 1 && pair == 1) {
+		returnValue = findValue(pairs,keyList,3);
+		extraValue = findValue(pairs,keyList,2);
+		answer = "Full House with " + returnValue + " and " + extraValue;
+		return answer;
+	}
+	else if(threeOfaKind >= 1) {
+		returnValue = findValue(pairs,keyList,3);
+		answer = "three of a kind of " + returnValue;
+		return answer;
+	}
+	else if(pair > 1) {
+		returnValue = findValue(pairs,keyList,2);
+		extraValue = findValue(pairs,keyList,2,returnValue);
+		answer = "two pair with " + returnValue + " and " + extraValue;
+		return answer;
+	}
+	else if(pair == 1) {
+		returnValue = findValue(pairs,keyList,2);
+		answer = "It is a pair of " + returnValue;
+		return answer;
+	}
+	else{
+		console.log("What is happening");
+	}
+
+}
+
+function whichStraight(cards){
+	
+	//var straightList = sortCards(cards);
+	var lastValue;
+	var isLowStraight = 0;
+	var flushList = [0,9,9,10,10,11,12];
+	var i;
+	
+	// Finds the lowest Straight A,5,4,3,2
+	for(i = 0; i < flushList.length; i++){
+		if(lastValue != flushList[i]){
+			if(flushList[i] == 0){
+				isLowStraight++;
+			}
+			else if(flushList[i] == 8){
+				isLowStraight--;
+			}
+			else if(flushList[i] == 9){
+				isLowStraight++;
+			}
+			else if(flushList[i] == 10){
+				isLowStraight++;
+			}
+			else if(flushList[i] == 11){
+				isLowStraight++;
+			}
+			else if(flushList[i] == 12){
+				isLowStraight++;
+			}
+	    }
+	    lastValue = flushList[i];
+	}
+
+	if(isLowStraight > 4){
+		console.log("Low Straight");
+	}
+	else{
+		console.log("Straight");
+	}
+}
+
+/*
+function whichFlush(cards) {
+	console.log("HELLLO");
+	var isRoyal = 0;
+	var isLowStraight = 0;
+	var flushList = [0,7,8,9,10,11,12];
+	var i;
+	// If values match the beginning values
+	for(i = 0; i < 5; i++) {
+		if (flushList[i] == i) {
+			isRoyal++;
+		}
+	}
+
+	for(i = 0; i < flushList.length; i++){
+		if(flushList[i] == 0){
+			isLowStraight++;
+		}
+		else if(flushList[i] == 9){
+			isLowStraight++;
+		}
+		else if(flushList[i] == 10){
+			isLowStraight++;
+		}
+		else if(flushList[i] == 11){
+			isLowStraight++;
+		}
+		else if(flushList[i] == 12){
+			isLowStraight++;
+		}
+	}
+
+	if (isRoyal > 4) {
+		console.log("Royal Flush");
+	}
+	else if(isLowStraight > 4){
+		console.log("Low Straight");
+	}
+	else {
+		console.log("Straight Flush");
+	}
+}
+*/
+//whichStraight();
+console.log(whichPair());
 /*
 function orderTesting() {
 	var list = [1,2,2,3,4,5,7];

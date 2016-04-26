@@ -494,13 +494,14 @@ function lobby() {
     socket.on("player's action", playerAction);
 
 	socket.on("again button", againButton);
+	
+	socket.on("timer", timer);
 
     // Assigns cards to the table
     socket.on("flop cards", flopCards)
     socket.on("turn card", turnCard)
     socket.on("river card", riverCard)
     socket.on("other cards", otherCardsFunction);	// Server indicates the cards of the other players
-    //socket.on("winner", displayWinner);
   });
 
    // All background for the lobby
@@ -1276,9 +1277,10 @@ function playerAction(data) {
 function timer(data){
 	var past = new Date();
 	var i = 30;
+	var store;
 	var timeText = new createjs.Text(i, "20px Bembo", "red");
  	timeText.x = 360;
-	timeText.y = 590;
+	timeText.y = 390;
 	timeText.name = "time";
 	stage.addChild(timeText);
     stage.update();
@@ -1296,6 +1298,8 @@ function timer(data){
 			 stage.update();
 			 if (i < 1) {
 			 	createjs.Ticker.off("tick",timeTicker);
+			    store = game_menu.getChildByName("raise_container");
+				game_menu.removeChild(store);
 				var player = getCurrentPlayer();
 				socket.emit("buttons", {remove: false, action: "fold"});
 				socket.emit("fold",{username: player});

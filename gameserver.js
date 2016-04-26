@@ -351,12 +351,7 @@ function buttons(data) {
 	}
 
 	this.emit("remove buttons");
-	console.log("In buttons");
-	console.log("index player is " + indexPlayer);
-	console.log("This is userSockets length: " + userSockets.length);
 	for (var i = 0; i < userSockets.length; i++) {
-		console.log("This is playingPlayers: " + playingPlayers[indexPlayer].getUsername());
-		console.log("This is userSockets: " + userSockets[i].username);
 		if(playingPlayers[indexPlayer].getUsername() == userSockets[i].username) {
 			var userSocket = userSockets[i].socket;
 			// Provide that player the turn signal and buttons
@@ -565,6 +560,7 @@ function currentTurn(data) {
 					 times++;
 
 					 if (times == 2) {
+						console.log(totalCards);
 						result = Logic.determineHand(totalCards);
 						// Stores the results of each user
             console.log("520: " + playerCards[i].get_owner());
@@ -589,24 +585,27 @@ function currentTurn(data) {
 					util.log("i: " + usernames[i]);
 
 					var str = userResults[usernames[i]];
-          util.log("userResults length: " + userResults.length);
+                    util.log("userResults length: " + userResults.length);
 					if (str.indexOf("Royal Flush") >= 0) {
-						userPoints[usernames[i]] = 10;
+						userPoints[usernames[i]] = 11;
 					}
 					else if(str.indexOf("Straight Flush") >= 0) {
-						userPoints[usernames[i]] = 9;
+						userPoints[usernames[i]] = 10;
 					}
 					else if(str.indexOf("four of a kind") >= 0) {
-						userPoints[usernames[i]] = 8;
+						userPoints[usernames[i]] = 9;
 					}
 					else if(str.indexOf("Full House") >= 0) {
-						userPoints[usernames[i]] = 7;
+						userPoints[usernames[i]] = 8;
 					}
 					else if(str.indexOf("Flush") >= 0) {
-						userPoints[usernames[i]] = 6;
+						userPoints[usernames[i]] = 7;
 					}
-					else if(str.indexOf("Straight") >= 0) {
+					else if(str.indexOf("Low Straight") >= 0) {
 						userPoints[usernames[i]] = 5;
+					}
+					else if(str.indexOf("Straight") >= 0){
+						userPoints[usernames[i]] = 6;
 					}
 					else if(str.indexOf("three of a kind") >= 0) {
 						userPoints[usernames[i]] = 4;
