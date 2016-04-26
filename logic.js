@@ -15,7 +15,6 @@ module.exports = {
 	// Determines the value of the hand
 	// Takes in table cards and two cards of player
 	determineHand: function(cardList) {
-
 		// Retrieving all variables to determine hand
 		var handResult;
 		handResult = isSuit(cardList);
@@ -34,10 +33,10 @@ module.exports = {
 				return "Flush";
 				break;
 			case "NYY":
-				return "Straight";
+				return whichStraight(cardList);
 				break;
 			case "NYN":
-				return "Straight";
+				return whichStraight(cardList);
 				break;
 			case "NNY":
 				return whichPair(cardList);
@@ -69,6 +68,7 @@ module.exports = {
 		var user1Value;
 		var user2Value;
 		var i = 0;
+		
 
 		//What if we looked into the result string and find the values
 		//Need something for pair/two pair/threeokakind/FullHouse/FourofKind
@@ -100,7 +100,7 @@ module.exports = {
 
 		/* Look through each cardList and find the highest value
 		   that stands apart.
-		   Works for high card/Straight/Flush/StraightFlush/RoyalFlush */
+		   Works for HighCard/Straight/Flush/StraightFlush/RoyalFlush */
 		for(i = 0; i < List1.length; i++) {
 			if (List1[i] != List2[i]) {
 				if (List1[i] < List2[i]) {
@@ -115,6 +115,46 @@ module.exports = {
 		}
 
 	    return userPoints;
+	}
+}
+
+function whichStraight(cards){
+	
+	var straightList = sortCards(cards);
+	var lastValue;
+	var isLowStraight = 0;
+	var i;
+	
+	// Finds the lowest Straight A,5,4,3,2
+	for(i = 0; i < straightList.length; i++){
+		if(lastValue != straightList[i]){
+			if(straightList[i] == 0){
+				isLowStraight++;
+			}
+			else if(straightList[i] == 8){
+				isLowStraight--;
+			}
+			else if(straightList[i] == 9){
+				isLowStraight++;
+			}
+			else if(straightList[i] == 10){
+				isLowStraight++;
+			}
+			else if(straightList[i] == 11){
+				isLowStraight++;
+			}
+			else if(straightList[i] == 12){
+				isLowStraight++;
+			}
+	    }
+	    lastValue = straightList[i];
+	}
+
+	if(isLowStraight > 4){
+		return "Low Straight";
+	}
+	else{
+		return "Straight";
 	}
 }
 
@@ -172,6 +212,7 @@ function isSuit(cards) {
 
 function isOrder(cards) {
 	var orderList = sortCards(cards);
+	var isLowStraight = 0;
 	var order = 0;
 
 	// Determines if the list has five values in order
@@ -190,6 +231,28 @@ function isOrder(cards) {
 			order = 0;
 		}
 	}
+	
+	for(i = 0; i < orderList.length; i++){
+		if(orderList[i] == 0){
+			isLowStraight++;
+		}
+		else if(orderList[i] == 9){
+			isLowStraight++;
+		}
+		else if(orderList[i] == 10){
+			isLowStraight++;
+		}
+		else if(orderList[i] == 11){
+			isLowStraight++;
+		}
+		else if(orderList[i] == 12){
+			isLowStraight++;
+		}
+	}
+	
+	if(isLowStraight > 4){
+		return "Y";
+	}	
 
 	return "N";
 }
@@ -231,15 +294,16 @@ function isPairs(cards) {
 function whichFlush(cards) {
 	var flushList = sortCards(cards);
 	var isRoyal = 0;
+	var i;
 
 	// If values match the beginning values
-	for (var i = 0; i < 5; i++) {
+	for(i = 0; i < 5; i++) {
 		if (flushList[i] == i) {
 			isRoyal++;
 		}
 	}
 
-	if (isRoyal > 4) {
+	if (isRoyal > 4){
 		return "Royal Flush";
 	}
 	else {
@@ -317,13 +381,13 @@ function whichPair(cards) {
 		answer = "four of a kind of " + returnValue;
 		return answer;
 	}
-	else if(threeOfaKind == 1 && pair == 1) {
+	else if(threeOfaKind == 1 && pair >= 1) {
 		returnValue = findValue(pairs,keyList,3);
 		extraValue = findValue(pairs,keyList,2);
 		answer = "Full House with " + returnValue + " and " + extraValue;
 		return answer;
 	}
-	else if(threeOfaKind == 1) {
+	else if(threeOfaKind >= 1) {
 		returnValue = findValue(pairs,keyList,3);
 		answer = "three of a kind of " + returnValue;
 		return answer;
