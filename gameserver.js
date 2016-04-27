@@ -36,7 +36,7 @@ var gameStage = 0;
 var game_in_progress = false;
 var usernames;
 
-var localUserNames = ["~Antonio", "~Sam", "~Daniel", "~Philip"];
+var localUserNames = ["~Antonio", "~Sam", "~Daniel", "~Philip", "~Jessie"];
 var localUserCount = 0;
 
 var latestPlayerUsername = localUserNames[localUserCount];
@@ -237,6 +237,17 @@ function onNewPlayer(data) {
    if(game_in_progress == false){
 	 playingPlayers = sortTablePlayers.slice()
 	 currentHandPlayers = sortTablePlayers.slice();
+	 
+	 var socketList = [];
+	 for(i = 0; i < connectedPlayers.length; i++){
+		for(j = 0; j < userSockets.length; j++){
+		  if(connectedPlayers[i].getUsername() == userSockets[j].username){
+			socketList.push(userSockets[j]);
+		  } 
+		}
+	 }
+	 
+	 userSockets = socketList.slice();
    }
 
    console.log("This is the length of playingPlayers: " + playingPlayers.length);
@@ -329,6 +340,17 @@ function waitToPlay() {
     playingPlayers = sortTablePlayers.slice();
     connectedPlayers = sortTablePlayers.slice();
     currentHandPlayers = sortTablePlayers.slice();
+	
+	var socketList = [];
+	for(i = 0; i < connectedPlayers.length; i++){
+	  for(j = 0; j < userSockets.length; j++){
+	    if(connectedPlayers[i].getUsername() == userSockets[j].username){
+	      socketList.push(userSockets[j]);
+	    } 
+	  }
+    }
+
+	userSockets = socketList.slice();
 
 	console.log("This is the new length: " + connectedPlayers.length);
 	game_in_progress = false;
@@ -423,12 +445,15 @@ function firstTurn(data) {
 	playingPlayers = connectedPlayers.slice();
     currentHandPlayers = connectedPlayers.slice();
 
-	console.log("This is the length of waitlist: " + waitList.length);
-
+    console.log("This is in first turn");
+	for(i = 0; i < connectedPlayers.length; i++){
+		console.log(currentHandPlayers[i].getUsername());
+	}
+	
     for(i = 0; i < waitList.length; i++){
       for(j = 0; j < playingPlayers.length; j++){
  	      if(playingPlayers[j].getUsername() == waitList[i].getUsername()){
- 	        playingPlayers.splice(j, 1);
+ 	          playingPlayers.splice(j, 1);
 		      currentHandPlayers.splice(j,1);
  	      }
       }
@@ -684,10 +709,6 @@ function currentTurn(data) {
 			 if(round_over == true){
 			   waitToPlay();
 			 }
-			 
-	  	   for(i=0; i < connectedPlayers.length; i++){
-	  		   console.log("This is after waitToPlay: " + connectedPlayers[i].getChips());
-	  	   }
 		 }
 	 }
 
@@ -780,6 +801,12 @@ function onsocketDisconnect() {
 					userSocket.emit("timer");
 					userSocket.emit("add buttons");
 					break;
+				}
+			}
+			
+			for(var i=0; i < currentHandPlayers.length; i++){
+				if(playingPlayers[indexPlayer].getUsername() == currentHandPlayers[i].getUsername()){
+				    currentHandPlayers.splice(i, 1);
 				}
 			}
 		}
