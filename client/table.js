@@ -893,6 +893,7 @@ function newTurn() {
 	currentBetAmount = 0;
 	currentUserBet = 0;
 	lastUserBet = 0;
+	lastBetAmount = 0;
 	setAmountBet(0);
 
 	var actionList = ["mainPlayerAction","leftPlayerAction","rightPlayerAction","backPlayerAction"];

@@ -275,12 +275,13 @@ function leaveButton(currentPlayer) {
 function callButton() {
   var playerChips = getPlayerChips()
 
-	var call = new button(290,475,50,18,"check/call","yellow",10);
+  var call = new button(290,475,50,18,"check/call","yellow",10);
 
   var totalBet = getTotalBet();
   var amount = totalBet - getAmountBet();
   var currentChips;
   var player = getCurrentPlayer();
+  var lastBet;
 
   console.log(totalBet);
   console.log(amount);
@@ -295,16 +296,23 @@ function callButton() {
     {
       console.log("got'em")
       amount = playerChips*1;
-      removePlayerChips(playerChips*1)
+      removePlayerChips(playerChips*1);
+	  lastBet = getLastBetAmount();
       currentChips = 0;
     }
     else {  // User has enough chips
-      amount = getTotalBet() - getAmountBet();
+	  console.log("This is the total bet amount: " + getTotalBet());
+	  console.log("This is the amount bet: " + getAmountBet());
+	  console.log("This is the currentChips: " + getPlayerChips());
+	  console.log("This is the last user bet amount: " + getLastUserBet());
+	  console.log("This is the last bet amount: " + getLastBetAmount());
+	  lastBet = getLastBetAmount();
+      amount = getLastBetAmount() - getLastUserBet();
       removePlayerChips(amount)
       currentChips = getPlayerChips();
     }
 
-		socket.emit("increase pot", {chips: amount, amount: amount});
+		socket.emit("increase pot", {chips: amount, amount: lastBet});
 		socket.emit("changed amount", {id: player, chips: currentChips});
 		socket.emit("current turn", {action: "call", user: player, amount: totalBet});
 		socket.emit("buttons", {remove: false});
@@ -375,8 +383,13 @@ function showRaiseContainer(maxChips) {
       game_menu.removeChild(game_menu.getChildByName("raise_container"));
 
       var currentBetAmount = parseInt(bet_amount.text.substr(1));
-      var lastBet = getLastUserBet();
+	  console.log("This is the last bet amount: " + getLastBetAmount());
+	  console.log("This is the last user bet amount: " + getLastUserBet());
+	  
+	  var lastBet = getLastUserBet();
+      //var lastBet = getLastUserBet();
       var diffAmount = currentBetAmount - lastBet;
+	  console.log("This is the current bet amount: " + currentBetAmount);
       setAmountBet(getAmountBet() + currentBetAmount);
 
       var currentChips = getPlayerChips() - diffAmount;
