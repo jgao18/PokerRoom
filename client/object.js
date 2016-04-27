@@ -225,8 +225,39 @@ function button(x,y,width,height,label,color,textSize) {
     user_button.addChild(text);
     return user_button;
 }
-
+	// Begin loading content (only sounds to load)
+	var assetsPath = "/sounds/";
+	manifest = [
+		{id: "background", src: "backgroundMusic.ogg"},
+		{id: "buttonClick", src: "buttonClick.ogg"}
+	];
+	
+	createjs.Sound.alternateExtensions = ["mp3"];
+	preload = new createjs.LoadQueue(true, assetsPath);
+	preload.installPlugin(createjs.Sound);
+	preload.addEventListener("complete", handleComplete); 
+	function handleComplete(event) {
+		createjs.Sound.play("background");
+	}
+	preload.addEventListener("progress", updateLoading);
+	
+	function updateLoading(event) {
+		// Load Updated
+	}
+	preload.loadManifest(manifest);
+	
 /* All are buttons for the game */
+
+// Toggles sounds on/off
+function soundButton() {
+	var sound = new button(25,25,80,30,"Sounds","yellow",20);
+	addToGame(sound);
+	stage.update();
+	
+	sound.addEventListener("click", function(event) {
+		createjs.Sound.volume = 0.0
+	})	
+}
 
 // Provides instructions for the game
 function helpButton() {
@@ -235,6 +266,7 @@ function helpButton() {
 	stage.update();
 
 	help.addEventListener("click", function(event) {
+		createjs.Sound.play("buttonClick");
 		alert("RANK OF HANDS\n\n1) Royal Flush\n2) Straight Flush\n3) Four of a Kind\n4) Full House\n5) Flush\n6) Straight\n7) Three of a Kind\n8) Two Pair\n9) One Pair\n10) High Card");
 	})
 }
@@ -246,6 +278,7 @@ function optionsButton() {
 	stage.update();
 
 	options.addEventListener("click", function(event) {
+		createjs.Sound.play("buttonClick");
 		alert("The options button is still in development.");
 	})
 }
@@ -260,7 +293,8 @@ function leaveButton(currentPlayer) {
 	stage.update();
 
         leave.addEventListener("click", function(event) {
-               alert("The leave button is still in development.");
+			createjs.Sound.play("buttonClick");
+            alert("The leave button is still in development.");
         })
         /*
 
@@ -288,6 +322,7 @@ function callButton() {
   console.log((playerChips - amount) < 0);
 
 	call.addEventListener("click", function(event) {
+		createjs.Sound.play("buttonClick");
     if (currentChips == 0) {  // User has 0 chips left
       amount = 0;
       currentChips = 0
@@ -325,6 +360,7 @@ function raiseButton(maxChips) {
   var raise_button = new button(345,475,50,18,"raise", "yellow",10);
 
   raise_button.addEventListener("click", function(event) {
+	  createjs.Sound.play("buttonClick");
 		// If user wants to get out of the raise options, then press raise again
 		if ((show = game_menu.getChildByName("raise_container"))) {
       raise_button.children[1].text = "raise";
@@ -499,4 +535,4 @@ function pokerChip(x, y) {
 	chip_plate.name = "player1_chip_plate";
 	stage.addChild(chip_plate)
 	stage.update();
-}
+}	
