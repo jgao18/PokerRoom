@@ -14,6 +14,8 @@
   
   setcookie("user_cookie", $username , time() + (86400 * 30), "/");
   setcookie("chip_cookie", $stored , time() + (86400 * 30), "/"); 
+  
+  $chipamount=$_post['chipamount'];
 
 ?>
         

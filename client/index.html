@@ -17,11 +17,29 @@
     <script src="Deck.js"></script>
     <script src="object.js"></script>
     <script src="Player.js"></script>
-  </head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+  
+      <script type="text/javascript">
+      $(function(){
+        $.ajax({
+          type: "POST",
+          url: 'unlink.php',
+          data: ({Imgname:"13"}),
+          success: function(data) {
+            alert(data);
+          }
+        });
+      });
+      
+      
+    </script>
+    </head>
 
   <body onload="game_init()">
 
   <canvas id="demoCanvas" width="750" height="650" style="background-color: green;"></canvas>
+  
 
   </body>
 </html>

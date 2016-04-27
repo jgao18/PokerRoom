@@ -7,6 +7,12 @@ var Player = require("./player").Player;
 var Deck = require("./deck").Deck;
 var Card = require("./card").Card;
 var Logic = require("./logic");
+//var cheerio = require("cheerio"),
+  //  $= cheerio.load('<h2 class= "title"> hello world</h2>');
+    //$.html();
+    
+
+
 var serverPort = process.argv[2];
 
 // stores all sockets per user
@@ -41,11 +47,11 @@ var localUserCount = 0;
 
 var latestPlayerUsername = localUserNames[localUserCount];
 var latestPlayerChipAmount = 1000;
-
 var deck;
 var playerCards;
 var tableCards;
 
+  
 function init() {
   // initialize variables once server starts
   connectedPlayers = [];
@@ -57,12 +63,12 @@ function init() {
   usernames = [];
   waitList = [];
   waitSockets = [];
+  
 
   app.get('/*', function(req, res){
     var file = req.params[0];
         util.log(file);
 
-      //Send the requesting client the file.
      res.sendFile( __dirname + '/client/' + file );
 
    });
@@ -70,11 +76,42 @@ function init() {
   app.get('/*', function(req, res){
     var file = req.params[0];
     util.log(file);
+    
     if (file == "link.php")
       res.sendFile( __dirname + file );
 
    });
+  
+ 
+  
+  //updatescore();
+  //sayHelloWorld() 
 
+  // Create an object using an object literal.
+
+ /* var ourObj = {};
+	// Create a string member called "data" and give it a string.
+	// Also create an array of simple object literals for our object.
+	ourObj.data = "Some Data Points";
+	ourObj.arPoints = [{'x':1, 'y': 2},{'x': 2.3, 'y': 3.3},{'x': -1, 'y': -4}];
+	
+   $.ajax({
+   url: 'unlink.php',
+   type: 'post',
+   data: {"points" : JSON.stringify(ourObj)},
+   success: function(data) {
+        // Do something with data that came back. 
+   }
+   
+});
+*/
+  /*var request = require('request');
+  request.post({
+  url:     'unlink.php',
+  form:    { mes: "heydude" }
+}, function(error, response, body){
+  console.log(body);
+});*/
 
     io.on('connection', function (socket) {
 
@@ -114,6 +151,33 @@ function init() {
 		console.log("Game server started on port " + serverPort);
 	});
 };
+ /*function callPHP(params) {
+    var httpc = new XMLHttpRequest(); // simplified for clarity
+    var url = "unlink.php";
+    httpc.open("POST", url, true); // sending as POST
+
+    httpc.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    httpc.setRequestHeader("Content-Length", params.length); // POST request MUST have a Content-Length header (as per HTTP/1.1)
+
+    httpc.onreadystatechange = function() { //Call a function when the state changes.
+    if(httpc.readyState == 4 && httpc.status == 200) { // complete and no errors
+        alert(httpc.responseText); // some processing here, or whatever you want to do with the response
+        }
+    }
+    httpc.send(params);
+}
+function updatescore(){
+            var thisgamemarks= 2300;
+            var thequizid = 5;
+            $.post("unlink.php", { quizidvalue: thequizid, newmarkvalue: thisgamemarks } );
+            }
+
+
+function sayHelloWorld() {
+    var hello = "hello";
+    var world = "world";
+
+ window.location.href = "unlink.php?w1=" + encodeURIComponent(hello) + "&w2=" + encodeURIComponent(world);}*/
 
 function changePlayerAmount(user,amount,extra){
 	var i;
@@ -416,7 +480,7 @@ function fold(data) {
 // Enters this phase once players press the Ready Button
 function firstTurn(data) {
 
-	console.log("WHAT IS HAPPEPPPPP");
+	//console.log("WHAT IS HAPPEPPPPP");
 
 	gameStage = 0;
 	indexPlayer = 0;
@@ -783,7 +847,10 @@ function onsocketDisconnect() {
 				}
 			}
 		}
+		
 	}
+	
+	
 
     var i;
 	var storeDict;
