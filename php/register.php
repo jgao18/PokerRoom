@@ -55,11 +55,11 @@ if (isset($_POST['register'])) {
                 // The rowCount() method returns 1 if the record is inserted,
                 // so redirect the user to the login page
                 if ($stmt->rowCount()) {
-		    echo '<script>';
-		    echo 'alert("Your account was successfully created!")';
-		    echo '</script>';
-                    //header('Location: login.php');
-                    //exit;
+		    echo '<script type="text/javascript">'; 
+                    echo 'alert("Your account was successfully created!");'; 
+                    echo 'window.location.href = "login.php";';
+                    echo '</script>';
+                                          
                 }
             }
         }
