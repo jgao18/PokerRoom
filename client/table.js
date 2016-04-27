@@ -132,7 +132,7 @@ function game_init() {
 	// Creating the stage
 	stage = new createjs.Stage("demoCanvas");
 
-	// Loading the background image
+	// Loading the background image and sounds
 	backgroundFelt();
 	stage.addChild(game_menu);
 
@@ -508,6 +508,7 @@ function lobby() {
    pokertable();
    paint_deck();
    optionsButton();
+   soundButton();
    helpButton();
    leaveButton(currentPlayer);
 }
