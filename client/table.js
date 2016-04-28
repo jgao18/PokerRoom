@@ -1037,8 +1037,11 @@ function nextAction() {
 			}
 
 			// Signal doesn't delete properly
-			var signal = stage.getChildByName("signal");
-			game_menu.removeChild(signal);
+			var storeSignal;
+			if (storeSignal = stage.getChildByName("signal")) {
+				console.log("Removing signal");
+				stage.removeChild(storeSignal);
+			}
 
 			// Erases all flip cards
 			for (var i = 0; i < 13; i ++) {
@@ -1067,10 +1070,13 @@ function nextAction() {
 			}
 
 			// Signal doesn't delete properly
-			var signal = stage.getChildByName("signal");
-			game_menu.removeChild(signal);
+			var storeSignal;
+			if (storeSignal = stage.getChildByName("signal")) {
+				console.log("Removing signal");
+				stage.removeChild(storeSignal);
+			}
 			
-			var again = game_menu.getChildByName("againButton");
+			var again = stage.getChildByName("againButton");
 			game_menu.removeChild(again);
 			
 			var ready = game_menu.getChildByName("readyButton");
@@ -1143,6 +1149,11 @@ function removeCallandFoldButton() {
 	var buttonContainer = game_menu.getChildByName("buttons");
 	var call_button = buttonContainer.getChildByName("call_button");
 	var fold_button = buttonContainer.getChildByName("fold_button");
+	var storeSignal;
+	if (storeSignal = stage.getChildByName("signal")) {
+		console.log("Removing signal");
+		stage.removeChild(storeSignal);
+	}
 	buttonContainer.removeChild(call_button,fold_button);
 }
 
@@ -1265,7 +1276,7 @@ function playerAction(data) {
 			if (storeText = stage.getChildByName("backPlayerAction")) {
 				stage.removeChild(storeText);
 			}
-			text.x += 450;
+			text.x += 460;
 			text.y += 120;
 			text.name = "backPlayerAction";
 			break;

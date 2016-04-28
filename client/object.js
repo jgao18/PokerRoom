@@ -311,11 +311,11 @@ function callButton() {
       removePlayerChips(amount)
       currentChips = getPlayerChips();
     }
-
+		socket.emit("buttons", {remove: false});
 		socket.emit("increase pot", {chips: amount, amount: lastBet});
 		socket.emit("changed amount", {id: player, chips: currentChips});
 		socket.emit("current turn", {action: "call", user: player, amount: totalBet});
-		socket.emit("buttons", {remove: false});
+		//socket.emit("buttons", {remove: false});
 	})
 	return call;
 }
@@ -394,10 +394,11 @@ function showRaiseContainer(maxChips) {
 
       var currentChips = getPlayerChips() - diffAmount;
       var player = getCurrentPlayer();
+	  socket.emit("buttons", {remove: false});
       socket.emit("changed amount", {id: player, chips: currentChips});
       socket.emit("increase pot", {chips: diffAmount, amount: currentBetAmount});
       socket.emit("current turn", {action: "raise", user: player, amount: currentBetAmount});
-      socket.emit("buttons", {remove: false});
+      //socket.emit("buttons", {remove: false});
     });
     raise_container.addChild(bet_button);
   }
@@ -412,6 +413,7 @@ function foldButton() {
 
 	fold.addEventListener("click", function(event) {
 		var player = getCurrentPlayer();
+		//socket.emit("buttons", {remove: false, action: "fold"});
 		socket.emit("buttons", {remove: false, action: "fold"});
 		socket.emit("fold",{username: player});
 		socket.emit("current turn",{action: "fold", user: player});
@@ -444,6 +446,12 @@ function readyButton() {
         deleteItemFromGame(ready);
         socket.emit("ready");
 		
+		var storeSignal;
+		if (storeSignal = stage.getChildByName("signal")) {
+			console.log("Removing signal");
+			stage.removeChild(storeSignal);
+		}
+		
 		var userStore = game_menu.getChildByName("won player");
 		game_menu.removeChild(userStore);
 	})
@@ -462,6 +470,12 @@ function againButton() {
 		for (var i = 0; i < 13; i ++) {
 			var shape = stage.getChildByName("tableCards");
 			stage.removeChild(shape);
+		}
+		
+		var storeSignal;
+		if (storeSignal = stage.getChildByName("signal")) {
+			console.log("Removing signal");
+			stage.removeChild(storeSignal);
 		}
 
 		var userStore = game_menu.getChildByName("won player");
