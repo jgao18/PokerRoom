@@ -278,7 +278,7 @@ function callButton() {
   var call = new button(290,475,50,18,"check/call","yellow",10);
 
   var totalBet = getTotalBet();
-  var amount = totalBet - getAmountBet();
+  var amount;
   var currentChips;
   var player = getCurrentPlayer();
   var lastBet;
