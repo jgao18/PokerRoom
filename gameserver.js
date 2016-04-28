@@ -26,14 +26,13 @@ var usernames;
 var socket;
 var playerCards;
 var tableCards;
+var gameStage = 0;
+var indexPlayer = 1;
 var playersReady = 0;
 var readyPlayers = 0;
 var numTimesAccess = 0;
 var roundOver = false;
-var indexPlayer = 1;
-var gameStage = 0;
 var game_in_progress = false;
-var usernames;
 
 var localUserNames = ["~Antonio", "~Sam", "~Daniel", "~Philip", "~Jessie"];
 var localUserCount = 0;
@@ -41,83 +40,76 @@ var localUserCount = 0;
 var latestPlayerUsername = localUserNames[localUserCount];
 var latestPlayerChipAmount = 1000;
 
-var deck;
-var playerCards;
-var tableCards;
-
 function init() {
-  // initialize variables once server starts
-  connectedPlayers = [];
-  currentHandPlayers = [];
-  playingPlayers = [];
-  playerCards = [];
-  tableCards = [];
-  userSockets = [];
-  usernames = [];
-  waitList = [];
-  waitSockets = [];
+	
+	// initialize variables once server starts
+	connectedPlayers = [];
+	currentHandPlayers = [];
+	playingPlayers = [];
+	playerCards = [];
+	tableCards = [];
+	userSockets = [];
+	usernames = [];
+	waitList = [];
+	waitSockets = [];
 
-  app.get('/*', function(req, res){
-    var file = req.params[0];
-       // util.log(file);
+	app.get('/*', function(req, res){
+	var file = req.params[0];
+	// util.log(file);
 
-      //Send the requesting client the file.
-     res.sendFile( __dirname + '/client/' + file );
+	//Send the requesting client the file.
+	res.sendFile( __dirname + '/client/' + file );
 
-   });
+	});
 
-  app.get('/*', function(req, res){
-    var file = req.params[0];
-    util.log(file);
-    if (file == "link.php")
-      res.sendFile( __dirname + file );
+	app.get('/*', function(req, res){
+	  var file = req.params[0];
+		util.log(file);
+		if (file == "link.php")
+			res.sendFile( __dirname + file );
+	});
 
-   });
 
+	io.on('connection', function (socket){
 
-    io.on('connection', function (socket) {
-
-    socket.on("new player", onNewPlayer);
-
-    socket.on("disconnect", onsocketDisconnect);
-    socket.emit('welcome', { message: latestPlayerUsername + " " + latestPlayerChipAmount });
-
-    socket.on('linkUsername', retrieveUsername);
-    socket.on('linkChipAmount', retrieveChipAmount);
-    socket.on('disconnectLink', function (data) { util.log(this.id) ; io.sockets.connected[this.id].disconnect(); });
-
-    // When socket presses ready button
-	socket.on("ready", startGame);
-
-    // Indicates the turn for the user
-    socket.on("current turn", currentTurn);
-
-	socket.on("buttons", buttons);
-
-	socket.on("fold", fold);
-
-	socket.on("call", currentTurn);
-
-    // Once players press the Ready Button
-    socket.on("first turn", firstTurn);
-
-    // Once players bet
-    socket.on("increase pot", potIncrease);
-
-    socket.on("changed amount", amountChanged);
-  });
+		socket.on("new player", onNewPlayer);
+		socket.on("disconnect", onsocketDisconnect);
+		socket.emit('welcome', { message: latestPlayerUsername + " " + latestPlayerChipAmount });
+		socket.on('linkUsername', retrieveUsername);
+		socket.on('linkChipAmount', retrieveChipAmount);
+		socket.on('disconnectLink', function (data) { util.log(this.id) ;io.sockets.connected[this.id].disconnect(); });
+		socket.on("ready", startGame);
+		socket.on("current turn", currentTurn);
+		socket.on("buttons", buttons);
+		socket.on("fold", fold);
+		socket.on("call", currentTurn);
+		socket.on("first turn", firstTurn);
+		socket.on("increase pot", potIncrease);
+		socket.on("changed amount", amountChanged);
+	
+	});
 
     // Thanks to the Nick/the PoP team for helping with this code
 	// Set to listen on this ip and this port.
 	server.listen(serverPort, '0.0.0.0', function(){
 		console.log("Game server started on port " + serverPort);
 	});
+	
 };
+
+function retrieveUsername(data){
+  latestPlayerUsername = data[0];
+}
+
+function retrieveChipAmount(data){
+  latestPlayerChipAmount = data[0];
+}
 
 function changePlayerAmount(user,amount,extra){
 	var i;
 	var playerAmount;
 	var newAmount;
+
 	for(i = 0; i < connectedPlayers.length; i++){
 		if(connectedPlayers[i].getUsername() == user){
 			if(extra == "pot"){
@@ -131,160 +123,146 @@ function changePlayerAmount(user,amount,extra){
 			}
 		}
 	}
-}
-
-// Restarts list of players that haven't fold
-function restartPlayerList() {
-	currentHandPlayers = connectedPlayers.slice();
+	
 }
 
 // Transfers the pot amount to the winner
-function amountChanged(data) {
+function amountChanged(data){
 	changePlayerAmount(data.id, data.chips,"raise");
 	this.emit("change amount",{username: data.id, chips: data.chips});
 	this.broadcast.emit("change amount",{username: data.id, chips: data.chips});
 }
 
-function retrieveUsername(data)
-{
-  latestPlayerUsername = data[0];
-}
-
-function retrieveChipAmount(data)
-{
-  latestPlayerChipAmount = data[0];
-}
-
 // Increases the pot amount and player's amount
-function potIncrease(data) {
+function potIncrease(data){
 	this.emit("last bet", {chips: data.amount})
 	this.emit("add to pot", {chips: data.chips, amount: data.amount});
 	this.broadcast.emit("add to pot", {chips: data.chips, amount: data.amount});
 }
 
+function sortListsByIndex(){
+	var i,j;
+	var socketList;
+	var sortTablePlayers = [];
+	for(i = 0; i < connectedPlayers.length; i++){
+		for(j = 0; j < connectedPlayers.length; j++){
+			if(connectedPlayers[j].getTableIndex() == i){
+				sortTablePlayers.push(connectedPlayers[j]);
+			}
+		}
+	}
+
+	connectedPlayers = sortTablePlayers.slice();
+
+
+	if(game_in_progress == false){
+		playingPlayers = sortTablePlayers.slice()
+		currentHandPlayers = sortTablePlayers.slice();
+
+		socketList = [];
+		for(i = 0; i < connectedPlayers.length; i++){
+			for(j = 0; j < userSockets.length; j++){
+				if(connectedPlayers[i].getUsername() == userSockets[j].username){
+				 	socketList.push(userSockets[j]);
+				} 
+			}
+		}
+
+		userSockets = socketList.slice();
+	}
+	
+}
+
 // Called by sockets when they hit the Play button
 function onNewPlayer(data) {
 	
-   if(connectedPlayers.length > 3) {
-	  return;
-   }
+  if(connectedPlayers.length > 3) {
+		return;
+	}
 
-   var i, existingPlayer;
-   var j;
-   var newPlayer;
-   var tableIndex = 0;
-   var pStatus;
-   var sortTablePlayers = [];
+	var i, j;
+	var existingPlayer;
+	var newPlayer;
+	var tableIndex = 0;
+	var pStatus;
 
-   // Stores each user's sockets by username in a list
-   if (game_in_progress == false) {
-   	 userSockets.push({username: latestPlayerUsername, socket: this });
-	 pStatus = true;
-   }else{
-	 waitSockets.push({username: latestPlayerUsername, socket: this });
-	 pStatus = false
-   }
+	// Stores each user's sockets by username in a list
+	if (game_in_progress == false) {
+		userSockets.push({username: latestPlayerUsername, socket: this });
+	}else{
+		waitSockets.push({username: latestPlayerUsername, socket: this });
+	}
 
-   for(i = 0; i < connectedPlayers.length; i++) {
-     if(connectedPlayers[i].getTableIndex() != i){
-	   tableIndex = i;
-	   break;
-	 }
-	 tableIndex += 1;
-   }
-
-   newPlayer = new Player(this.id, latestPlayerUsername, latestPlayerChipAmount, tableIndex, pStatus);
-
-   if(game_in_progress == true){
-     waitList.push(newPlayer);
-   }
-   else{
-   	 usernames.push(newPlayer.getUsername());
-   }
-
-   connectedPlayers.push(newPlayer);
-
-   // Sorts a new list of players by Table Index
-   for(i = 0; i < connectedPlayers.length; i++){
-	 for(j = 0; j < connectedPlayers.length; j++){
-	   if(connectedPlayers[j].getTableIndex() == i){
-	     sortTablePlayers.push(connectedPlayers[j]);
-	   }
-	 }
-   }
-
-   connectedPlayers = sortTablePlayers.slice();
-
-
-   if(game_in_progress == false){
-	 playingPlayers = sortTablePlayers.slice()
-	 currentHandPlayers = sortTablePlayers.slice();
-	 
-	 var socketList = [];
-	 for(i = 0; i < connectedPlayers.length; i++){
-		for(j = 0; j < userSockets.length; j++){
-		  if(connectedPlayers[i].getUsername() == userSockets[j].username){
-			socketList.push(userSockets[j]);
-		  } 
+  // Find an unused Table Index
+	for(i = 0; i < connectedPlayers.length; i++) {
+		if(connectedPlayers[i].getTableIndex() != i){
+			tableIndex = i;
+			break;
 		}
-	 }
-	 
-	 userSockets = socketList.slice();
-   }
+		tableIndex += 1;
+	}
 
-   // Initialize a new list and push 4 players into it.
-   outputArray = [];
-   for (i = 0; i < MAX_PLAYERS; i++)
-   {
-     outputArray.push(new Player());
-   }
+	newPlayer = new Player(this.id, latestPlayerUsername, latestPlayerChipAmount, tableIndex);
 
-   // Go through connectedPlayers list and provide the user info
-   for (i = 0; i < connectedPlayers.length; i++) {
-     existingPlayer = connectedPlayers[i];
-     outputArray[existingPlayer.getTableIndex()] = {id: existingPlayer.id, username: existingPlayer.getUsername(),
-												    chips: existingPlayer.getChips(), index: existingPlayer.getTableIndex()};
-   };
+	connectedPlayers.push(newPlayer);
+	sortListsByIndex();
+	if(game_in_progress == true){
+		waitList.push(newPlayer);
+	}
+	else{
+		usernames.push(newPlayer.getUsername());
+	}
 
-   // Send all connected player list to all players
-   this.emit("new player", outputArray);
-   this.broadcast.emit("new player", outputArray);
+	outputArray = [];
+	for (i = 0; i < MAX_PLAYERS; i++){
+		outputArray.push(new Player());
+	}
 
-   if((!game_in_progress) && connectedPlayers.length == 2){
-     this.emit("ready");
-	 this.broadcast.emit("ready");
-   }
-   else if((!game_in_progress) && connectedPlayers.length > 2){
-	 this.emit("ready");
-   }
- 
-   playersReady++;
-	
-   latestPlayerUsername = localUserNames[0];
-   var haveUserName = false;
-   var i = 0;
-   var j = 0;
-   while(!haveUserName){
-	  if(connectedPlayers[i].getUsername() == latestPlayerUsername){
-		 i = 0;
-		 j++;
-		 latestPlayerUsername = localUserNames[j];
-	   }
-	   else{
-	     i++;
-	   }
+	// Send all players info to clients
+	for (i = 0; i < connectedPlayers.length; i++) {
+		existingPlayer = connectedPlayers[i];
+		outputArray[existingPlayer.getTableIndex()] = {id: existingPlayer.id, username: existingPlayer.getUsername(),
+				    chips: existingPlayer.getChips(), index: existingPlayer.getTableIndex()};
+	}
 
-	   if(i == connectedPlayers.length){
-		 haveUserName = true;
-	   }
-   }
+	this.emit("new player", outputArray);
+	this.broadcast.emit("new player", outputArray);
+
+	if((!game_in_progress) && connectedPlayers.length == 2){
+		this.emit("ready");
+		this.broadcast.emit("ready");
+	}
+	else if((!game_in_progress) && connectedPlayers.length > 2){
+		this.emit("ready");
+	}
+
+	playersReady++;
+
+	i = 0;
+	j = 0;
+	var haveUserName = false;
+	latestPlayerUsername = localUserNames[0];
+
+	while(!haveUserName){
+		if(connectedPlayers[i].getUsername() == latestPlayerUsername){
+			i = 0;
+			j++;
+			latestPlayerUsername = localUserNames[j];
+		}
+		else{
+			i++;
+		}
+
+		if(i == connectedPlayers.length){
+			haveUserName = true;
+		}
+	}
 
 };
 
+// Adds waiting players to game
 function waitToPlay() {
 	var i;
-	var sortTablePlayers = [];
-
 	for(i = 0; i < waitList.length; i++){
 		playersReady++;
 	}
@@ -296,30 +274,8 @@ function waitToPlay() {
 		usernames.push(waitSockets[i].username);
 	}
 	
-    for(i = 0; i < MAX_PLAYERS; i++){
- 	  for(j = 0; j < connectedPlayers.length; j++){
- 	    if(connectedPlayers[j].getTableIndex() == i){
- 	      sortTablePlayers.push(connectedPlayers[j]);
- 	    }
-      }
-    }
-
-    playingPlayers = sortTablePlayers.slice();
-    connectedPlayers = sortTablePlayers.slice();
-    currentHandPlayers = sortTablePlayers.slice();
-	
-	var socketList = [];
-	for(i = 0; i < connectedPlayers.length; i++){
-	  for(j = 0; j < userSockets.length; j++){
-	    if(connectedPlayers[i].getUsername() == userSockets[j].username){
-	      socketList.push(userSockets[j]);
-	    } 
-	  }
-    }
-
-	userSockets = socketList.slice();
-
 	game_in_progress = false;
+	sortListsByIndex();
 	waitList = [];
 	waitSockets = [];
 }
@@ -327,6 +283,8 @@ function waitToPlay() {
 // Provides the turn signal and buttons
 function buttons(data) {
 
+	var i;
+	var userSocket;
 	// If the round is over
 	if (data.remove == true) {
 		this.emit("remove buttons");
@@ -339,25 +297,24 @@ function buttons(data) {
 	}
 
 	this.emit("remove buttons");
-	for (var i = 0; i < userSockets.length; i++) {
+	for (i = 0; i < userSockets.length; i++) {
 		if(playingPlayers[indexPlayer].getUsername() == userSockets[i].username) {
-			var userSocket = userSockets[i].socket;
-			// Provide that player the turn signal and buttons
+			userSocket = userSockets[i].socket;
 			this.emit("signal", {username: userSockets[i].username });
 			this.broadcast.emit("signal", {username: userSockets[i].username });
 			userSocket.emit("timer");
 			userSocket.emit("add buttons");
 		}
 	}
-
+	
 	indexPlayer++;
 
 	// Retract to the previous index
-    if (data.action == "fold") {
-    	if(indexPlayer > 0 && indexPlayer < playingPlayers.length) {
-    		indexPlayer--;
-    	}
-    }
+	if(data.action == "fold") {
+		if(indexPlayer > 0 && indexPlayer < playingPlayers.length) {
+			indexPlayer--;
+		}
+	}
 
 	// If the index is out of bounds then revert to 0
 	if (indexPlayer >= playingPlayers.length) {
@@ -717,9 +674,9 @@ function onsocketDisconnect() {
 	}
 
     var i;
-	var storeDict;
-	var storeSocket;
-	var username;
+	  var storeDict;
+	  var storeSocket;
+	  var username;
     for (i = 0; i < connectedPlayers.length; i++ ) {
 	  if (connectedPlayers[i].id == this.id) {
 		username = connectedPlayers[i].getUsername();

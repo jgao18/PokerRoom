@@ -311,7 +311,7 @@ function callButton() {
       removePlayerChips(amount)
       currentChips = getPlayerChips();
     }
-		socket.emit("buttons", {remove: false});
+		socket.emit("buttons", {remove: false, action: "call"});
 		socket.emit("increase pot", {chips: amount, amount: lastBet});
 		socket.emit("changed amount", {id: player, chips: currentChips});
 		socket.emit("current turn", {action: "call", user: player, amount: totalBet});
@@ -394,7 +394,7 @@ function showRaiseContainer(maxChips) {
 
       var currentChips = getPlayerChips() - diffAmount;
       var player = getCurrentPlayer();
-	  socket.emit("buttons", {remove: false});
+	  socket.emit("buttons", {remove: false, action: "raise"});
       socket.emit("changed amount", {id: player, chips: currentChips});
       socket.emit("increase pot", {chips: diffAmount, amount: currentBetAmount});
       socket.emit("current turn", {action: "raise", user: player, amount: currentBetAmount});
