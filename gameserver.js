@@ -201,7 +201,7 @@ function onNewPlayer(data) {
 		}
 		tableIndex += 1;
 	}
-
+	console.log("This is tableIndex: " + tableIndex);
 	newPlayer = new Player(this.id, latestPlayerUsername, latestPlayerChipAmount, tableIndex);
 
 	connectedPlayers.push(newPlayer);
@@ -531,6 +531,12 @@ function currentTurn(data) {
 				var addPoints;
 				var user1Cards = tableCards.slice();
 				var user2Cards = tableCards.slice();
+				var storePoints = {};
+				
+				for(var i = 0; i < usernames.length; i++){
+					storePoints[usernames[i]] = 0;
+				}
+				
 				for (var i = 0; i < usernames.length; i++) {
 					for(var j = 0; j < usernames.length; j++) {
 						// If there are multiple of the same results
@@ -543,23 +549,32 @@ function currentTurn(data) {
 							user2Cards.push(playerHands[usernames[j]]["Card2"]);
 							// If the cards are bigger then increase the user points by 0.5
 							addPoints = Logic.finalEvaluation(user1Cards,user2Cards,userResults[usernames[i]],userResults[usernames[j]]);
-							userPoints[usernames[i]] += addPoints;
+							console.log("The user : " + usernames[i] + " is increasing by " + addPoints);
+							storePoints[usernames[i]] += addPoints;
+							//userPoints[usernames[i]] += addPoints;
 							//totalCards = tableCards.slice();
 							user1Cards = tableCards.slice();
 							user2Cards = tableCards.slice();
 						}
 					}
 				}
+				
+				for(var i = 0; i < usernames.length; i++){
+					userPoints[usernames[i]] += storePoints[usernames[i]];
+				}
 
 				// Decides the winner
 				var winner;
 				var high = 0;
 				for (var i = 0; i < playingPlayers.length; i++) {
+					util.log("This is the userPoints[usernames[i]]: " + userPoints[usernames[i]]);
 					// need to only include from the list playingPlayers
-					if (userPoints[playingPlayers[i].getUsername()] > high) {
+					if (userPoints[playingPlayers[i].getUsername()] > high){
 						winner = playingPlayers[i].getUsername();
 						high = userPoints[playingPlayers[i].getUsername()];
+						util.log("This is the high in the if: " + high);
 					}
+					util.log("This is the high: " + high);
 				}
 				this.emit("winning player",{player: winner});
 				this.broadcast.emit("winning player",{player: winner});
@@ -609,7 +624,6 @@ function currentTurn(data) {
 };
 
 function startGame() {
-
 	readyPlayers++;
 
 	if (readyPlayers >= connectedPlayers.length) {
@@ -618,25 +632,32 @@ function startGame() {
 		var deck = new Deck();
 		deck.get_new_deck();
 
-    for (i = 0; i < userSockets.length; i++)
-    {
-    	var userSocket = userSockets[i].socket;
-    	var card1 = deck.draw_card();
-    	var user = userSockets[i].username;
-    	card1.set_owner(user);
-	    var card2 = deck.draw_card();
-      card2.set_owner(user);
-      playerCards.push(card1, card2);
-      userSocket.emit("client cards", {owner: user, value1 : card1.get_value(), suit1 : card1.get_suit(),
-								 value2 : card2.get_value(), suit2 : card2.get_suit()});
-    }
-
-    tableCards = [deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card()];
+		for (i = 0; i < userSockets.length; i++){
+			var userSocket = userSockets[i].socket;
+			var card1 = deck.draw_card();
+			var user = userSockets[i].username;
+			card1.set_owner(user);
+			var card2 = deck.draw_card();
+			card2.set_owner(user);
+			playerCards.push(card1, card2);
+			userSocket.emit("client cards", {owner: user, value1 : card1.get_value(), suit1 : card1.get_suit(),
+									 										 value2 : card2.get_value(), suit2 : card2.get_suit()});
+		}
+		tableCards = [deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card(), deck.draw_card()];
 
 		this.emit("start game");
 		this.broadcast.emit("start game");
 	}
 };
+
+function splicePlayerById(playerList, id){
+	var i;
+	for(i = 0; i < playerList.length; i++) {
+		if (playerList[i].id == id) {
+			playerList.splice(i,1);
+		}
+	}
+}
 
 // Disconnects each socket
 function onsocketDisconnect() {
@@ -685,7 +706,11 @@ function onsocketDisconnect() {
       }
     }
 
-	for(i = 0; i < playingPlayers.length; i++) {
+		splicePlayerById(playingPlayers, this.id);
+		splicePlayerById(currentHandPlayers, this.id);
+		splicePlayerById(waitList, this.id);
+		
+	/*for(i = 0; i < playingPlayers.length; i++) {
   	  if (playingPlayers[i].id == this.id) {
   		  playingPlayers.splice(i,1);
   	  }
@@ -695,7 +720,7 @@ function onsocketDisconnect() {
    	  if (currentHandPlayers[i].id == this.id) {
   	    currentHandPlayers.splice(i,1);
   	  }
-	}
+	}*/
 
 	for(i = 0; i < userSockets.length; i++) {
 		storeDict = userSockets[i];
@@ -711,11 +736,11 @@ function onsocketDisconnect() {
 		}
 	}
 
-	for(i = 0; i < waitList.length; i++){
+	/*for(i = 0; i < waitList.length; i++){
 		if(waitList[i].id == this.id){
 			waitList.splice(i,1);
 		}
-	}
+	}*/
 
 	for(i = 0; i < waitSockets.length; i++) {
 		storeDict = waitSockets[i];

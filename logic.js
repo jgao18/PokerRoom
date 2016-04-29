@@ -212,6 +212,7 @@ function isSuit(cards) {
 
 function isOrder(cards) {
 	var orderList = sortCards(cards);
+	var lastValue;
 	var isLowStraight = 0;
 	var order = 0;
 
@@ -233,21 +234,27 @@ function isOrder(cards) {
 	}
 	
 	for(i = 0; i < orderList.length; i++){
-		if(orderList[i] == 0){
-			isLowStraight++;
-		}
-		else if(orderList[i] == 9){
-			isLowStraight++;
-		}
-		else if(orderList[i] == 10){
-			isLowStraight++;
-		}
-		else if(orderList[i] == 11){
-			isLowStraight++;
-		}
-		else if(orderList[i] == 12){
-			isLowStraight++;
-		}
+		if(lastValue != orderList[i]){
+			if(orderList[i] == 0){
+				isLowStraight++;
+			}
+			else if(orderList[i] == 8){
+				isLowStraight--;
+			}
+			else if(orderList[i] == 9){
+				isLowStraight++;
+			}
+			else if(orderList[i] == 10){
+				isLowStraight++;
+			}
+			else if(orderList[i] == 11){
+				isLowStraight++;
+			}
+			else if(orderList[i] == 12){
+				isLowStraight++;
+			}
+	    }
+	    lastValue = orderList[i];
 	}
 	
 	if(isLowStraight > 4){

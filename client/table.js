@@ -51,29 +51,34 @@ function setPotToZero(){
 	pot(0);
 }
 
-function getAmountBet() {
+function getAmountBet(){
 	return amountBet;
 }
 
-function getCurrentPlayer() {
+function getCurrentPlayer(){
 	return currentPlayer.getUsername();
 }
 
-function setAmountBet(num) {
+function setAmountBet(num){
 	amountBet = num;
 }
 
-function removePlayerChips(amount) {
+function removePlayerChips(amount){
 	currentPlayer.deleteChips(amount);
 }
 
-function getPlayerChips() {
+function getPlayerChips(){
 	return currentPlayer.getChips();
 }
 
 // Adds object to Game Container
-function addToGame(object) {
+function addToGame(object){
 	game_menu.addChild(object);
+	stage.update();
+}
+
+function deleteItemFromGame(object){
+	game_menu.removeChild(object);
 	stage.update();
 }
 
@@ -110,7 +115,7 @@ function game_init() {
 }
 
 //Indicates what cards have been used
-function otherCardsFunction(data) {
+function otherCardsFunction(data){
 	// Saves the array of cards from the server
 	inputPlayerCards = data;
 	temp = [];
@@ -154,7 +159,7 @@ function riverCard(data){
 function onNewPlayer(data){
 
 	var playerList = data;
-	var localIndex = currentPlayer.getTableIndex();
+	//var localIndex = currentPlayer.getTableIndex();
 	var nextPlayerIndex;
 	var nextPlayerIterator = 0;
 	
@@ -169,7 +174,8 @@ function onNewPlayer(data){
 			currentPlayers[existingPlayer.getTableIndex()] = existingPlayer;
 		}
 	}
-
+	
+	var localIndex = currentPlayer.getTableIndex();
 	positions[currentPlayer.getUsername()] = "main";
 
 	for (i = 0; i< maxPlayers - 1; i++){
@@ -315,23 +321,19 @@ function onRemovePlayer(data) {
 
 /* Draws other players on the board
    IndexAfterLocal refers the order they are in the array */
-function drawPlayerAt(playerIndex, indexAfterLocal)
-{
-  if (indexAfterLocal == 0)
-  {
-    clientAmounts("left", currentPlayers[playerIndex].getUsername(), currentPlayers[playerIndex].getChips());
-	positions[currentPlayers[playerIndex].getUsername()] = "right";
+function drawPlayerAt(playerIndex, indexAfterLocal){
+  if (indexAfterLocal == 0){
+  	clientAmounts("left", currentPlayers[playerIndex].getUsername(), currentPlayers[playerIndex].getChips());
+		positions[currentPlayers[playerIndex].getUsername()] = "right";
   }
-  else if (indexAfterLocal == 1)
-  {
-	console.log("SOMEONE IS BACK PLAYER WTF");
+  else if (indexAfterLocal == 1){
+		console.log("SOMEONE IS BACK PLAYER WTF");
     clientAmounts("back", currentPlayers[playerIndex].getUsername(), currentPlayers[playerIndex].getChips());
-	positions[currentPlayers[playerIndex].getUsername()] = "back";
+		positions[currentPlayers[playerIndex].getUsername()] = "back";
   }
-  else if (indexAfterLocal == 2)
-  {
-    clientAmounts("right", currentPlayers[playerIndex].getUsername(), currentPlayers[playerIndex].getChips());
-	positions[currentPlayers[playerIndex].getUsername()] = "left";
+  else if (indexAfterLocal == 2){
+  	clientAmounts("right", currentPlayers[playerIndex].getUsername(), currentPlayers[playerIndex].getChips());
+		positions[currentPlayers[playerIndex].getUsername()] = "left";
   }
 }
 
@@ -1052,7 +1054,7 @@ function playerOptions() {
 	fold();
 }
 
-function removeCallandFoldButton() {
+function removeCallandFoldButton(){
 	var buttonContainer = game_menu.getChildByName("buttons");
 	var call_button = buttonContainer.getChildByName("call_button");
 	var fold_button = buttonContainer.getChildByName("fold_button");
