@@ -1,4 +1,4 @@
-var Player = function(id, username, chips, tableIndex, position, pStatus)
+var Player = function(id, username, chips, tableIndex, position)
 {
   var username = username || "INVALID_USER"
   var password, statistics;
@@ -6,7 +6,6 @@ var Player = function(id, username, chips, tableIndex, position, pStatus)
   var tableIndex = tableIndex;
   var id;
   var position = position || 0 ;
-  var isPlaying = pStatus || true;
 
   var getUsername = function()
   {
@@ -30,14 +29,6 @@ var Player = function(id, username, chips, tableIndex, position, pStatus)
 
   var getId = function() {
 	return id;
-  }
-
-  var getIsPlaying = function() {
-    return isPlaying;
-  }
-
-  var setIsPlaying = function(pStatus) {
-	isPlaying = pStatus;
   }
 
   var getTableIndex = function()
@@ -89,10 +80,8 @@ var Player = function(id, username, chips, tableIndex, position, pStatus)
 		getUsername: getUsername,
 		getPassword: getPassword,
     	getChips: getChips,
-      setChips: setChips,
+        setChips: setChips,
 	    getId: getId,
-	    getIsPlaying: getIsPlaying,
-	    setIsPlaying: setIsPlaying,
     	getTableIndex: getTableIndex,
 		setUsername: setUsername,
 		setPassword: setPassword,
