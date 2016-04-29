@@ -652,7 +652,7 @@ function startGame() {
 
 function splicePlayerById(playerList, id){
 	var i;
-	for(i = 0; i < playerList.length; i++) {
+	for(i = 0; i < playerList.length; i++){
 		if (playerList[i].id == id) {
 			playerList.splice(i,1);
 		}
@@ -661,11 +661,11 @@ function splicePlayerById(playerList, id){
 
 // Disconnects each socket
 function onsocketDisconnect() {
-    util.log("Player has disconnected: " + this.id);
+	util.log("Player has disconnected: " + this.id);
 
 	var index;
 	if(indexPlayer == 0){
-	   index = playingPlayers.length - 1;
+		index = playingPlayers.length - 1;
 	}
 	else{
 		index = indexPlayer - 1;
@@ -685,44 +685,33 @@ function onsocketDisconnect() {
 					break;
 				}
 			}
-			
+
 			for(var i=0; i < currentHandPlayers.length; i++){
 				if(playingPlayers[indexPlayer].getUsername() == currentHandPlayers[i].getUsername()){
-				    currentHandPlayers.splice(i, 1);
+					currentHandPlayers.splice(i, 1);
 				}
 			}
+				
 		}
 	}
 
-    var i;
-	  var storeDict;
-	  var storeSocket;
-	  var username;
-    for (i = 0; i < connectedPlayers.length; i++ ) {
-	  if (connectedPlayers[i].id == this.id) {
-		username = connectedPlayers[i].getUsername();
-        connectedPlayers.splice(i, 1);
-        this.broadcast.emit("remove player", {id: this.id});
-      }
-    }
-
-		splicePlayerById(playingPlayers, this.id);
-		splicePlayerById(currentHandPlayers, this.id);
-		splicePlayerById(waitList, this.id);
-		
-	/*for(i = 0; i < playingPlayers.length; i++) {
-  	  if (playingPlayers[i].id == this.id) {
-  		  playingPlayers.splice(i,1);
-  	  }
+	var i;
+	var storeDict;
+	var storeSocket;
+	var username;
+	for (i = 0; i < connectedPlayers.length; i++ ){
+		if (connectedPlayers[i].id == this.id){
+			username = connectedPlayers[i].getUsername();
+			connectedPlayers.splice(i, 1);
+			this.broadcast.emit("remove player", {id: this.id});
+		}
 	}
 
-	for(i = 0; i < currentHandPlayers.length; i++) {
-   	  if (currentHandPlayers[i].id == this.id) {
-  	    currentHandPlayers.splice(i,1);
-  	  }
-	}*/
+	splicePlayerById(playingPlayers, this.id);
+	splicePlayerById(currentHandPlayers, this.id);
+	splicePlayerById(waitList, this.id);
 
-	for(i = 0; i < userSockets.length; i++) {
+	for(i = 0; i < userSockets.length; i++){
 		storeDict = userSockets[i];
 		storeSocket = storeDict["socket"];
 		if(storeSocket.id == this.id) {
@@ -736,26 +725,21 @@ function onsocketDisconnect() {
 		}
 	}
 
-	/*for(i = 0; i < waitList.length; i++){
-		if(waitList[i].id == this.id){
-			waitList.splice(i,1);
-		}
-	}*/
 
-	for(i = 0; i < waitSockets.length; i++) {
+	for(i = 0; i < waitSockets.length; i++){
 		storeDict = waitSockets[i];
 		storeSocket = storeDict["socket"];
-		if(storeSocket.id == this.id) {
+		if(storeSocket.id == this.id){
 			waitSockets.splice(i,1);
 		}
 	}
 
 	//indexPlayer++;
-	if (indexPlayer >= playingPlayers.length) {
+	if (indexPlayer >= playingPlayers.length){
 		indexPlayer = 0;
 	}
 
-	if (playingPlayers.length == 1 && game_in_progress) {
+	if (playingPlayers.length == 1 && game_in_progress){
 		roundOver = true;
 		// Access the currentPlayer
 		var user = playingPlayers[0];
@@ -764,14 +748,14 @@ function onsocketDisconnect() {
 		this.broadcast.emit("remove buttons");
 		this.emit("winning player", {player: user.getUsername()});
 		this.broadcast.emit("winning player", {player: user.getUsername()});
-		
+
 		if(connectedPlayers.length == 1){
-		  this.emit("round over",{status: "only one player"});
-		  this.broadcast.emit("round over",{status: "only one player"});
-	    }
+			this.emit("round over",{status: "only one player"});
+			this.broadcast.emit("round over",{status: "only one player"});
+		}
 		else if(connectedPlayers.length > 1){
-  		  this.emit("round over",{status: "more than one player"});
-  		  this.broadcast.emit("round over",{status: "more than one player"});
+			this.emit("round over",{status: "more than one player"});
+			this.broadcast.emit("round over",{status: "more than one player"});
 		}
 
 		// Restart the playing player list
@@ -779,7 +763,7 @@ function onsocketDisconnect() {
 		game_in_progress = false;
 		playerCards = [];
 	}
-	
+
 	if(playingPlayers.length == 1){
 		this.emit("round over",{status: "only one player"});
 		this.broadcast.emit("round over",{status: "only one player"});
@@ -787,12 +771,12 @@ function onsocketDisconnect() {
 	}
 
 
-	if (connectedPlayers.length == 0) {
+	if (connectedPlayers.length == 0){
 		waitList = [];
-	    connectedPlayers = [];
-	    currentHandPlayers = [];
+		connectedPlayers = [];
+		currentHandPlayers = [];
 		playingPlayers = [];
-	    playerCards = [];
+		playerCards = [];
 		userSockets = [];
 	}
 };

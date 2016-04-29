@@ -13,7 +13,6 @@ function sortNumber(a,b) {
 module.exports = {
 
 	// Determines the value of the hand
-	// Takes in table cards and two cards of player
 	determineHand: function(cardList) {
 		// Retrieving all variables to determine hand
 		var handResult;
@@ -114,7 +113,7 @@ module.exports = {
 			}
 		}
 
-	    return userPoints;
+	  return userPoints;
 	}
 }
 
@@ -146,8 +145,8 @@ function whichStraight(cards){
 			else if(straightList[i] == 12){
 				isLowStraight++;
 			}
-	    }
-	    lastValue = straightList[i];
+	  }
+	  lastValue = straightList[i];
 	}
 
 	if(isLowStraight > 4){
@@ -162,14 +161,11 @@ function whichStraight(cards){
 function sortCards(cards) {
 
 	var pointList = [];
-
-	//console.log("THIS IS THE CARDS LENGTH" + cards.length);
 	for (var i = 0; i < cards.length; i++) {
 		pointList.push(keyDict[cards[i].get_value()]);
 	}
 
 	pointList.sort(sortNumber);
-
 	return pointList;
 }
 

@@ -3,8 +3,7 @@ var main_menu = new createjs.Container();
 var bet_amount;
 
 // Creates the Heart
-var get_heart_object = function(sm)
-{
+var get_heart_object = function(sm){
   var heart = new createjs.Shape();
   heart.graphics.beginStroke("red");
   heart.graphics.beginFill("red");
@@ -17,8 +16,7 @@ var get_heart_object = function(sm)
 }
 
 // Creates the Spade
-var get_spade_object = function(sm)
-{
+var get_spade_object = function(sm){
   var spade = new createjs.Shape();
   spade.graphics.beginStroke("black");
   spade.graphics.beginFill("black");
@@ -35,8 +33,7 @@ var get_spade_object = function(sm)
 }
 
 // Creates the Diamond
-var get_diamond_object = function(sm)
-{
+var get_diamond_object = function(sm){
   var diamond = new createjs.Shape();
   diamond.graphics.beginStroke("red");
   diamond.graphics.beginFill("red");
@@ -49,8 +46,7 @@ var get_diamond_object = function(sm)
 }
 
 // Creates the Club
-var get_club_object = function(sm)
-{
+var get_club_object = function(sm){
   sm = sm || 6;
   var club = new createjs.Shape();
   club.graphics.beginStroke("black");
@@ -70,39 +66,36 @@ var get_club_object = function(sm)
 }
 
 // Adds objects to Menu
-function addToMenu(object) {
+function addToMenu(object){
 	main_menu.addChild(object);
 	stage.update();
 }
 
 // Deletes certain objects from the Menu
-function deleteItemMenu(object) {
+function deleteItemMenu(object){
 	main_menu.removeChild(object);
 	stage.update();
 }
 
 // Removes all items from Menu
-function removeMenuChildren() {
+function removeMenuChildren(){
 	stage.removeChild(main_menu);
 	main_menu.removeAllChildren();
 	stage.update();
 }
 
 // Creates the value depending on the color
-var get_value_object = function(value, color, font)
-{
+var get_value_object = function(value, color, font){
   if (color == "red") {
     title = new createjs.Text(value, font, "#FF0000");
   } else if (color == "black") {
     title = new createjs.Text(value, font, "#000000");
   }
-
-  return title;
+	
+	return title;
 }
 
-// ?
-var get_dealer_chip = function(sm)
-{
+var get_dealer_chip = function(sm){
 	var dealer_chip = new createjs.Container();
 	var dealer_chip_text = new createjs.Text("DEALER", "20px Bembo", "#000");
 	dealer_chip_text.textBaseline = "top";
@@ -112,9 +105,9 @@ var get_dealer_chip = function(sm)
 	var height = dealer_chip_text.getMeasuredHeight()+7;
 
 	dealer_chip_text.x = 700;
-    dealer_chip_text.y = 579;
+	dealer_chip_text.y = 579;
 
-    var background = new createjs.Shape();
+	var background = new createjs.Shape();
 	background.graphics.beginFill("white").drawCircle(662,575,width,height,10);
 
 	dealer_chip.addChild(background,dealer_chip_text)
@@ -122,9 +115,7 @@ var get_dealer_chip = function(sm)
 	stage.update();
 }
 
-// ?
-var get_back_object = function(width, height, strokeColor, strokeThickness, fillColor)
-{
+var get_back_object = function(width, height, strokeColor, strokeThickness, fillColor){
   strokeColor = strokeColor;
   strokeThickness = strokeThickness;
   fillColor = fillColor;
@@ -136,33 +127,25 @@ var get_back_object = function(width, height, strokeColor, strokeThickness, fill
   return back;
 }
 
-// ?
-var get_front_object = function(width, height, strokeColor, strokeThickness, fillColor)
-{
+var get_front_object = function(width, height, strokeColor, strokeThickness, fillColor){
   var front = new createjs.Shape();
   front.graphics.setStrokeStyle(strokeThickness);
   front.graphics.beginStroke(strokeColor).beginFill(fillColor).drawRoundRect(0,0,width,height,5);
-
-  return front;
+	return front;
 }
 
-// ?
-var get_container_object = function(front, value, suit)
-{
-  var card_container = new createjs.Container();
+var get_container_object = function(front, value, suit){
+	var card_container = new createjs.Container();
   card_container.addChild(front,value,suit)
-
   return card_container;
 }
 
 // Provides the background for the game
-var get_room_background_object = function(sm)
-{
-  var background = new createjs.Bitmap("/images/pokerfelt.jpg");
+var get_room_background_object = function(sm){
+	var background = new createjs.Bitmap("/images/pokerfelt.jpg");
   background.scaleX = sm;
   background.scaleY = sm;
-
-  return background;
+	return background;
 }
 
 // Indicates which user's turn
@@ -172,19 +155,19 @@ function turn_signal(user) {
 
 	// Depending on which user, provide the user signal
 	switch (user) {
-		    // left
+		// left
 		case 3:
 			signal.graphics.moveTo(643, 260).lineTo(703, 260).lineTo(673, 280).lineTo(643, 260);
 			break;
-			// back
+		// back
 		case 2:
 			signal.graphics.moveTo(340, 60).lineTo(400, 60).lineTo(370, 80).lineTo(340, 60);
 			break;
-			// right
+		// right
 		case 1:
 			signal.graphics.moveTo(43, 260).lineTo(103, 260).lineTo(73, 280).lineTo(43, 260);
 			break;
-			// main
+		// main
 		case 0:
 			signal.graphics.moveTo(515, 540).lineTo(545, 510).lineTo(545, 570).lineTo(515, 540);
 			break;
@@ -195,12 +178,10 @@ function turn_signal(user) {
 
 // Allows a user to create a button with specifications
 function button(x,y,width,height,label,color,textSize) {
-	// The container which the button will be put
-    var user_button = new createjs.Container();
+	var user_button = new createjs.Container();
 
-	// Creating the text for button
 	var text;
-	switch (textSize) {
+	switch (textSize){
 		case 10:
 			text = new createjs.Text(label, "10px Bembo", "#000");
 			text.y -= 2;
@@ -209,24 +190,19 @@ function button(x,y,width,height,label,color,textSize) {
 			text = new createjs.Text(label, "20px Bembo", "#000");
 			break;
 	}
-    text.textBaseline = "top";
-    text.textAlign = "center";
+	
+	text.textBaseline = "top";
+	text.textAlign = "center";
+	text.x += x + (width/2);
+	text.y += y + (height/4);
 
-	// Setting text coordinates
-    text.x += x + (width/2);
-    text.y += y + (height/4);
+	var background = new createjs.Shape();
+	background.graphics.beginFill(color).drawRoundRect(x,y,width,height,10);
 
-	// Creating the button shape
-    var background = new createjs.Shape();
-    background.graphics.beginFill(color).drawRoundRect(x,y,width,height,10);
-
-	// Adding the button shape and text to container
-    user_button.addChild(background);
-    user_button.addChild(text);
-    return user_button;
+	user_button.addChild(background);
+	user_button.addChild(text);
+	return user_button;
 }
-
-/* All are buttons for the game */
 
 // Provides instructions for the game
 function helpButton() {
@@ -235,7 +211,8 @@ function helpButton() {
 	stage.update();
 
 	help.addEventListener("click", function(event) {
-		alert("RANK OF HANDS\n\n1) Royal Flush\n2) Straight Flush\n3) Four of a Kind\n4) Full House\n5) Flush\n6) Straight\n7) Three of a Kind\n8) Two Pair\n9) One Pair\n10) High Card");
+		alert("RANK OF HANDS\n\n1) Royal Flush\n2) Straight Flush\n3) Four of a Kind\n4) 
+		Full House\n5) Flush\n6) Straight\n7) Three of a Kind\n8) Two Pair\n9) One Pair\n10) High Card");
 	})
 }
 
@@ -245,7 +222,7 @@ function optionsButton() {
 	addToGame(options);
 	stage.update();
 
-	options.addEventListener("click", function(event) {
+	options.addEventListener("click", function(event){
 		alert("The options button is still in development.");
 	})
 }
@@ -254,204 +231,174 @@ function optionsButton() {
 /* Isn't functioning correctly, need to fix it.
    Will remove player from the current stage. */
 function leaveButton(currentPlayer) {
-
 	var leave = new button(662,610,80,30,"Leave","yellow",20);
 	addToGame(leave);
 	stage.update();
 
-        leave.addEventListener("click", function(event) {
-               alert("The leave button is still in development.");
-        })
-        /*
-
-	leave.addEventListener("click", function(event) {
-		removeGameChildren();
-        game_init();
-		socket.emit("disconnect", currentPlayer.id);
-	})*/
+	leave.addEventListener("click", function(event){
+		alert("The leave button is still in development.");
+	})
 }
 
 // Allows the user to call
 function callButton() {
-  var playerChips = getPlayerChips()
+	
+	var playerChips = getPlayerChips()
+	var call = new button(290,475,50,18,"check/call","yellow",10);
 
-  var call = new button(290,475,50,18,"check/call","yellow",10);
-
-  var totalBet = getTotalBet();
-  var amount;
-  var currentChips;
-  var player = getCurrentPlayer();
-  var lastBet;
-
-  console.log(totalBet);
-  console.log(amount);
-  console.log((playerChips - amount) < 0);
+	var totalBet = getTotalBet();
+	var amount;
+	var currentChips;
+	var player = getCurrentPlayer();
+	var lastBet;
 
 	call.addEventListener("click", function(event) {
-    if (currentChips == 0) {  // User has 0 chips left
-      amount = 0;
-      currentChips = 0
-    }
-    else if ((playerChips - amount) < 0) // Calling would make chips negative
-    {
-      console.log("got'em")
-      amount = playerChips*1;
-      removePlayerChips(playerChips*1);
-	  lastBet = getLastBetAmount();
-      currentChips = 0;
-    }
-    else {  // User has enough chips
-	  console.log("This is the total bet amount: " + getTotalBet());
-	  console.log("This is the amount bet: " + getAmountBet());
-	  console.log("This is the currentChips: " + getPlayerChips());
-	  console.log("This is the last user bet amount: " + getLastUserBet());
-	  console.log("This is the last bet amount: " + getLastBetAmount());
-	  lastBet = getLastBetAmount();
-      amount = getLastBetAmount() - getLastUserBet();
-      removePlayerChips(amount)
-      currentChips = getPlayerChips();
-    }
+		if (currentChips == 0){  // User has 0 chips left
+			amount = 0;
+			currentChips = 0
+		}
+		else if ((playerChips - amount) < 0){ // Calling would make chips negative
+			amount = playerChips*1;
+			removePlayerChips(playerChips*1);
+			lastBet = getLastBetAmount();
+			currentChips = 0;
+		}
+		else{  // User has enough chips
+			lastBet = getLastBetAmount();
+			amount = getLastBetAmount() - getLastUserBet();
+			removePlayerChips(amount)
+			currentChips = getPlayerChips();
+		}
 		socket.emit("buttons", {remove: false, action: "call"});
 		socket.emit("increase pot", {chips: amount, amount: lastBet});
 		socket.emit("changed amount", {id: player, chips: currentChips});
 		socket.emit("current turn", {action: "call", user: player, amount: totalBet});
-		//socket.emit("buttons", {remove: false});
 	})
+	
 	return call;
 }
 
 
 function raiseButton(maxChips) {
-  var raise_button = new button(345,475,50,18,"raise", "yellow",10);
+	var raise_button = new button(345,475,50,18,"raise", "yellow",10);
 
-  raise_button.addEventListener("click", function(event) {
-		// If user wants to get out of the raise options, then press raise again
-		if ((show = game_menu.getChildByName("raise_container"))) {
-      raise_button.children[1].text = "raise";
+	raise_button.addEventListener("click", function(event){
+		if ((show = game_menu.getChildByName("raise_container"))){
+			raise_button.children[1].text = "raise";
 			game_menu.removeChild(show);
 			addCallandFoldButton();
 		}
-		else {
-      raise_button.children[1].text = "return";
+		else{
+			raise_button.children[1].text = "return";
 			removeCallandFoldButton();
 			showRaiseContainer(maxChips);
 		}
-})
+	})
+	
 	return raise_button;
 }
 
-function handleSliderChange(evt) {
-  console.log(evt.target.value);
-
+function handleSliderChange(evt){
   bet_amount.text = "$" + Math.round(evt.target.value);
   stage.update();
-
-  //betAmount(Math.round(evt.target.value));
 }
 
 // Allows the different options for raising
 function showRaiseContainer(maxChips) {
-  var raise_container = new createjs.Container(); // Holds the bet amount text, slider, and bet button
-  raise_container.name = "raise_container";
+	var raise_container = new createjs.Container(); // Holds the bet amount text, slider, and bet button
+	raise_container.name = "raise_container";
 
-  if (maxChips <= getTotalBet() || maxChips == 0) { // User doesn't have enough chips to raise
-    not_enough = new createjs.Text("Insufficient chips!", "16px Bembo", "#FFFF00");
-    not_enough.x = 312;
-    not_enough.y = 455;
-    raise_container.addChild(not_enough);
-  }
-  else {
-    // Bet amount text
-    var amountBetIncremented = getTotalBet() + 1;
+	if(maxChips <= getTotalBet() || maxChips == 0){ // User doesn't have enough chips to raise
+		not_enough = new createjs.Text("Insufficient chips!", "16px Bembo", "#FFFF00");
+		not_enough.x = 312;
+		not_enough.y = 455;
+		raise_container.addChild(not_enough);
+	}
+	else{
+		// Bet amount text
+		var amountBetIncremented = getTotalBet() + 1;
 
-    bet_amount = new createjs.Text("$" + amountBetIncremented, "16px Bembo", "#FFFF00"); // global variable
-    bet_amount.name = "bet_amount";
-    bet_amount.x = 238;
-    bet_amount.y = 445;
-    raise_container.addChild(bet_amount);
+		bet_amount = new createjs.Text("$" + amountBetIncremented, "16px Bembo", "#FFFF00"); // global variable
+		bet_amount.name = "bet_amount";
+		bet_amount.x = 238;
+		bet_amount.y = 445;
+		raise_container.addChild(bet_amount);
 
-    // Slider
-    var raise_slider = new Slider(amountBetIncremented*1, maxChips*1, 150,15).set({x: 290, y: 445, value: 1});
-    raise_slider.trackColor = "purple";
-    raise_slider.thumbColor = "#FFFF00";
-    raise_slider.on("change", handleSliderChange, this);
-    raise_container.addChild(raise_slider);
+		// Slider
+		var raise_slider = new Slider(amountBetIncremented*1, maxChips*1, 150,15).set({x: 290, y: 445, value: 1});
+		raise_slider.trackColor = "purple";
+		raise_slider.thumbColor = "#FFFF00";
+		raise_slider.on("change", handleSliderChange, this);
+		raise_container.addChild(raise_slider);
 
-    // Bet Button
-    var bet_button = new button(460,445,35,18,"bet", "yellow",10);
-    bet_button.addEventListener("click", function(event) {
-      game_menu.removeChild(game_menu.getChildByName("raise_container"));
+		// Bet Button
+		var bet_button = new button(460,445,35,18,"bet", "yellow",10);
+		bet_button.addEventListener("click", function(event){
+			game_menu.removeChild(game_menu.getChildByName("raise_container"));
 
-      var currentBetAmount = parseInt(bet_amount.text.substr(1));
-	  console.log("This is the last bet amount: " + getLastBetAmount());
-	  console.log("This is the last user bet amount: " + getLastUserBet());
-	  
-	  var lastBet = getLastUserBet();
-      //var lastBet = getLastUserBet();
-      var diffAmount = currentBetAmount - lastBet;
-	  console.log("This is the current bet amount: " + currentBetAmount);
-      setAmountBet(getAmountBet() + currentBetAmount);
+			var currentBetAmount = parseInt(bet_amount.text.substr(1));
 
-      var currentChips = getPlayerChips() - diffAmount;
-      var player = getCurrentPlayer();
-	  socket.emit("buttons", {remove: false, action: "raise"});
-      socket.emit("changed amount", {id: player, chips: currentChips});
-      socket.emit("increase pot", {chips: diffAmount, amount: currentBetAmount});
-      socket.emit("current turn", {action: "raise", user: player, amount: currentBetAmount});
-      //socket.emit("buttons", {remove: false});
-    });
-    raise_container.addChild(bet_button);
-  }
+			var lastBet = getLastUserBet();
+			var diffAmount = currentBetAmount - lastBet;
+			setAmountBet(getAmountBet() + currentBetAmount);
 
-  addToGame(raise_container);
-  stage.update();
+			var currentChips = getPlayerChips() - diffAmount;
+			var player = getCurrentPlayer();
+			socket.emit("buttons", {remove: false, action: "raise"});
+			socket.emit("changed amount", {id: player, chips: currentChips});
+			socket.emit("increase pot", {chips: diffAmount, amount: currentBetAmount});
+			socket.emit("current turn", {action: "raise", user: player, amount: currentBetAmount});
+		});
+		
+		raise_container.addChild(bet_button);
+	}
+
+	addToGame(raise_container);
+	stage.update();
 }
 
 // Allows the user to fold
-function foldButton() {
+function foldButton(){
 	var fold = new button(400,475,50,18,"fold", "yellow",10);
 
-	fold.addEventListener("click", function(event) {
+	fold.addEventListener("click", function(event){
 		var player = getCurrentPlayer();
-		//socket.emit("buttons", {remove: false, action: "fold"});
 		socket.emit("buttons", {remove: false, action: "fold"});
 		socket.emit("fold",{username: player});
 		socket.emit("current turn",{action: "fold", user: player});
-		//socket.emit("buttons", {remove: false, action: "fold"});
 	})
 	return fold;
 }
 
 // Goes into the lobby once the user presses the button
-function startButton() {
+function startButton(){
 	var start = new button(315,300,100,45,"Start", "#F00",20);
 	addToMenu(start);
 	stage.addChild(main_menu);
 	stage.update();
 
-	start.addEventListener("click", function(event) {
-        removeMenuChildren();
-        lobby();
+	start.addEventListener("click", function(event){
+		removeMenuChildren();
+		lobby();
 	})
 }
 
 // Once everyone presses ready, start the game
-function readyButton() {
+function readyButton(){
 	var ready = new button(315,300,100,45,"Ready", "#F00",20);
 	ready.name = "readyButton";
 	addToGame(ready);
 	stage.update();
 
-	ready.addEventListener("click", function(event) {
-        deleteItemFromGame(ready);
-        socket.emit("ready");
-		
+	ready.addEventListener("click", function(event){
+		deleteItemFromGame(ready);
+		socket.emit("ready");
+
 		var storeSignal;
-		if (storeSignal = stage.getChildByName("signal")) {
-			console.log("Removing signal");
+		if (storeSignal = stage.getChildByName("signal")){
 			stage.removeChild(storeSignal);
 		}
-		
+
 		var userStore = game_menu.getChildByName("won player");
 		game_menu.removeChild(userStore);
 	})
@@ -460,21 +407,20 @@ function readyButton() {
 // Once the finishes, all players must press this button to play again
 function againButton() {
 	var again = new button(315,245,100,45,"Again?", "#F00",20);
+	var shape;
 	again.name = "againButton";
 	addToGame(again);
 	stage.update();
 
 	again.addEventListener("click", function(event) {
-
 		// Delete all cards
 		for (var i = 0; i < 13; i ++) {
-			var shape = stage.getChildByName("tableCards");
+	  	shape = stage.getChildByName("tableCards");
 			stage.removeChild(shape);
 		}
 		
 		var storeSignal;
-		if (storeSignal = stage.getChildByName("signal")) {
-			console.log("Removing signal");
+		if (storeSignal = stage.getChildByName("signal")){
 			stage.removeChild(storeSignal);
 		}
 
@@ -483,29 +429,27 @@ function againButton() {
 
 		deleteItemFromGame(again);
 		socket.emit("ready");
-		//socket.emit("from again");
 	})
 }
 
 // Produces the background for the game
-function backgroundFelt() {
-    main_background = new createjs.Bitmap("/images/pokerfelt.jpg");
-    stage.addChild(main_background);
-    createjs.Ticker.addEventListener("tick", handleTick);
-    function handleTick(event) {
-      	stage.update();
-    }
+function backgroundFelt(){
+	main_background = new createjs.Bitmap("/images/pokerfelt.jpg");
+	stage.addChild(main_background);
+	createjs.Ticker.addEventListener("tick", handleTick);
+	function handleTick(event){
+	`stage.update();
+	}
 }
 
 // Provides the username and the user amount for each player
 function pokerChip(x, y) {
-  // Used by all users
-  var chip_plate = new createjs.Container();
-  var chip_background = new createjs.Shape();
-
-  // x = 490, y = 398
+	// Used by all users
+	var chip_plate = new createjs.Container();
+	var chip_background = new createjs.Shape();
+	
 	chip_background.graphics.beginFill("red").drawCircle(x,y,15);
-    chip_background.graphics.beginFill("white").drawCircle(x,y,12);
+	chip_background.graphics.beginFill("white").drawCircle(x,y,12);
 	chip_background.graphics.beginFill("red").drawCircle(x,y,9);
 	chip_background.graphics.beginFill("red").drawPolyStar(x,y,15,8,0.5,90);
 	chip_background.graphics.beginFill("white").drawCircle(x,y,2);
