@@ -93,7 +93,7 @@ function game_init() {
 	// Creating the stage
 	stage = new createjs.Stage("demoCanvas");
 
-	// Loading the background image
+	// Loading the background image and sounds
 	backgroundFelt();
 	stage.addChild(game_menu);
 
@@ -343,46 +343,46 @@ function lobby() {
 	socket = io.connect();
 	socket.on('welcome', function (data) {
 
-	// Assigns the information for the client
-	var tempUsername = data.message.toString().split(" ")[0];
-	var tempChipAmount = data.message.toString().split(" ")[1];
+		// Assigns the information for the client
+		var tempUsername = data.message.toString().split(" ")[0];
+		var tempChipAmount = data.message.toString().split(" ")[1];
 
-	currentPlayer = new Player();
-	currentPlayer.setUsername(tempUsername);
-	currentPlayer.addChips(tempChipAmount);
+		currentPlayer = new Player();
+		currentPlayer.setUsername(tempUsername);
+		currentPlayer.addChips(tempChipAmount);
 
-	// Setting all Events
-	socket.emit("new player", {username: currentPlayer.getUsername(), chips: currentPlayer.getChips()});
-	socket.on("new player", onNewPlayer);
-	socket.on("remove player", onRemovePlayer);
-	socket.on("start game", start_game);
-	socket.on("next action", nextAction);
-	socket.on("add buttons", addButtonContainer);
-	socket.on("remove buttons", removeButtonContainer);
-	socket.on("ready", readyButton);
-	socket.on("add to pot", serverPot);
-	socket.on("round over", lastAction);
-	socket.on("winning player", wonPlayer);
-	socket.on("signal", assignSignal);
-	socket.on("client cards", assignCards)
-	socket.on("change amount", changeAmount);
-	socket.on("last bet", setLastUserBet);
-	socket.on("player's action", playerAction);
-	socket.on("again button", againButton);
-	socket.on("timer", timer);
+		// Setting all Events
+		socket.emit("new player", {username: currentPlayer.getUsername(), chips: currentPlayer.getChips()});
+		socket.on("new player", onNewPlayer);
+		socket.on("remove player", onRemovePlayer);
+		socket.on("start game", start_game);
+		socket.on("next action", nextAction);
+		socket.on("add buttons", addButtonContainer);
+		socket.on("remove buttons", removeButtonContainer);
+		socket.on("ready", readyButton);
+		socket.on("add to pot", serverPot);
+		socket.on("round over", lastAction);
+		socket.on("winning player", wonPlayer);
+		socket.on("signal", assignSignal);
+		socket.on("client cards", assignCards)
+		socket.on("change amount", changeAmount);
+		socket.on("last bet", setLastUserBet);
+		socket.on("player's action", playerAction);
+		socket.on("again button", againButton);
+		socket.on("timer", timer);
 
-	// Assigns cards to the table
-	socket.on("flop cards", flopCards)
-	socket.on("turn card", turnCard)
-	socket.on("river card", riverCard)
-	socket.on("other cards", otherCardsFunction);	
-});
+		// Assigns cards to the table
+		socket.on("flop cards", flopCards)
+		socket.on("turn card", turnCard)
+		socket.on("river card", riverCard)
+		socket.on("other cards", otherCardsFunction);	
+	});
 
-pokertable();
-paint_deck();
-optionsButton();
-helpButton();
-leaveButton(currentPlayer);
+	pokertable();
+	paint_deck();
+	optionsButton();
+	helpButton();
+	leaveButton(currentPlayer);
 }
 
 function showAgain(){

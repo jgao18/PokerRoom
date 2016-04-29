@@ -203,6 +203,42 @@ function button(x,y,width,height,label,color,textSize) {
 	user_button.addChild(text);
 	return user_button;
 }
+<<<<<<< HEAD
+=======
+	// Begin loading content (only sounds to load)
+	var assetsPath = "/sounds/";
+	manifest = [
+		{id: "background", src: "backgroundMusic.ogg"},
+		{id: "buttonClick", src: "buttonClick.ogg"}
+	];
+	
+	createjs.Sound.alternateExtensions = ["mp3"];
+	preload = new createjs.LoadQueue(true, assetsPath);
+	preload.installPlugin(createjs.Sound);
+	preload.addEventListener("complete", handleComplete); 
+	function handleComplete(event) {
+		createjs.Sound.play("background");
+	}
+	preload.addEventListener("progress", updateLoading);
+	
+	function updateLoading(event) {
+		// Load Updated
+	}
+	preload.loadManifest(manifest);
+	
+/* All are buttons for the game */
+
+// Toggles sounds on/off
+function soundButton() {
+	var sound = new button(25,25,80,30,"Sounds","yellow",20);
+	addToGame(sound);
+	stage.update();
+	
+	sound.addEventListener("click", function(event) {
+		createjs.Sound.volume = 0.0
+	})	
+}
+>>>>>>> upstream/master
 
 // Provides instructions for the game
 function helpButton() {
@@ -211,6 +247,7 @@ function helpButton() {
 	stage.update();
 
 	help.addEventListener("click", function(event) {
+		createjs.Sound.play("buttonClick");
 		alert("RANK OF HANDS\n\n1) Royal Flush\n2) Straight Flush\n3) Four of a Kind\n4) Full House\n5) Flush\n6) Straight\n7) Three of a Kind\n8) Two Pair\n9) One Pair\n10) High Card");
 	})
 }
@@ -221,7 +258,12 @@ function optionsButton() {
 	addToGame(options);
 	stage.update();
 
+<<<<<<< HEAD
 	options.addEventListener("click", function(event){
+=======
+	options.addEventListener("click", function(event) {
+		createjs.Sound.play("buttonClick");
+>>>>>>> upstream/master
 		alert("The options button is still in development.");
 	})
 }
@@ -234,9 +276,23 @@ function leaveButton(currentPlayer) {
 	addToGame(leave);
 	stage.update();
 
+<<<<<<< HEAD
 	leave.addEventListener("click", function(event){
 		alert("The leave button is still in development.");
 	})
+=======
+        leave.addEventListener("click", function(event) {
+			createjs.Sound.play("buttonClick");
+            alert("The leave button is still in development.");
+        })
+        /*
+
+	leave.addEventListener("click", function(event) {
+		removeGameChildren();
+        game_init();
+		socket.emit("disconnect", currentPlayer.id);
+	})*/
+>>>>>>> upstream/master
 }
 
 // Allows the user to call
@@ -456,4 +512,4 @@ function pokerChip(x, y) {
 	chip_plate.name = "player1_chip_plate";
 	stage.addChild(chip_plate)
 	stage.update();
-}
+}	
