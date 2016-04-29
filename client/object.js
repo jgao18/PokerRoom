@@ -211,8 +211,7 @@ function helpButton() {
 	stage.update();
 
 	help.addEventListener("click", function(event) {
-		alert("RANK OF HANDS\n\n1) Royal Flush\n2) Straight Flush\n3) Four of a Kind\n4) 
-		Full House\n5) Flush\n6) Straight\n7) Three of a Kind\n8) Two Pair\n9) One Pair\n10) High Card");
+		alert("RANK OF HANDS\n\n1) Royal Flush\n2) Straight Flush\n3) Four of a Kind\n4) Full House\n5) Flush\n6) Straight\n7) Three of a Kind\n8) Two Pair\n9) One Pair\n10) High Card");
 	})
 }
 
@@ -438,7 +437,7 @@ function backgroundFelt(){
 	stage.addChild(main_background);
 	createjs.Ticker.addEventListener("tick", handleTick);
 	function handleTick(event){
-	`stage.update();
+		stage.update();
 	}
 }
 
