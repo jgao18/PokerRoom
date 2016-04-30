@@ -443,6 +443,9 @@ function lobby() {
     // Assigns the information for the client
     var tempUsername = data.message.toString().split(" ")[0];
     var tempChipAmount = data.message.toString().split(" ")[1];
+    
+    console.log(tempUsername);
+    console.log(tempChipAmount);
 
     currentPlayer = new Player();
     currentPlayer.setUsername(tempUsername);

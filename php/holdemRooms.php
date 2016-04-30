@@ -24,7 +24,7 @@ if ($stmt->rowCount() > 0){
      "";
   }
 $errors =[];
-if (isset($_POST['addRoom'])) // This needs to update the database
+if (isset($_POST['addRoom']))
 {
   $expected = ['roomName', 'roomIP'];
     // Assign $_POST variables to simple variables and check all fields have values
@@ -106,8 +106,6 @@ if (isset($_POST['refresh'])) // This needs to pull from the database
 
 if (isset($_POST['join_server']))
 {
-  //header('Location: ../link.php/');
-
   $ip = $_POST['servers'];
 
   setcookie('server_cookie', $ip , time() + (86400*30), '/');
@@ -115,7 +113,7 @@ if (isset($_POST['join_server']))
   $username = $_COOKIE["user_cookie"];
   $chipAmount = $_COOKIE["chip_cookie"];
 
-  // If it IS a Turing server
+  // If the selected server is not a turing server, use ElephantIO to pass the username
   if (strpos($ip, 'http://192.168.1.101:') !== FALSE) {
     $client = new Client(new Version1X($ip)); // This does not like it if you include the backslash at the end of the address!
 
