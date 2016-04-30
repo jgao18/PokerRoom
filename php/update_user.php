@@ -12,9 +12,6 @@ if (isset($_POST["user_data"])) {
   $username = $dataList[0];
   $chips = $dataList[1];
   
-  setcookie("chip_cookie", $chips , time() + (86400 * 30), "/");
-
-    
   $sql= 'UPDATE users SET chipamount=:chipamount WHERE username=:username';
   $stmt = $db->prepare($sql);
   $stmt->bindParam(':username', $username);

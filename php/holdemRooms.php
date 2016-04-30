@@ -111,11 +111,16 @@ if (isset($_POST['join_server']))
   setcookie('server_cookie', $ip , time() + (86400*30), '/');
 
   $username = $_COOKIE["user_cookie"];
-  $chipAmount = $_COOKIE["chip_cookie"];
 
-  // If the selected server is not a turing server, use ElephantIO to pass the username
+  // If the selected server IS a turing server, use ElephantIO to pass the username and chip amount
   if (strpos($ip, 'http://192.168.1.101:') !== FALSE) {
     $client = new Client(new Version1X($ip)); // This does not like it if you include the backslash at the end of the address!
+    
+    $sql = 'SELECT chipamount FROM users WHERE username = :username';
+    $stmt = $db->prepare($sql);
+    $stmt->bindParam(':username', $username);
+    $stmt->execute();
+    $chipAmount = $stmt->fetchColumn();
 
     $client->initialize();
     $client->emit('linkUsername', [$username, $chipAmount]);
