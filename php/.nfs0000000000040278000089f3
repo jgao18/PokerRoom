@@ -1,11 +1,9 @@
 <?php
 include('header.php');
-require_once ("AutoLogin.php");
-require_once ("authenticate.php");
 $errors = [];
-if (isset($_POST['changepwd'])) {
+if (isset($_POST['register'])) {
     require_once ("db_connect.php");
-    $expected = ['currentpwd', 'newpwd', 'confirm'];
+    $expected = ['username', 'pwd', 'confirm'];
     // Assign $_POST variables to simple variables and check all fields have values
     foreach ($_POST as $key => $value) {
         if (in_array($key, $expected)) {
@@ -15,50 +13,63 @@ if (isset($_POST['changepwd'])) {
             }
         }
     }
+     if(strlen($username)>9){
+        $errors['field_name']= ' Usernames must be less than 9 characters.';
+    }
+   
     // Proceed only if there are no errors
     if (!$errors) {
-        if ($newpwd != $confirm) {
+        if ($pwd != $confirm) {
             $errors['nomatch'] = 'Passwords do not match.';
-        } else{
-                   	$username=$_SESSION['username'];
-                   	$currentpwd=$_POST['currentpwd'];
-                	$pwd=$_POST['newpwd'];
-                    $stmt = $db->prepare('SELECT pwd FROM users WHERE username = :username');
-                    $stmt->bindParam(':username', $username);
-                    $stmt->execute();
-                    $stored = $stmt->fetchColumn();
-                 if (password_verify($currentpwd, $stored)) {                
-                 	  $sql = ('UPDATE users SET pwd =:pwd WHERE username = :username');
+        } else {
+            // Check that the username hasn't already been registered
+            $sql = 'SELECT COUNT(*) FROM users WHERE username = :username';
+            $stmt = $db->prepare($sql);
+            $stmt->bindParam(':username', $username);
+            $stmt->execute();
+            if ($stmt->fetchColumn() != 0) {
+                $errors['failed'] = "$username is already registered. Choose another name.";
+            } else {
+                try {
+                    // Generate a random 8-character user key and insert values into the database
+                    $chipamount = 1000;
+                    $user_key = hash('crc32', microtime(true) . mt_rand() . $username);
+                    $sql = 'INSERT INTO users (user_key, username, pwd,chipamount,last_login)
+                            VALUES (:key, :username, :pwd, :chipamount,NOW())';
                     $stmt = $db->prepare($sql);
+                    $stmt->bindParam(':key', $user_key);
                     $stmt->bindParam(':username', $username);
                     // Store an encrypted version of the password
                     $stmt->bindValue(':pwd', password_hash($pwd, PASSWORD_DEFAULT));
-                     $stmt->execute();
-     
-                      header('Location: lobby.php');
-                      exit;
-                  
-               }else{
-        $error = 'Current password does not match.';
-    
+                    $stmt->bindParam(':chipamount', $chipamount);
+                    $stmt->execute();
+                } catch (\PDOException $e) {
+                    if (0 === strpos($e->getCode(), '23')) {
+                        // If the user key is a duplicate, regenerate, and execute INSERT statement again
+                        $user_key = hash('crc32', microtime(true) . mt_rand() . $username);
+                        if (!$stmt->execute()) {
+                            throw $e;
+                        }
+                    }
+                }
+                // The rowCount() method returns 1 if the record is inserted,
+                // so redirect the user to the login page
+                if ($stmt->rowCount()) {
+                    header('Location: login.php');
+		    echo '<script>';
+		    echo 'alert("Your account was successfully created!")';
+		    echo '</script>';
+                    exit;
+                }
+            }
+        }
+    }
 }
-}
-}
-}          
-              
-               
-    
 ?>
-<div id="main">
-  <div id="navigation">
-    &nbsp;
-  </div>
-<div id="page">
 <!doctype html>
 <html>
 <head>
-<meta charset="utf-8">
-<title>Change Password</title>
+
 <style>
 	html, body {
     width: 100%;
@@ -87,11 +98,11 @@ input[type=password] {
     margin: 10px;
     margin-top: 12px;
     margin-left: 18px;
-    width: 250px;
+    width: 290px;
     height: 35px;
 	border: 1px solid #c7d0d2;
-   
-    
+    border-radius: 2px;
+    box-shadow: inset 0 1.5px 3px rgba(190, 190, 190, .4), 0 0 0 5px #f5f7f8;
 -webkit-transition: all .4s ease;
     -moz-transition: all .4s ease;
     transition: all .4s ease;
@@ -99,12 +110,12 @@ input[type=password] {
 input[type=text]:hover,
 input[type=password]:hover {
     border: 1px solid #b6bfc0;
-    
+    box-shadow: inset 0 1.5px 3px rgba(190, 190, 190, .7), 0 0 0 5px #f5f7f8;
 }
 input[type=text]:focus,
 input[type=password]:focus {
     border: 1px solid #a8c9e4;
- 
+    box-shadow: inset 0 1.5px 3px rgba(190, 190, 190, .4), 0 0 0 5px #e6f2f9;
 }
 input[type=checkbox] {
     margin-left: 20px;
@@ -120,7 +131,7 @@ input[type=submit] {
     float: center;
     margin-right: 20px;
     margin-top: 20px;
-    width: 115px;
+    width: 100px;
     height: 30px;
 font-size: 12px;
     font-weight: bold;
@@ -129,7 +140,7 @@ font-size: 12px;
     background-image: -webkit-gradient(linear, left top, left bottom, from(#acd6ef), to(#6ec2e8));
     background-image: -moz-linear-gradient(top left 90deg, #acd6ef 0%, #6ec2e8 100%);
     background-image: linear-gradient(top left 90deg, #acd6ef 0%, #6ec2e8 100%);
-   
+    border-radius: 30px;
     border: 1px solid #66add6;
     box-shadow: 0 1px 2px rgba(0, 0, 0, .3), inset 0 1px 0 rgba(255, 255, 255, .5);
     cursor: pointer;
@@ -166,38 +177,38 @@ label[for=color] {
     margin-left: 6.5em;
 }
  </style>
+
+<meta charset="utf-8">
+<title>Create Account</title>
 </head>
 
 <body id="create">
-<h1>Change Password</h1>
-<?php
-if (isset($error)) {
-    echo "<p>$error</p>";
-}
-?>
+<h1>Create Account</h1>
 <form action="<?= $_SERVER['PHP_SELF']; ?>" method="post">
     <p>
-        <label for="currentpwd">Current Password:</label>
-        <input type="password" name="currentpwd" id="currentpwd"
+        <label for="username">Username:</label>
+        <input type="text" name="username" id="username"
         <?php
-        if (isset($currentpwd) && !isset($errors['currentpwd'])) {
-            echo 'value="' . htmlentities($currentpwd) . '">';
+        if (isset($username) && !isset($errors['username'])) {
+            echo 'value="' . htmlentities($username) . '">';
         } else {
             echo '>';
         }
-        if (isset($errors['currentpwd'])) {
-            echo $errors['currentpwd'];
+        if (isset($errors['username'])) {
+            echo $errors['username'];
         } elseif (isset($errors['failed'])) {
             echo $errors['failed'];
+        }elseif(isset($errors['field_name'])){
+            echo $errors['field_name'];
         }
         ?>
     </p>
     <p>
-        <label for="newpwd">New Password:</label>
-        <input type="password" name="newpwd" id="newpwd">
+        <label for="pwd">Password:</label>
+        <input type="password" name="pwd" id="pwd">
         <?php
-        if (isset($errors['newpwd'])) {
-            echo $errors['newpwd'];
+        if (isset($errors['pwd'])) {
+            echo $errors['pwd'];
         }
         ?>
     </p>
@@ -213,9 +224,8 @@ if (isset($error)) {
         ?>
     </p>
     <p>
-        <input type="submit" name="changepwd" id="changepwd" value="Change Password">
+        <input type="submit" name="register" id="register" value="Create Account">
     </p>
 </form>
 </body>
 </html>
-</div>
