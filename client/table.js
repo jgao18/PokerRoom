@@ -109,7 +109,7 @@ function game_init() {
 	
 	// Changes the pace of the Tickers
 	createjs.Ticker.timingMode = createjs.Ticker.RAF;
-	createjs.Ticker.setFPS(60);
+	createjs.Ticker.setFPS(80);
 
 	menu();
 }
@@ -946,7 +946,8 @@ function nextAction() {
 				stage.removeChild(storeSignal);
 			}
 			
-			var again = stage.getChildByName("againButton");
+			console.log("Deleting buttons");
+			var again = game_menu.getChildByName("againButton");
 			game_menu.removeChild(again);
 			
 			var ready = game_menu.getChildByName("readyButton");
