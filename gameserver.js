@@ -12,6 +12,7 @@ var serverPort = process.argv[2];
 
 var http = require('http');
 http.post = require('http-post');
+var ip = require("ip");
 
 var userSockets;  // stores all sockets per user
 var playingPlayers;  // players that are still in the round (haven't folded)
@@ -41,7 +42,7 @@ var latestPlayerUsername = localUserNames[localUserCount];
 var latestPlayerChipAmount = 1000;
 
 function init() {
-	
+
 	// initialize variables once server starts
 	connectedPlayers = [];
 	currentHandPlayers = [];
@@ -73,7 +74,7 @@ function init() {
 	io.on('connection', function (socket){
 
 		socket.on("new player", onNewPlayer);
-		socket.on("disconnect", onsocketDisconnect);
+		socket.on("disconnect", onSocketDisconnect);
 		socket.emit('welcome', { message: latestPlayerUsername + " " + latestPlayerChipAmount });
 		socket.on('linkUsername', retrieveUsername);
 		socket.on('linkChipAmount', retrieveChipAmount);
@@ -86,7 +87,7 @@ function init() {
 		socket.on("first turn", firstTurn);
 		socket.on("increase pot", potIncrease);
 		socket.on("changed amount", amountChanged);
-	
+
 	});
 
     // Thanks to the the PoP team for the idea + helping with this code
@@ -94,7 +95,7 @@ function init() {
 	server.listen(serverPort, '0.0.0.0', function(){
 		console.log("Game server started on port " + serverPort);
 	});
-	
+
 };
 
 function retrieveUsername(data){
@@ -123,7 +124,7 @@ function changePlayerAmount(user,amount,extra){
 			}
 		}
 	}
-	
+
 }
 
 // Transfers the pot amount to the winner
@@ -164,18 +165,18 @@ function sortListsByIndex(){
 			for(j = 0; j < userSockets.length; j++){
 				if(connectedPlayers[i].getUsername() == userSockets[j].username){
 				 	socketList.push(userSockets[j]);
-				} 
+				}
 			}
 		}
 
 		userSockets = socketList.slice();
 	}
-	
+
 }
 
 // Called by sockets when they hit the Play button
 function onNewPlayer(data) {
-	
+
   if(connectedPlayers.length > 3) {
 		return;
 	}
@@ -273,7 +274,7 @@ function waitToPlay() {
 		userSockets.push(waitSockets[i]);
 		usernames.push(waitSockets[i].username);
 	}
-	
+
 	game_in_progress = false;
 	sortListsByIndex();
 	waitList = [];
@@ -306,7 +307,7 @@ function buttons(data) {
 			userSocket.emit("add buttons");
 		}
 	}
-	
+
 	indexPlayer++;
 
 	// Retract to the previous index
@@ -363,7 +364,7 @@ function firstTurn(data) {
 	indexPlayer = 0;
 	playingPlayers = connectedPlayers.slice();
     currentHandPlayers = connectedPlayers.slice();
-	
+
     for(i = 0; i < waitList.length; i++){
       for(j = 0; j < playingPlayers.length; j++){
  	      if(playingPlayers[j].getUsername() == waitList[i].getUsername()){
@@ -533,11 +534,11 @@ function currentTurn(data) {
 				var user1Cards = tableCards.slice();
 				var user2Cards = tableCards.slice();
 				var storePoints = {};
-				
+
 				for(var i = 0; i < usernames.length; i++){
 					storePoints[usernames[i]] = 0;
 				}
-				
+
 				for (var i = 0; i < usernames.length; i++) {
 					for(var j = 0; j < usernames.length; j++) {
 						// If there are multiple of the same results
@@ -559,7 +560,7 @@ function currentTurn(data) {
 						}
 					}
 				}
-				
+
 				for(var i = 0; i < usernames.length; i++){
 					userPoints[usernames[i]] += storePoints[usernames[i]];
 				}
@@ -591,19 +592,19 @@ function currentTurn(data) {
 			    playerCards = [];
 				round_over = true;
 			 }
-			 
+
 			 for(i = 0; i < userSockets.length; i++){
 				 userSocket = userSockets[i].socket;
 			     userSocket.emit("next action", gameStages[gameStage]);
 			 }
-			 
+
 			 if(round_over == true){
 			   waitToPlay();
 			 }
 		 }
 	 }
 
-	
+
  	if (data.action == "raise") {
  		this.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
  		this.broadcast.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
@@ -662,9 +663,9 @@ function splicePlayerById(playerList, id){
 }
 
 // Disconnects each socket
-function onsocketDisconnect() {
+function onSocketDisconnect() {
 	util.log("Player has disconnected: " + this.id);
-    
+
 	var index;
 	if(indexPlayer == 0){
 		index = playingPlayers.length - 1;
@@ -693,7 +694,7 @@ function onsocketDisconnect() {
 					currentHandPlayers.splice(i, 1);
 				}
 			}
-				
+
 		}
 	}
 
@@ -702,22 +703,24 @@ function onsocketDisconnect() {
 	var storeSocket;
 	var username;
 	var chips;
-    for (i = 0; i < connectedPlayers.length; i++ ) {
+  for (i = 0; i < connectedPlayers.length; i++ ) {
 	  if (connectedPlayers[i].id == this.id) {
-		username = connectedPlayers[i].getUsername();
-		chips = connectedPlayers[i].getChips();
-		connectedPlayers.splice(i, 1);
-		this.broadcast.emit("remove player", {id: this.id});
-      }
+			username = connectedPlayers[i].getUsername();
+			chips = connectedPlayers[i].getChips();
+			connectedPlayers.splice(i, 1);
+			this.broadcast.emit("remove player", {id: this.id});
     }
-    
-    // Couldn't get this to pass in multiple values, so used the ~ (disallowed from usernames) as a seperator
-    http.post('http://localhost/~gaoj/PokerRoom/php/update_user.php', {user_data: [username + "~" + chips] }, function(res) {
-      res.setEncoding('utf8');
-      res.on('data', function(chunk) {
-	console.log(chunk);
-      });
-    });
+  }
+
+	if (ip.address().indexOf("192.168.1.101") >= 0) {
+		// Couldn't get this to pass in multiple values, so used the ~ (disallowed from usernames) as a seperator
+		http.post('http://localhost/~gaoj/PokerRoom/php/update_user.php', {user_data: [username + "~" + chips] }, function(res) {
+		  res.setEncoding('utf8');
+		  res.on('data', function(chunk) {
+				console.log(chunk);
+		  });
+		});
+	}
 
 	splicePlayerById(playingPlayers, this.id);
 	splicePlayerById(currentHandPlayers, this.id);
