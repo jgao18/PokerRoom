@@ -55,27 +55,21 @@ if (isset($_POST['register'])) {
                 // The rowCount() method returns 1 if the record is inserted,
                 // so redirect the user to the login page
                 if ($stmt->rowCount()) {
-		    echo '<script type="text/javascript">'; 
-                    echo 'alert("Your account was successfully created!");'; 
-                    echo 'window.location.href = "login.php";';
-                    echo '</script>';
-                                          
+                    header('Location: login.php');
+		    echo '<script>';
+		    echo 'alert("Your account was successfully created!")';
+		    echo '</script>';
+                    exit;
                 }
             }
         }
     }
 }
 ?>
-<div id="main">
-  <div id="navigation">
-    &nbsp;
-  </div>
-<div id="page">
 <!doctype html>
 <html>
 <head>
-<meta charset="utf-8">
-<title>Create Account</title>
+
 <style>
 	html, body {
     width: 100%;
@@ -137,7 +131,7 @@ input[type=submit] {
     float: center;
     margin-right: 20px;
     margin-top: 20px;
-    width: 115px;
+    width: 100px;
     height: 30px;
 font-size: 12px;
     font-weight: bold;
@@ -184,12 +178,14 @@ label[for=color] {
 }
  </style>
 
+<meta charset="utf-8">
+<title>Create Account</title>
 </head>
 
 <body id="create">
-<h1><center>Create Account</center></h1>
+<h1>Create Account</h1>
 <form action="<?= $_SERVER['PHP_SELF']; ?>" method="post">
-    <p><center>
+    <p>
         <label for="username">Username:</label>
         <input type="text" name="username" id="username"
         <?php
@@ -205,18 +201,18 @@ label[for=color] {
         }elseif(isset($errors['field_name'])){
             echo $errors['field_name'];
         }
-        ?></center>
+        ?>
     </p>
-    <p><center>
+    <p>
         <label for="pwd">Password:</label>
-        <input type="password" name="pwd" id="pwd"></center>
+        <input type="password" name="pwd" id="pwd">
         <?php
         if (isset($errors['pwd'])) {
             echo $errors['pwd'];
         }
         ?>
     </p>
-    <p><center>
+    <p>
         <label for="confirm">Confirm Password:</label>
         <input type="password" name="confirm" id="confirm">
         <?php
@@ -225,12 +221,11 @@ label[for=color] {
         } elseif (isset($errors['nomatch'])) {
             echo $errors['nomatch'];
         }
-        ?></center>
+        ?>
     </p>
-    <p><center>
-        <input type="submit" name="register" id="register" value="Create Account"></center>
+    <p>
+        <input type="submit" name="register" id="register" value="Create Account">
     </p>
 </form>
 </body>
 </html>
-</div>

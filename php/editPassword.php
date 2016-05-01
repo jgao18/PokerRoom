@@ -49,7 +49,11 @@ if (isset($_POST['changepwd'])) {
                
     
 ?>
-
+<div id="main">
+  <div id="navigation">
+    &nbsp;
+  </div>
+<div id="page">
 <!doctype html>
 <html>
 <head>
@@ -215,3 +219,4 @@ if (isset($error)) {
 </form>
 </body>
 </html>
+</div>
