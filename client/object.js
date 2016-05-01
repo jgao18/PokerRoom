@@ -359,6 +359,7 @@ function showRaiseContainer(maxChips) {
 		// Bet Button
 		var bet_button = new button(566,444,35,18,"bet", "yellow",10);
 		bet_button.addEventListener("click", function(event){
+      createjs.Sound.play("buttonClick");
 			game_menu.removeChild(game_menu.getChildByName("raise_container"));
 
 			var currentBetAmount = parseInt(bet_amount.text.substr(1));
