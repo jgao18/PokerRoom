@@ -416,6 +416,7 @@ function readyButton(){
 	stage.update();
 
 	ready.addEventListener("click", function(event){
+		createjs.Sound.play("buttonClick");
 		deleteItemFromGame(ready);
 		socket.emit("ready");
 
@@ -438,6 +439,7 @@ function againButton() {
 	stage.update();
 
 	again.addEventListener("click", function(event) {
+		createjs.Sound.play("buttonClick");
 
 		var card;
 		for(var i = 0; i < 2; i++){
