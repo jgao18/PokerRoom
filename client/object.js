@@ -387,6 +387,7 @@ function foldButton(){
 	var fold = new button(400,475,50,18,"fold", "yellow",10);
 
 	fold.addEventListener("click", function(event){
+		createjs.Sound.play("buttonClick");
 		var player = getCurrentPlayer();
 		socket.emit("buttons", {remove: false, action: "fold"});
 		socket.emit("fold",{username: player});
@@ -403,6 +404,7 @@ function startButton(){
 	stage.update();
 
 	start.addEventListener("click", function(event){
+		createjs.Sound.play("buttonClick");
 		removeMenuChildren();
 		lobby();
 	})
@@ -416,6 +418,7 @@ function readyButton(){
 	stage.update();
 
 	ready.addEventListener("click", function(event){
+		createjs.Sound.play("buttonClick");
 		deleteItemFromGame(ready);
 		socket.emit("ready");
 
@@ -438,6 +441,7 @@ function againButton() {
 	stage.update();
 
 	again.addEventListener("click", function(event) {
+		createjs.Sound.play("buttonClick");
 
 		var card;
 		for(var i = 0; i < 2; i++){
