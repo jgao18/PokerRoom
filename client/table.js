@@ -380,7 +380,8 @@ function lobby() {
 
 	pokertable();
 	paint_deck();
-	optionsButton();
+	soundButton();
+//	optionsButton();
 	helpButton();
 	leaveButton(currentPlayer);
 }
