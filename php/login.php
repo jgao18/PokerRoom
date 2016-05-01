@@ -86,11 +86,11 @@ input[type=password] {
     margin: 10px;
     margin-top: 12px;
     margin-left: 18px;
-    width: 290px;
+    width: 250px;
     height: 35px;
 	border: 1px solid #c7d0d2;
-    border-radius: 2px;
-    box-shadow: inset 0 1.5px 3px rgba(190, 190, 190, .4), 0 0 0 5px #f5f7f8;
+   
+    
 -webkit-transition: all .4s ease;
     -moz-transition: all .4s ease;
     transition: all .4s ease;
@@ -98,12 +98,12 @@ input[type=password] {
 input[type=text]:hover,
 input[type=password]:hover {
     border: 1px solid #b6bfc0;
-    box-shadow: inset 0 1.5px 3px rgba(190, 190, 190, .7), 0 0 0 5px #f5f7f8;
+    
 }
 input[type=text]:focus,
 input[type=password]:focus {
     border: 1px solid #a8c9e4;
-    box-shadow: inset 0 1.5px 3px rgba(190, 190, 190, .4), 0 0 0 5px #e6f2f9;
+ 
 }
 input[type=checkbox] {
     margin-left: 20px;
@@ -128,7 +128,7 @@ font-size: 12px;
     background-image: -webkit-gradient(linear, left top, left bottom, from(#acd6ef), to(#6ec2e8));
     background-image: -moz-linear-gradient(top left 90deg, #acd6ef 0%, #6ec2e8 100%);
     background-image: linear-gradient(top left 90deg, #acd6ef 0%, #6ec2e8 100%);
-    border-radius: 30px;
+   
     border: 1px solid #66add6;
     box-shadow: 0 1px 2px rgba(0, 0, 0, .3), inset 0 1px 0 rgba(255, 255, 255, .5);
     cursor: pointer;
