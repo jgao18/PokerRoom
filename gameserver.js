@@ -776,8 +776,8 @@ function onSocketDisconnect() {
 		game_in_progress = false;
 		playerCards = [];
 	}
-
-	if(playingPlayers.length == 1){
+	
+	if(connectedPlayers.length == 1){
 		this.emit("round over",{status: "only one player"});
 		this.broadcast.emit("round over",{status: "only one player"});
 		readyPlayers = 0;
