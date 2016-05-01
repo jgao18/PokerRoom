@@ -1,7 +1,4 @@
 <?php
-//require_once './includes/init.php';
-//require_once './includes/logout_sess.php';
-//include('./includes/init.php');
 include ("logout_sess.php");
 include ("AutoLogin.php");
 include ("init.php");
@@ -12,8 +9,6 @@ if (isset($_POST['cancel'])) {
     header('Location: ' . $_SESSION['return_to']);
     exit;
 }
-
-//use Foundationphp\Sessions\AutoLogin;
 
 if (isset($_POST['logout'], $_SESSION['remember']) || isset($_POST['logout'], $_SESSION['lynda_auth'])) {
 ?>

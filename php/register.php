@@ -66,10 +66,16 @@ if (isset($_POST['register'])) {
     }
 }
 ?>
+<div id="main">
+  <div id="navigation">
+    &nbsp;
+  </div>
+<div id="page">
 <!doctype html>
 <html>
 <head>
-
+<meta charset="utf-8">
+<title>Create Account</title>
 <style>
 	html, body {
     width: 100%;
@@ -98,11 +104,11 @@ input[type=password] {
     margin: 10px;
     margin-top: 12px;
     margin-left: 18px;
-    width: 290px;
+    width: 250px;
     height: 35px;
 	border: 1px solid #c7d0d2;
-    border-radius: 2px;
-    box-shadow: inset 0 1.5px 3px rgba(190, 190, 190, .4), 0 0 0 5px #f5f7f8;
+   
+    
 -webkit-transition: all .4s ease;
     -moz-transition: all .4s ease;
     transition: all .4s ease;
@@ -110,12 +116,12 @@ input[type=password] {
 input[type=text]:hover,
 input[type=password]:hover {
     border: 1px solid #b6bfc0;
-    box-shadow: inset 0 1.5px 3px rgba(190, 190, 190, .7), 0 0 0 5px #f5f7f8;
+    
 }
 input[type=text]:focus,
 input[type=password]:focus {
     border: 1px solid #a8c9e4;
-    box-shadow: inset 0 1.5px 3px rgba(190, 190, 190, .4), 0 0 0 5px #e6f2f9;
+ 
 }
 input[type=checkbox] {
     margin-left: 20px;
@@ -131,7 +137,7 @@ input[type=submit] {
     float: center;
     margin-right: 20px;
     margin-top: 20px;
-    width: 100px;
+    width: 115px;
     height: 30px;
 font-size: 12px;
     font-weight: bold;
@@ -140,7 +146,7 @@ font-size: 12px;
     background-image: -webkit-gradient(linear, left top, left bottom, from(#acd6ef), to(#6ec2e8));
     background-image: -moz-linear-gradient(top left 90deg, #acd6ef 0%, #6ec2e8 100%);
     background-image: linear-gradient(top left 90deg, #acd6ef 0%, #6ec2e8 100%);
-    border-radius: 30px;
+   
     border: 1px solid #66add6;
     box-shadow: 0 1px 2px rgba(0, 0, 0, .3), inset 0 1px 0 rgba(255, 255, 255, .5);
     cursor: pointer;
@@ -178,14 +184,12 @@ label[for=color] {
 }
  </style>
 
-<meta charset="utf-8">
-<title>Create Account</title>
 </head>
 
 <body id="create">
-<h1>Create Account</h1>
+<h1><center>Create Account</center></h1>
 <form action="<?= $_SERVER['PHP_SELF']; ?>" method="post">
-    <p>
+    <p><center>
         <label for="username">Username:</label>
         <input type="text" name="username" id="username"
         <?php
@@ -201,18 +205,18 @@ label[for=color] {
         }elseif(isset($errors['field_name'])){
             echo $errors['field_name'];
         }
-        ?>
+        ?></center>
     </p>
-    <p>
+    <p><center>
         <label for="pwd">Password:</label>
-        <input type="password" name="pwd" id="pwd">
+        <input type="password" name="pwd" id="pwd"></center>
         <?php
         if (isset($errors['pwd'])) {
             echo $errors['pwd'];
         }
         ?>
     </p>
-    <p>
+    <p><center>
         <label for="confirm">Confirm Password:</label>
         <input type="password" name="confirm" id="confirm">
         <?php
@@ -221,11 +225,12 @@ label[for=color] {
         } elseif (isset($errors['nomatch'])) {
             echo $errors['nomatch'];
         }
-        ?>
+        ?></center>
     </p>
-    <p>
-        <input type="submit" name="register" id="register" value="Create Account">
+    <p><center>
+        <input type="submit" name="register" id="register" value="Create Account"></center>
     </p>
 </form>
 </body>
 </html>
+</div>
