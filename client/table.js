@@ -240,7 +240,24 @@ function assignSignal(data) {
 			userSignal = turn_signal(index);
 			break;
 	}
-
+	
+	var action;
+	switch(positions[data.username]){
+		case "main":
+			action = stage.getChildByName("mainPlayerAction");
+			break;
+		case "left":
+			action = stage.getChildByName("leftPlayerAction");
+			break;
+		case "right":
+			action = stage.getChildByName("rightPlayerAction");
+			break;
+		case "back":
+			action = stage.getChildByName("backPlayerAction");
+			break;
+	}
+	
+	stage.removeChild(action);
 	userSignal.name = "signal";
 	stage.addChild(userSignal);
 	stage.update();
@@ -370,6 +387,7 @@ function lobby() {
 		socket.on("player's action", playerAction);
 		socket.on("again button", againButton);
 		socket.on("timer", timer);
+		socket.on("remove folded cards",playerFolded);
 
 		// Assigns cards to the table
 		socket.on("flop cards", flopCards)
@@ -474,7 +492,7 @@ function tableCard() {
 }
 
 // Passes the first card to the player
-function firstPass(card,x, y, card2, secondX, secondY, front) {
+function firstPass(card, x, y, card2, secondX, secondY, front) {
 
 	var i = 0;
 	var cardTicker = createjs.Ticker.addEventListener("tick", handleTick);
@@ -485,7 +503,7 @@ function firstPass(card,x, y, card2, secondX, secondY, front) {
     stage.update();
     if (i > 50){
  			if (front == true){
-				flip(card,card1,310,504);
+				flip(card,card1,310,504,front);
  			}
 			// Calls the function to pass the second card
 			secondPass(card2,secondX,secondY, front);
@@ -506,7 +524,7 @@ function secondPass(card, x, y, front){
       stage.update();
     	if (i > 50) {
   			if (front == true){
- 					flip(card,card2,375,504);
+ 					flip(card,card2,375,504,front);
   			}
 				createjs.Ticker.off("tick",cardTicker);
 				return;
@@ -754,6 +772,7 @@ function newTurn() {
 		}
 	}
 	
+	return;
 }
 
 // Once all user have finish their turn, go to the next action
@@ -767,9 +786,9 @@ function nextAction() {
 			var tCard5 = stage.getChildByName("tCard5");
 			var tCard4 = stage.getChildByName("tCard4");
 			var tCard3 = stage.getChildByName("tCard3");
-			flip(tCard5,tableCard5,260,300);
-			flip(tCard4,tableCard4,320,300);
-			flip(tCard3,tableCard3,380,300);
+			flip(tCard5,tableCard5,260,300,false);
+			flip(tCard4,tableCard4,320,300,false);
+			flip(tCard3,tableCard3,380,300,false);
 			action++;
 			break;
 			
@@ -777,7 +796,7 @@ function nextAction() {
 		case 1:
 			newTurn();
 			var tCard2 = stage.getChildByName("tCard2");
-			flip(tCard2,tableCard2,440,300);
+			flip(tCard2,tableCard2,440,300,false);
 			action++;
 			break;
 			
@@ -785,7 +804,7 @@ function nextAction() {
 		case 2:
 			newTurn();
 			var tCard1 = stage.getChildByName("tCard1");
-			flip(tCard1,tableCard1,500,300);
+			flip(tCard1,tableCard1,500,300,false);
 			action++;
 			break;
 			
@@ -812,10 +831,10 @@ function nextAction() {
 						}
 					}
 					
-					if (tempOtherCards[0] != null){
-						flip(card1, tempOtherCards[0], 20, 300);
-						flip(card2, tempOtherCards[1], 80, 300);
-				    }
+					if (tempOtherCards[0] != undefined && card1 != undefined){
+						flip(card1, tempOtherCards[0], 20, 300, false);
+						flip(card2, tempOtherCards[1], 80, 300, false);
+				  }
 				}
 				if (positions[username] == "left"){
 					card1 = stage.getChildByName("lCard1");
@@ -827,10 +846,10 @@ function nextAction() {
 						}
 					}
 					
-					if (tempOtherCards[0] != null){
-					  flip(card1, tempOtherCards[0], 615, 300);
-					  flip(card2, tempOtherCards[1], 675, 300);
-				    }
+					if (tempOtherCards[0] != undefined && card1 != undefined){
+					  flip(card1, tempOtherCards[0], 615, 300, false);
+					  flip(card2, tempOtherCards[1], 675, 300, false);
+				  }
 				}
 				if (positions[username] == "back"){
 					card1 = stage.getChildByName("bCard1");
@@ -843,11 +862,16 @@ function nextAction() {
 							tempOtherCards.push(otherCards[i]);
 						}
 					}
-					if (tempOtherCards[0] != null){
-						flip(card1, tempOtherCards[0], 310, 90);
-						flip(card2, tempOtherCards[1], 370, 90);
+					if (tempOtherCards[0] != undefined && card1 != undefined){
+						flip(card1, tempOtherCards[0], 310, 90, false);
+						flip(card2, tempOtherCards[1], 370, 90, false);
 				    }
 				}
+			}
+			
+			var storeSignal;
+			if (storeSignal = stage.getChildByName("signal")) {
+				stage.removeChild(storeSignal);
 			}
 
 			otherCards = [];
@@ -862,6 +886,13 @@ function nextAction() {
 			
 			newTurn();
 			var store;
+			
+			var card;
+			for(var i = 0; i < 2; i++){
+				card = stage.getChildByName("mainCard");
+				stage.removeChild(card);
+			}
+			
 			// Erases all unfolded cards
 			var cardList = ["rCard1","rCard2","lCard1","lCard2","bCard1","bCard2",
 							"tCard1","tCard2","tCard3","tCard4","tCard5"];
@@ -882,7 +913,7 @@ function nextAction() {
 				var shape = stage.getChildByName("tableCards");
 				stage.removeChild(shape);
 			}
-
+		
 			otherCards = [];
 			againButton();
 			socket.emit("buttons",{remove: true});
@@ -894,6 +925,12 @@ function nextAction() {
 			
 			newTurn();
 			var store;
+			
+			var card;
+			for(var i = 0; i < 2; i++){
+				card = stage.getChildByName("mainCard");
+				stage.removeChild(card);
+			}
 			// Erases all unfolded cards
 			var cardList = ["rCard1","rCard2","lCard1","lCard2","bCard1","bCard2",
 							"tCard1","tCard2","tCard3","tCard4","tCard5"];
@@ -903,7 +940,6 @@ function nextAction() {
 				}
 			}
 
-			// Signal doesn't delete properly
 			var storeSignal;
 			if (storeSignal = stage.getChildByName("signal")) {
 				stage.removeChild(storeSignal);
@@ -931,7 +967,7 @@ function nextAction() {
 
 // Flips any cards pass into this function
 // x and y corresponds to where the new card should be placed
-function flip(card,cardObj,x,y) {
+function flip(card,cardObj,x,y,front) {
 	var i = 0;
 	var store = card;
 	var flipTick = createjs.Ticker.addEventListener("tick", handleTick);
@@ -939,30 +975,40 @@ function flip(card,cardObj,x,y) {
    	 	i++;
    	 	store.scaleX -= 0.05;
    	 	store.x += 1.2;
-        stage.update();
+      stage.update();
    	 	if (i > 20) {
-			stage.removeChild(card);
-			playerCards(cardObj,x,y);
- 			createjs.Ticker.off("tick",flipTick);
+				stage.removeChild(card);
+				playerCards(cardObj,x,y,front);
+ 				createjs.Ticker.off("tick",flipTick);
    		}
     }
 }
 
-// What does passedFirstCard mean?
-function playerCards(cardObj,x,y) {
+// Shows the card values in the game
+function playerCards(cardObj,x,y,front) {
 
 	if (passedFirstCard == false){
 		card = cardObj.get_card_container_object(cardObj);
 		card.x += x;
 		card.y += y;
-		card.name =  "tableCards";
+		if(front == true){
+			card.name = "mainCard";
+		}
+		else{
+			card.name = "tableCards";
+		}
 		passedFirstCard = true;
 	}
 	else{
 		card = cardObj.get_card_container_object(cardObj);
 		card.x += x;
 		card.y += y;
-		card.name =  "tableCards";
+		if(front == true){
+			card.name = "mainCard";
+		}
+		else{
+			card.name = "tableCards";
+		}
 		passedFirstCard = false;
 	}
 
@@ -1050,6 +1096,41 @@ function wonPlayer(data) {
 	 player.name = "won player";
 	 game_menu.addChild(player);
 	 stage.update();
+}
+
+function playerFolded(data){
+	var i;
+	var position;
+	var card1;
+	var card2;
+	
+	switch(positions[data.user]){
+		case "right":
+			card1 = stage.getChildByName("rCard1");
+			card2 = stage.getChildByName("rCard2");
+			stage.removeChild(card1);
+			stage.removeChild(card2);
+			break;
+		case "left":
+			card1 = stage.getChildByName("lCard1");
+			card2 = stage.getChildByName("lCard2");
+			stage.removeChild(card1);
+			stage.removeChild(card2);
+			break;
+		case "back":
+			card1 = stage.getChildByName("bCard1");
+			card2 = stage.getChildByName("bCard2");
+			stage.removeChild(card1);
+			stage.removeChild(card2);
+			break;
+		case "main":
+			for (i = 0; i < 2; i ++) {
+				var card = stage.getChildByName("mainCard");
+				stage.removeChild(card);
+			}
+			break;
+	}
+
 }
 
 function playerAction(data) {

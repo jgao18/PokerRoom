@@ -382,6 +382,7 @@ finalEvaluation([0,1,3,5,6,8,9],[1,3,4,4,9,10,11],"High Card");
 finalEvaluation([3,4,6,7,8,9,10],[0,1,3,5,6,8,9], "High card");
 finalEvaluation([0,1,2,4,5,5,6],[0,1,3,4,5,5,6],"It is a pair of 9", "It is a pair of 9");*/
 // Finds the value that correspond to times
+/*
 function findValue(dict,keyList,times,extra) {
 	var lastIndex = keyList.length - 1;
 	for(var i = lastIndex; i >= 0; i--) {
@@ -518,7 +519,7 @@ function whichStraight(cards){
 		console.log("Straight");
 	}
 }
-
+*/
 /*
 function whichFlush(cards) {
 	console.log("HELLLO");
@@ -563,7 +564,6 @@ function whichFlush(cards) {
 }
 */
 //whichStraight();
-console.log(whichPair());
 /*
 function orderTesting() {
 	var list = [1,2,2,3,4,5,7];
@@ -608,3 +608,133 @@ function pairTesting() {
 	}
 }
 */
+
+function isSuit() {
+	var testList = [];
+	var points = 0;
+	var heart = 0;
+	var spade = 0;
+	var diamond = 0;
+	var club = 0;
+  
+	var cards = ["heart","heart","club","heart","heart","heart","spade"];
+	// Determines if there are multiple suits
+	for(var i = 0; i < cards.length; i++) {
+		switch(cards[i]) {
+			case "heart":
+				heart++;
+				break;
+			case "spade":
+				spade++;
+				break;
+			case "diamond":
+				diamond++;
+				break;
+			case "club":
+				club++;
+				break;
+		}
+	}
+
+	// Determines if there are 5 cards of the same suit or more
+	if((heart>4) || (spade>4) || (diamond>4) || (club>4)) {
+		points = "Y";
+	}
+	else {
+		points = "N";
+	}
+
+	return points;
+}
+
+function isOrder(cards) {
+	var orderList = [0,2,6,9,11,11,12];
+	var lastValue;
+	var isLowStraight = 0;
+	var order = 0;
+
+	// Determines if the list has five values in order
+	for (var i = 0; i < (orderList.length-1); i++) {
+		if ((orderList[i] + 1) == orderList[i+1] ) {
+			order++;
+			if (order > 3) {
+				return "Y";
+			}
+		}
+		// If the next value the same value as current
+		else if (orderList[i+1] == orderList[i]){
+			continue;
+		}
+		else {
+			order = 0;
+		}
+	}
+	
+	for(i = 0; i < orderList.length; i++){
+		if(lastValue != orderList[i]){
+			if(orderList[i] == 0){
+				isLowStraight++;
+			}
+			else if(orderList[i] == 8){
+				isLowStraight--;
+			}
+			else if(orderList[i] == 9){
+				isLowStraight++;
+			}
+			else if(orderList[i] == 10){
+				isLowStraight++;
+			}
+			else if(orderList[i] == 11){
+				isLowStraight++;
+			}
+			else if(orderList[i] == 12){
+				isLowStraight++;
+			}
+	    }
+	    lastValue = orderList[i];
+	}
+	
+	if(isLowStraight > 4){
+		return "Y";
+	}	
+
+	return "N";
+}
+
+function isPairs(cards) {
+	var newList = [];
+	var pairs = {};
+	var pairList = [0,2,6,9,11,11,12];
+	var numOfCards = 1;
+	var i = 0;
+
+	// Retrieve values
+	for (i = 0; i < pairList.length; i++) {
+		newList.push(values[pairList[i]]);
+	}
+
+	// Stores pairs in a dictionary
+	for (i = 0; i < (newList.length-1); i++) {
+		if (newList[i] == newList[i+1]) {
+			numOfCards++;
+			pairs[newList[i]] = numOfCards;
+		}
+		else {
+			numOfCards = 1;
+		}
+	}
+
+	// If there is a pair, return "Y"
+	for (i = 0; i < values.length; i++) {
+		if( pairs[values[i]] > 1) {
+			return "Y";
+		}
+	}
+
+	return "N";
+}
+
+console.log(isSuit());
+console.log(isOrder());
+console.log(isPairs());
+
