@@ -145,7 +145,7 @@ function sortListsByIndex(){
 	var i,j;
 	var socketList;
 	var sortTablePlayers = [];
-	for(i = 0; i < connectedPlayers.length; i++){
+	for(i = 0; i < MAX_PLAYERS; i++){
 		for(j = 0; j < connectedPlayers.length; j++){
 			if(connectedPlayers[j].getTableIndex() == i){
 				sortTablePlayers.push(connectedPlayers[j]);
@@ -202,7 +202,7 @@ function onNewPlayer(data) {
 		}
 		tableIndex += 1;
 	}
-	console.log("This is tableIndex: " + tableIndex);
+
 	newPlayer = new Player(this.id, latestPlayerUsername, latestPlayerChipAmount, tableIndex);
 
 	connectedPlayers.push(newPlayer);
@@ -309,10 +309,9 @@ function buttons(data) {
 	}
 
 	indexPlayer++;
-
 	// Retract to the previous index
 	if(data.action == "fold") {
-		if(indexPlayer > 0 && indexPlayer < playingPlayers.length) {
+		if(indexPlayer > 1 && indexPlayer < playingPlayers.length) {
 			indexPlayer--;
 		}
 	}
@@ -327,13 +326,16 @@ function fold(data) {
 
 	// Find the player and remove him from the current round
 	for (var i = 0; i < playingPlayers.length; i++) {
-		if( playingPlayers[i].getUsername() == data.username ) {
+		if( playingPlayers[i].getUsername() == data.username) {
 			playingPlayers.splice(i, 1);
 		}
 	}
+	
+	this.emit("remove folded cards", {user: data.username});
+	this.broadcast.emit("remove folded cards", {user: data.username});
 
 	// Check for out of bounds
-	if(indexPlayer >= playingPlayers.length) {
+	if(indexPlayer >= playingPlayers.length){
 		indexPlayer = 0;
 	}
 
@@ -551,7 +553,6 @@ function currentTurn(data) {
 							user2Cards.push(playerHands[usernames[j]]["Card2"]);
 							// If the cards are bigger then increase the user points by 0.5
 							addPoints = Logic.finalEvaluation(user1Cards,user2Cards,userResults[usernames[i]],userResults[usernames[j]]);
-							console.log("The user : " + usernames[i] + " is increasing by " + addPoints);
 							storePoints[usernames[i]] += addPoints;
 							//userPoints[usernames[i]] += addPoints;
 							//totalCards = tableCards.slice();
@@ -569,14 +570,11 @@ function currentTurn(data) {
 				var winner;
 				var high = 0;
 				for (var i = 0; i < playingPlayers.length; i++) {
-					util.log("This is the userPoints[usernames[i]]: " + userPoints[usernames[i]]);
 					// need to only include from the list playingPlayers
 					if (userPoints[playingPlayers[i].getUsername()] > high){
 						winner = playingPlayers[i].getUsername();
 						high = userPoints[playingPlayers[i].getUsername()];
-						util.log("This is the high in the if: " + high);
 					}
-					util.log("This is the high: " + high);
 				}
 				this.emit("winning player",{player: winner});
 				this.broadcast.emit("winning player",{player: winner});

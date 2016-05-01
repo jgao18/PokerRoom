@@ -431,6 +431,13 @@ function againButton() {
 	stage.update();
 
 	again.addEventListener("click", function(event) {
+		
+		var card;
+		for(var i = 0; i < 2; i++){
+			card = stage.getChildByName("mainCard");
+			stage.removeChild(card);
+		}
+		
 		// Delete all cards
 		for (var i = 0; i < 13; i ++) {
 	  	shape = stage.getChildByName("tableCards");
@@ -448,6 +455,7 @@ function againButton() {
 		deleteItemFromGame(again);
 		socket.emit("ready");
 	})
+	
 }
 
 // Produces the background for the game

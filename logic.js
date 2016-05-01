@@ -63,12 +63,11 @@ module.exports = {
 
 		var List1 = sortCards(user1Cards);
 		var List2 = sortCards(user2Cards);
-	    var userPoints = 0;
+	  var userPoints = 0;
 		var user1Value;
 		var user2Value;
 		var i = 0;
 		
-
 		//What if we looked into the result string and find the values
 		//Need something for pair/two pair/threeokakind/FullHouse/FourofKind
 		if(isPairs(user1Cards) == "Y") {
