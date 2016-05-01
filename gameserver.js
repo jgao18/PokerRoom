@@ -7,18 +7,19 @@ var Player = require("./player").Player;
 var Deck = require("./deck").Deck;
 var Card = require("./card").Card;
 var Logic = require("./logic");
+
 var serverPort = process.argv[2];
 
-// stores all sockets per user
-var userSockets;
-// players that are still in the round (haven't folded)
-var playingPlayers;
-// all players connected in the game
-var connectedPlayers;
-// players that haven't decided their turn yet
-var currentHandPlayers;
-// players that need to wait until round is over
-var waitList;
+var http = require('http');
+http.post = require('http-post');
+var ip = require("ip");
+
+var userSockets;  // stores all sockets per user
+var playingPlayers;  // players that are still in the round (haven't folded)
+var connectedPlayers;  // all players connected in the game
+var currentHandPlayers;  // players that haven't decided their turn yet
+var waitList;  // players that need to wait until round is over
+
 var waitSockets;
 
 const MAX_PLAYERS = 4;
@@ -41,7 +42,7 @@ var latestPlayerUsername = localUserNames[localUserCount];
 var latestPlayerChipAmount = 1000;
 
 function init() {
-	
+
 	// initialize variables once server starts
 	connectedPlayers = [];
 	currentHandPlayers = [];
@@ -73,7 +74,7 @@ function init() {
 	io.on('connection', function (socket){
 
 		socket.on("new player", onNewPlayer);
-		socket.on("disconnect", onsocketDisconnect);
+		socket.on("disconnect", onSocketDisconnect);
 		socket.emit('welcome', { message: latestPlayerUsername + " " + latestPlayerChipAmount });
 		socket.on('linkUsername', retrieveUsername);
 		socket.on('linkChipAmount', retrieveChipAmount);
@@ -86,15 +87,15 @@ function init() {
 		socket.on("first turn", firstTurn);
 		socket.on("increase pot", potIncrease);
 		socket.on("changed amount", amountChanged);
-	
+
 	});
 
-    // Thanks to the Nick/the PoP team for helping with this code
+    // Thanks to the the PoP team for the idea + helping with this code
 	// Set to listen on this ip and this port.
 	server.listen(serverPort, '0.0.0.0', function(){
 		console.log("Game server started on port " + serverPort);
 	});
-	
+
 };
 
 function retrieveUsername(data){
@@ -123,7 +124,7 @@ function changePlayerAmount(user,amount,extra){
 			}
 		}
 	}
-	
+
 }
 
 // Transfers the pot amount to the winner
@@ -164,18 +165,18 @@ function sortListsByIndex(){
 			for(j = 0; j < userSockets.length; j++){
 				if(connectedPlayers[i].getUsername() == userSockets[j].username){
 				 	socketList.push(userSockets[j]);
-				} 
+				}
 			}
 		}
 
 		userSockets = socketList.slice();
 	}
-	
+
 }
 
 // Called by sockets when they hit the Play button
 function onNewPlayer(data) {
-	
+
   if(connectedPlayers.length > 3) {
 		return;
 	}
@@ -273,7 +274,7 @@ function waitToPlay() {
 		userSockets.push(waitSockets[i]);
 		usernames.push(waitSockets[i].username);
 	}
-	
+
 	game_in_progress = false;
 	sortListsByIndex();
 	waitList = [];
@@ -306,7 +307,7 @@ function buttons(data) {
 			userSocket.emit("add buttons");
 		}
 	}
-	
+
 	indexPlayer++;
 	// Retract to the previous index
 	if(data.action == "fold") {
@@ -365,7 +366,7 @@ function firstTurn(data) {
 	indexPlayer = 0;
 	playingPlayers = connectedPlayers.slice();
     currentHandPlayers = connectedPlayers.slice();
-	
+
     for(i = 0; i < waitList.length; i++){
       for(j = 0; j < playingPlayers.length; j++){
  	      if(playingPlayers[j].getUsername() == waitList[i].getUsername()){
@@ -413,16 +414,16 @@ function currentTurn(data) {
 	var round_over = false;
 	var gameStages = ["preflop","flop", "turn", "river", "postriver"];
 
- 	if (data.action == "raise") {
- 		// Make a new list with all players
- 		currentHandPlayers = playingPlayers.slice();
- 		// Look for the user that raised and erased him from list
- 		for (var i = 0; i < currentHandPlayers.length; i++) {
- 			if(data.user == currentHandPlayers[i].getUsername()) {
- 				currentHandPlayers.splice(i, 1);
- 			}
- 		}
- 	}
+	if (data.action == "raise") {
+		// Make a new list with all players
+		currentHandPlayers = playingPlayers.slice();
+		// Look for the user that raised and erased him from list
+		for (var i = 0; i < currentHandPlayers.length; i++) {
+			if(data.user == currentHandPlayers[i].getUsername()) {
+				currentHandPlayers.splice(i, 1);
+			}
+		}
+	}
 
 	// If all player decided their action for the turn
 	if (currentHandPlayers.length == 0) {
@@ -488,6 +489,7 @@ function currentTurn(data) {
 						// Restart the card list
 						totalCards = tableCards.slice();
 						times = 0;
+
 					 }
 				 }
 
@@ -534,11 +536,11 @@ function currentTurn(data) {
 				var user1Cards = tableCards.slice();
 				var user2Cards = tableCards.slice();
 				var storePoints = {};
-				
+
 				for(var i = 0; i < usernames.length; i++){
 					storePoints[usernames[i]] = 0;
 				}
-				
+
 				for (var i = 0; i < usernames.length; i++) {
 					for(var j = 0; j < usernames.length; j++) {
 						// If there are multiple of the same results
@@ -559,7 +561,7 @@ function currentTurn(data) {
 						}
 					}
 				}
-				
+
 				for(var i = 0; i < usernames.length; i++){
 					userPoints[usernames[i]] += storePoints[usernames[i]];
 				}
@@ -580,39 +582,39 @@ function currentTurn(data) {
 				// Inform every player which cards are who's
 			    for (var i = 0; i < userSockets.length; i++)
 			    {
-			         var userSocket = userSockets[i].socket;
-			         userSocket.emit("other cards", outputPlayerCards);
+				var userSocket = userSockets[i].socket;
+				userSocket.emit("other cards", outputPlayerCards);
 			    }
 
 				// Restart the list
 			    playerCards = [];
 				round_over = true;
 			 }
-			 
+
 			 for(i = 0; i < userSockets.length; i++){
 				 userSocket = userSockets[i].socket;
 			     userSocket.emit("next action", gameStages[gameStage]);
 			 }
-			 
+
 			 if(round_over == true){
 			   waitToPlay();
 			 }
 		 }
 	 }
 
-	
+
  	if (data.action == "raise") {
  		this.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
  		this.broadcast.emit("player's action", {player: data.user, action: "raised", amount: data.amount});
 	}
 	else if (data.action == "call") {
- 		this.emit("player's action", {player: data.user, action: "checked/called", amount: data.amount});
- 		this.broadcast.emit("player's action", {player: data.user, action: "checked/called", amount: data.amount});
- 	}
+		this.emit("player's action", {player: data.user, action: "checked/called", amount: data.amount});
+		this.broadcast.emit("player's action", {player: data.user, action: "checked/called", amount: data.amount});
+	}
 	else if (data.action == "fold") {
- 		this.emit("player's action", {player: data.user, action: "folded", amount: 0});
- 		this.broadcast.emit("player's action", {player: data.user, action: "folded", amount: 0});
- 	}
+		this.emit("player's action", {player: data.user, action: "folded", amount: 0});
+		this.broadcast.emit("player's action", {player: data.user, action: "folded", amount: 0});
+	}
 
 	// Provide the next player in the list
     playerTurn = currentHandPlayers[0];
@@ -629,6 +631,7 @@ function startGame() {
 		readyPlayers = 0;
 		var deck = new Deck();
 		deck.get_new_deck();
+
 
 		for (i = 0; i < userSockets.length; i++){
 			var userSocket = userSockets[i].socket;
@@ -658,7 +661,7 @@ function splicePlayerById(playerList, id){
 }
 
 // Disconnects each socket
-function onsocketDisconnect() {
+function onSocketDisconnect() {
 	util.log("Player has disconnected: " + this.id);
 
 	var index;
@@ -689,7 +692,7 @@ function onsocketDisconnect() {
 					currentHandPlayers.splice(i, 1);
 				}
 			}
-				
+
 		}
 	}
 
@@ -697,12 +700,24 @@ function onsocketDisconnect() {
 	var storeDict;
 	var storeSocket;
 	var username;
-	for (i = 0; i < connectedPlayers.length; i++ ){
-		if (connectedPlayers[i].id == this.id){
+	var chips;
+  for (i = 0; i < connectedPlayers.length; i++ ) {
+	  if (connectedPlayers[i].id == this.id) {
 			username = connectedPlayers[i].getUsername();
+			chips = connectedPlayers[i].getChips();
 			connectedPlayers.splice(i, 1);
 			this.broadcast.emit("remove player", {id: this.id});
-		}
+    }
+  }
+
+	if (ip.address().indexOf("192.168.1.101") >= 0) {
+		// Couldn't get this to pass in multiple values, so used the ~ (disallowed from usernames) as a seperator
+		http.post('http://localhost/~gaoj/PokerRoom/php/update_user.php', {user_data: [username + "~" + chips] }, function(res) {
+		  res.setEncoding('utf8');
+		  res.on('data', function(chunk) {
+				console.log(chunk);
+		  });
+		});
 	}
 
 	splicePlayerById(playingPlayers, this.id);

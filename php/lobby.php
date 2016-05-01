@@ -10,10 +10,10 @@
   $stmt = $db->prepare($sql);
   $stmt->bindParam(':username', $username);
   $stmt->execute();
-  $stored = $stmt->fetchColumn();
+  $chips = $stmt->fetchColumn();
   
   setcookie("user_cookie", $username , time() + (86400 * 30), "/");
-  setcookie("chip_cookie", $stored , time() + (86400 * 30), "/"); 
+  setcookie("chip_cookie", $chips , time() + (86400 * 30), "/"); 
 
 ?>
         
@@ -25,7 +25,7 @@
   <div id="page">
     <h2>Main Menu</h2>
     <p>Welcome to the Poker Room, <?= htmlentities($_SESSION['username']); ?>!</p>
-       <p> You have $<?= htmlentities($stored); ?> on your account.</p>
+       <p> You have $<?= htmlentities($chips); ?> on your account.</p>
 
    <ul>
       <li><a href="../php/holdemRooms.php">Texas Hold'em Rooms</a></li>    

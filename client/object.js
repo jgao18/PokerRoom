@@ -91,7 +91,7 @@ var get_value_object = function(value, color, font){
   } else if (color == "black") {
     title = new createjs.Text(value, font, "#000000");
   }
-	
+
 	return title;
 }
 
@@ -190,7 +190,7 @@ function button(x,y,width,height,label,color,textSize) {
 			text = new createjs.Text(label, "20px Bembo", "#000");
 			break;
 	}
-	
+
 	text.textBaseline = "top";
 	text.textAlign = "center";
 	text.x += x + (width/2);
@@ -214,7 +214,7 @@ manifest = [
 createjs.Sound.alternateExtensions = ["mp3"];
 preload = new createjs.LoadQueue(true, assetsPath);
 preload.installPlugin(createjs.Sound);
-preload.addEventListener("complete", handleComplete); 
+preload.addEventListener("complete", handleComplete);
 function handleComplete(event) {
 	createjs.Sound.play("background");
 }
@@ -248,22 +248,19 @@ function optionsButton() {
 	})
 }
 
-
-/* Isn't functioning correctly, need to fix it.
-   Will remove player from the current stage. */
 function leaveButton(currentPlayer) {
 	var leave = new button(662,610,80,30,"Leave","yellow",20);
 	addToGame(leave);
 	stage.update();
 
 	leave.addEventListener("click", function(event){
-		alert("The leave button is still in development.");
+    window.close();
 	})
 }
 
 // Allows the user to call
 function callButton() {
-	
+
 	var playerChips = getPlayerChips()
 	var call = new button(290,475,50,18,"check/call","yellow",10);
 
@@ -295,7 +292,7 @@ function callButton() {
 		socket.emit("changed amount", {id: player, chips: currentChips});
 		socket.emit("current turn", {action: "call", user: player, amount: totalBet});
 	})
-	
+
 	return call;
 }
 
@@ -315,7 +312,7 @@ function raiseButton(maxChips) {
 			showRaiseContainer(maxChips);
 		}
 	})
-	
+
 	return raise_button;
 }
 
@@ -341,19 +338,19 @@ function showRaiseContainer(maxChips) {
 
 		bet_amount = new createjs.Text("$" + amountBetIncremented, "16px Bembo", "#FFFF00"); // global variable
 		bet_amount.name = "bet_amount";
-		bet_amount.x = 238;
-		bet_amount.y = 445;
+		bet_amount.x = 146;
+		bet_amount.y = 444;
 		raise_container.addChild(bet_amount);
 
 		// Slider
-		var raise_slider = new Slider(amountBetIncremented*1, maxChips*1, 150,15).set({x: 290, y: 445, value: 1});
+		var raise_slider = new Slider(amountBetIncremented*1, maxChips*1, 350,15).set({x: 198, y: 445, value: 1});
 		raise_slider.trackColor = "purple";
 		raise_slider.thumbColor = "#FFFF00";
 		raise_slider.on("change", handleSliderChange, this);
 		raise_container.addChild(raise_slider);
 
 		// Bet Button
-		var bet_button = new button(460,445,35,18,"bet", "yellow",10);
+		var bet_button = new button(566,444,35,18,"bet", "yellow",10);
 		bet_button.addEventListener("click", function(event){
 			game_menu.removeChild(game_menu.getChildByName("raise_container"));
 
@@ -370,7 +367,7 @@ function showRaiseContainer(maxChips) {
 			socket.emit("increase pot", {chips: diffAmount, amount: currentBetAmount});
 			socket.emit("current turn", {action: "raise", user: player, amount: currentBetAmount});
 		});
-		
+
 		raise_container.addChild(bet_button);
 	}
 
@@ -427,7 +424,7 @@ function readyButton(){
 
 // Once the finishes, all players must press this button to play again
 function againButton() {
-	var again = new button(315,245,100,45,"Again?", "#F00",20);
+	var again = new button(315,245,100,45,"Ready", "#F00",20);
 	var shape;
 	again.name = "againButton";
 	addToGame(again);
@@ -446,7 +443,7 @@ function againButton() {
 	  	shape = stage.getChildByName("tableCards");
 			stage.removeChild(shape);
 		}
-		
+
 		var storeSignal;
 		if (storeSignal = stage.getChildByName("signal")){
 			stage.removeChild(storeSignal);
@@ -476,7 +473,7 @@ function pokerChip(x, y) {
 	// Used by all users
 	var chip_plate = new createjs.Container();
 	var chip_background = new createjs.Shape();
-	
+
 	chip_background.graphics.beginFill("red").drawCircle(x,y,15);
 	chip_background.graphics.beginFill("white").drawCircle(x,y,12);
 	chip_background.graphics.beginFill("red").drawCircle(x,y,9);
