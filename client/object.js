@@ -225,6 +225,21 @@ function updateLoading(event) {
 }
 preload.loadManifest(manifest);
 
+// Provides a toggle function for all sounds
+function soundButton() {
+	var sound = new button(662,575,80,30,"Sound","yellow",20);
+	addToGame(sound);
+	stage.update();
+
+	sound.addEventListener("click", function(event) {
+		createjs.Sound.play("buttonClick");
+		if (createjs.Sound.volume == 1.0) {
+			createjs.Sound.volume = 0.0;
+		} else {
+			createjs.Sound.volume = 1.0;
+		}
+	})
+}
 
 // Provides instructions for the game
 function helpButton() {
@@ -233,18 +248,8 @@ function helpButton() {
 	stage.update();
 
 	help.addEventListener("click", function(event) {
+		createjs.Sound.play("buttonClick");
 		alert("RANK OF HANDS\n\n1) Royal Flush\n2) Straight Flush\n3) Four of a Kind\n4) Full House\n5) Flush\n6) Straight\n7) Three of a Kind\n8) Two Pair\n9) One Pair\n10) High Card");
-	})
-}
-
-// Will update later
-function optionsButton() {
-	var options = new button(662,575,80,30,"Options","yellow",20);
-	addToGame(options);
-	stage.update();
-
-	options.addEventListener("click", function(event){
-		alert("The options button is still in development.");
 	})
 }
 
@@ -271,6 +276,7 @@ function callButton() {
 	var lastBet;
 
 	call.addEventListener("click", function(event) {
+		createjs.Sound.play("buttonClick");
 		if (currentChips == 0){  // User has 0 chips left
 			amount = 0;
 			currentChips = 0
@@ -301,6 +307,7 @@ function raiseButton(maxChips) {
 	var raise_button = new button(345,475,50,18,"raise", "yellow",10);
 
 	raise_button.addEventListener("click", function(event){
+		createjs.Sound.play("buttonClick");
 		if ((show = game_menu.getChildByName("raise_container"))){
 			raise_button.children[1].text = "raise";
 			game_menu.removeChild(show);
@@ -431,13 +438,13 @@ function againButton() {
 	stage.update();
 
 	again.addEventListener("click", function(event) {
-		
+
 		var card;
 		for(var i = 0; i < 2; i++){
 			card = stage.getChildByName("mainCard");
 			stage.removeChild(card);
 		}
-		
+
 		// Delete all cards
 		for (var i = 0; i < 13; i ++) {
 	  	shape = stage.getChildByName("tableCards");
@@ -455,7 +462,7 @@ function againButton() {
 		deleteItemFromGame(again);
 		socket.emit("ready");
 	})
-	
+
 }
 
 // Produces the background for the game
