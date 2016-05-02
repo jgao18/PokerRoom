@@ -279,12 +279,6 @@ function callButton() {
   var player = getCurrentPlayer();
   var lastBet;
 
-  console.log("totalBet: " + totalBet);
-  console.log("getAmountBet: " + getAmountBet());
-  console.log("playerChips: " + playerChips);
-  console.log("amount: " + amount);
-  console.log("------");
-
   call.addEventListener("click", function(event) {
     createjs.Sound.play("buttonClick");
     if (currentChips == 0) { // User has 0 chips left
@@ -302,10 +296,6 @@ function callButton() {
       removePlayerChips(amount)
       currentChips = getPlayerChips();
     }
-    socket.emit("buttons", {
-      remove: false,
-      action: "call"
-    });
     socket.emit("increase pot", {
       chips: amount,
       amount: lastBet
@@ -318,6 +308,10 @@ function callButton() {
       action: "call",
       user: player,
       amount: totalBet
+    });
+    socket.emit("buttons", {
+      remove: false,
+      action: "call"
     });
   })
 
@@ -394,10 +388,6 @@ function showRaiseContainer(maxChips) {
 
       var currentChips = getPlayerChips() - diffAmount;
       var player = getCurrentPlayer();
-      socket.emit("buttons", {
-        remove: false,
-        action: "raise"
-      });
       socket.emit("changed amount", {
         id: player,
         chips: currentChips
@@ -410,6 +400,10 @@ function showRaiseContainer(maxChips) {
         action: "raise",
         user: player,
         amount: currentBetAmount
+      });
+      socket.emit("buttons", {
+        remove: false,
+        action: "raise"
       });
     });
 
