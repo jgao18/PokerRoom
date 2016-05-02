@@ -57,16 +57,6 @@ module.exports = {
         return "High Card";
         break;
       default:
-        console.log("Something went wrong");
-        console.log("Something went wrong");
-        console.log("Something went wrong");
-        console.log("Something went wrong");
-        console.log("Something went wrong");
-        console.log("Something went wrong");
-        console.log("Something went wrong");
-        console.log("Something went wrong");
-        console.log("Something went wrong");
-        console.log("Something went wrong");
         break;
     }
   },
