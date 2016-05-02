@@ -274,10 +274,16 @@ function callButton() {
   var call = new button(290, 475, 50, 18, "check/call", "yellow", 10);
 
   var totalBet = getTotalBet();
-  var amount;
+  var amount = totalBet - getAmountBet();
   var currentChips;
   var player = getCurrentPlayer();
   var lastBet;
+
+  console.log("totalBet: " + totalBet);
+  console.log("getAmountBet: " + getAmountBet());
+  console.log("playerChips: " + playerChips);
+  console.log("amount: " + amount);
+  console.log("------");
 
   call.addEventListener("click", function(event) {
     createjs.Sound.play("buttonClick");
@@ -291,6 +297,7 @@ function callButton() {
       currentChips = 0;
     } else { // User has enough chips
       lastBet = getLastBetAmount();
+      console.log("getLastBetAmount(): " + lastBet);
       amount = getLastBetAmount() - getLastUserBet();
       removePlayerChips(amount)
       currentChips = getPlayerChips();
