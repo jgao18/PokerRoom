@@ -1,6 +1,5 @@
 // Deck Class -- contains Card objects
-function Deck(sm, font, width, height, strokeColor, strokeThickness, backFillColor, frontFillColor)
-{
+function Deck(sm, font, width, height, strokeColor, strokeThickness, backFillColor, frontFillColor) {
   this.sm = sm || 5.2;
   this.font = font || "30px Impact";
   this.width = width || 50
@@ -22,15 +21,12 @@ function Deck(sm, font, width, height, strokeColor, strokeThickness, backFillCol
 
 }
 
-Deck.prototype.get_new_deck = function()
-{
+Deck.prototype.get_new_deck = function() {
   var i, j;
-  for (i=0; i < this.suits.length; i++)
-  {
-    for (j=0; j < this.values.length; j++)
-    {
+  for (i = 0; i < this.suits.length; i++) {
+    for (j = 0; j < this.values.length; j++) {
       this.currentDeck.push(new Card(this.values[j], this.suits[i], "INVALID_USER", this.sm, this.font, this.width, this.height, this.strokeColor,
-                                      this.strokeThickness, this.backFillColor, this.frontFillColor));
+        this.strokeThickness, this.backFillColor, this.frontFillColor));
     }
   }
 
@@ -39,14 +35,13 @@ Deck.prototype.get_new_deck = function()
   this.communityCards = [];
 }
 
-Deck.prototype.draw_card = function(type)
-{
+Deck.prototype.draw_card = function(type) {
   if (type == "player")
     this.playerCards.push(card);
   else if (type == "community")
     this.communityCards.push(card);
 
-  var cardIndex = Math.floor((Math.random()*this.cardCount));
+  var cardIndex = Math.floor((Math.random() * this.cardCount));
   var card = this.currentDeck[cardIndex];
   this.currentDeck.splice(cardIndex, 1);
   this.cardCount--;
@@ -54,7 +49,6 @@ Deck.prototype.draw_card = function(type)
   return card;
 }
 
-Deck.prototype.card = function()
-{
+Deck.prototype.card = function() {
   return this.currentDeck[0];
 }

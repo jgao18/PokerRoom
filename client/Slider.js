@@ -1,4 +1,4 @@
-// This file was taken directly from EaselJS source code
+// This file was taken directly from EaselJS source code, with some minor changes
 // https://github.com/CreateJS/EaselJS/blob/master/_assets/js/Slider.js
 
 (function() {

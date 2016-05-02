@@ -1,6 +1,5 @@
 // Card Class - used by Deck
-function Card(value, suit, owner, sm, font, width, height, strokeColor, strokeThickness, backFillColor, frontFillColor)
-{
+function Card(value, suit, owner, sm, font, width, height, strokeColor, strokeThickness, backFillColor, frontFillColor) {
   this.value = value;
   this.suit = suit;
   this.owner = owner || "INVALID_USER";
@@ -18,28 +17,23 @@ function Card(value, suit, owner, sm, font, width, height, strokeColor, strokeTh
   this.frontFillColor = frontFillColor;
 }
 
-Card.prototype.get_color = function()
-{
+Card.prototype.get_color = function() {
   return this.color;
 }
 
-Card.prototype.get_suit = function()
-{
+Card.prototype.get_suit = function() {
   return this.suit
 }
 
-Card.prototype.get_value = function()
-{
+Card.prototype.get_value = function() {
   return this.value;
 }
 
-Card.prototype.get_owner = function()
-{
+Card.prototype.get_owner = function() {
   return this.owner;
 }
 
-Card.prototype.set_owner = function(ownerName)
-{
+Card.prototype.set_owner = function(ownerName) {
   this.owner = ownerName;
 }
 
