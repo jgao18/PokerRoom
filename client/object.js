@@ -291,7 +291,6 @@ function callButton() {
       currentChips = 0;
     } else { // User has enough chips
       lastBet = getLastBetAmount();
-      console.log("getLastBetAmount(): " + lastBet);
       amount = getLastBetAmount() - getLastUserBet();
       removePlayerChips(amount)
       currentChips = getPlayerChips();
