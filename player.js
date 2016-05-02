@@ -1,89 +1,79 @@
-var Player = function(id, username, chips, tableIndex, position)
-{
+var Player = function(id, username, chips, tableIndex, position) {
   var username = username || "INVALID_USER"
   var password, statistics;
-  var chips = chips || 0 ;
+  var chips = chips || 0;
   var tableIndex = tableIndex;
   var id;
-  var position = position || 0 ;
+  var position = position || 0;
 
-  var getUsername = function()
-  {
+  var getUsername = function() {
     return username;
   }
 
-  var getPassword = function()
-  {
+  var getPassword = function() {
     return password;
   }
 
-  var getChips = function()
-  {
-    return chips*1;
+  var getChips = function() {
+    return chips * 1;
   }
 
-  var setChips = function(numChips)
-  {
+  var setChips = function(numChips) {
     chips = numChips;
   }
 
   var getId = function() {
-	return id;
+    return id;
   }
 
-  var getTableIndex = function()
-  {
+  var getTableIndex = function() {
     return tableIndex;
   }
 
-  var setUsername = function(user)
-  {
+  var setUsername = function(user) {
     username = user;
   }
 
-  var setPassword = function(pw)
-  {
+  var setPassword = function(pw) {
     password = pw;
   }
 
-  var addChips = function(numChips)
-  {
-    chips = chips*1 + numChips;
+  var addChips = function(numChips) {
+    chips = chips * 1 + numChips;
   }
 
   var deleteChips = function(numChips) {
-	chips = chips*1 - numChips;
+    chips = chips * 1 - numChips;
   }
 
-  var setTableIndex = function(index)
-  {
+  var setTableIndex = function(index) {
     tableIndex = index;
   }
 
   var setPosition = function(num) {
-	 position = num;
+    position = num;
   }
 
   var getPosition = function() {
-     return position;
+    return position;
   }
 
   return {
-		getUsername: getUsername,
-		getPassword: getPassword,
-        getChips: getChips,
-	    setChips: setChips,
-	    getId: getId,
-        getTableIndex: getTableIndex,
-	 	setUsername: setUsername,
-		setPassword: setPassword,
-        addChips: addChips,
-	    deleteChips: deleteChips,
-        setTableIndex: setTableIndex,
-		id: id,
-	    getPosition: getPosition,
-	    setPosition: setPosition
-	}
+    getUsername: getUsername,
+    getPassword: getPassword,
+    getChips: getChips,
+    setChips: setChips,
+    getId: getId,
+    getTableIndex: getTableIndex,
+    setUsername: setUsername,
+    setPassword: setPassword,
+    addChips: addChips,
+    deleteChips: deleteChips,
+    setTableIndex: setTableIndex,
+    id: id,
+    getPosition: getPosition,
+    setPosition: setPosition
+  }
 }
 
 exports.Player = Player;
